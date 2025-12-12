@@ -1,18 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,        // kills all ESLint errors
-  },
-  typescript: {
-    ignoreBuildErrors: true,         // kills all TypeScript errors
-  },
-  images: {
-    unoptimized: true,
-  },
-  transpilePackages: ["@metamask/sdk"], // fixes the React-Native async-storage error
-  experimental: {
-    serverComponentsExternalPackages: ["pino"], // fixes pino-pretty error
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
+  images: { unoptimized: true },
+  webpack: (config) => {
+    // Fix MetaMask SDK React-Native junk
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      "@react-native-async-storage/async-storage": false,
+      "pino-pretty": false,
+    };
+    return config;
   },
 };
 
