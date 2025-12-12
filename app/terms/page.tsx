@@ -43,6 +43,7 @@ export default function TermsPage() {
         Physical items ship within 3 business days of payment confirmation. Tracking is provided.  
         Buyer is responsible for providing a correct shipping address. Lost or undeliverable packages due to incorrect addresses are not eligible for refund.  
         Risk of loss passes to buyer upon delivery to the carrier.
+        Shipping is ONLY to US Customers.
       </p>
 
       <h2>7. Grading Authenticity</h2>
