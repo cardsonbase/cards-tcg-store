@@ -1,4 +1,3 @@
-// app/components/Cart.tsx — FINAL + ZONE-BASED SHIPPING + ONLY 2 FIXES APPLIED
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,7 +13,6 @@ const DECIMALS = 9;
 
 const US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
 
-// Accurate zone calculator from Benton, LA 71006
 const getZoneFromZip = (zip: string): number => {
   const p = zip.slice(0, 3);
   if (["710","711","712","713","714","716","717","718","719","755","756","757","758","759"].includes(p)) return 1;
@@ -43,6 +41,7 @@ export default function Cart({
   const [showSuccess, setShowSuccess] = useState(false);
   const [form, setForm] = useState({ name: "", address: "", city: "", state: "", zip: "" });
   const [calculatedShipping, setCalculatedShipping] = useState<number | null>(null);
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
   const totalBaseUsd = cart.items.reduce((s, i) => s + i.usd * i.quantity, 0);
   const totalWeightOz = cart.items.reduce((s, i) => s + i.weightOz * i.quantity, 0);
@@ -141,41 +140,64 @@ export default function Cart({
     }
   }, [isSuccess, txHash]);
 
-  // SHIPPING FORM — 100% YOUR ORIGINAL
   if (showForm) {
     return (
       <div className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center">
         <div className="bg-gradient-to-br from-[#111] to-black p-12 rounded-3xl border-4 border-yellow-400 w-full max-w-lg shadow-2xl relative">
-          <button onClick={() => setShowForm(false)} className="absolute top-4 right-4 text-yellow-400 text-4xl hover:text-yellow-300">×</button>
+          <button onClick={() => setShowForm(false)} className="absolute top-4 right-4 text-yellow-400 text-4xl hover:text-yellow-300">
+            ×
+          </button>
           <h2 className="text-yellow-400 text-5xl font-black text-center mb-10">SHIPPING ADDRESS</h2>
 
           <label className="text-yellow-400 text-xl font-bold mb-2 block">Name</label>
-          <input placeholder="Enter full name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full p-5 mb-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition" />
+          <input
+            placeholder="Enter full name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="w-full p-5 mb-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
+          />
 
           <label className="text-yellow-400 text-xl font-bold mb-2 block">Street Address</label>
-          <input placeholder="Enter street address" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className="w-full p-5 mb-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition" />
+          <input
+            placeholder="Enter street address"
+            value={form.address}
+            onChange={(e) => setForm({ ...form, address: e.target.value })}
+            className="w-full p-5 mb-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
+          />
 
           <div className="grid grid-cols-2 gap-4 mb-5">
             <div>
               <label className="text-yellow-400 text-xl font-bold mb-2 block">City</label>
-              <input placeholder="City" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="w-full p-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition" />
+              <input
+                placeholder="City"
+                value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })}
+                className="w-full p-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
+              />
             </div>
             <div>
               <label className="text-yellow-400 text-xl font-bold mb-2 block">State (e.g., CA)</label>
-              <input placeholder="State" value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} className="w-full p-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition" />
+              <input
+                placeholder="State"
+                value={form.state}
+                onChange={(e) => setForm({ ...form, state: e.target.value })}
+                className="w-full p-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
+              />
             </div>
           </div>
-<label className="flex items-center gap-2 text-sm">
-  <input type="checkbox" required className="rounded" />
-  I have read and agree to the{" "}
-  <a href="/terms" target="_blank" className="underline">
-    Terms of Service
-  </a>
-</label>
-          <label className="text-yellow-400 text-xl font-bold mb-2 block">ZIP Code</label>
-          <input placeholder="ZIP (5 digits)" value={form.zip} onChange={e => setForm({ ...form, zip: e.target.value })} className="w-full p-5 mb-8 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition" />
 
-          <button onClick={calculateShippingCost} className="w-full bg-yellow-400 hover:bg-yellow-300 text-black py-5 rounded-2xl font-black text-3xl mb-6 transition">
+          <label className="text-yellow-400 text-xl font-bold mb-2 block">ZIP Code</label>
+          <input
+            placeholder="ZIP (5 digits)"
+            value={form.zip}
+            onChange={(e) => setForm({ ...form, zip: e.target.value })}
+            className="w-full p-5 mb-8 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
+          />
+
+          <button
+            onClick={calculateShippingCost}
+            className="w-full bg-yellow-400 hover:bg-yellow-300 text-black py-5 rounded-2xl font-black text-3xl mb-6 transition"
+          >
             GET SHIPPING QUOTE
           </button>
 
@@ -188,27 +210,56 @@ export default function Cart({
             </div>
           )}
 
-          <button
-            onClick={handlePay}
-            disabled={calculatedShipping === null || isPending || !address}
-            className="w-full bg-green-400 hover:bg-green-300 text-black py-7 rounded-2xl font-black text-4xl disabled:opacity-50 transition"
-          >
-            {isPending ? "CONFIRMING..." : "CONFIRM & PAY"}
-          </button>
+          {/* REQUIRED TERMS CHECKBOX + FINAL PAY BUTTON */}
+          <div className="mt-10 space-y-8">
+            <label className="flex items-start gap-4 text-lg text-gray-200">
+              <input
+                type="checkbox"
+                required
+                checked={isTermsAccepted}
+                onChange={(e) => setIsTermsAccepted(e.target.checked)}
+                className="mt-1 h-6 w-6 rounded border-yellow-600 bg-gray-900 text-yellow-400 focus:ring-yellow-400"
+              />
+              <span>
+                I have read and agree to the{" "}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-white">
+                  Terms of Service
+                </a>{" "}
+                and understand all on-chain sales are final.
+              </span>
+            </label>
+
+            <button
+              onClick={handlePay}
+              disabled={calculatedShipping === null || isPending || !isTermsAccepted || !address}
+              className={`w-full py-8 rounded-3xl font-black text-5xl shadow-2xl transition-all ${
+                calculatedShipping !== null && isTermsAccepted && !isPending && address
+                  ? "bg-gradient-to-r from-green-400 to-green-500 hover:from-green-300 hover:to-green-400 text-black"
+                  : "bg-gray-800 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              {isPending ? "CONFIRMING ON BASE..." : "CONFIRM & PAY"}
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // THANK YOU SCREEN — FIXED (removed the stray {)
   if (showSuccess) {
     return (
       <div className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center">
         <div className="bg-gradient-to-br from-[#111] to-black p-16 rounded-3xl border-4 border-yellow-400 text-center shadow-2xl max-w-2xl">
           <div className="text-green-400 text-9xl mb-8">Purchase Complete</div>
           <h2 className="text-yellow-400 text-7xl font-black mb-8">THANK YOU!</h2>
-          <p className="text-white text-3xl mb-12">Your order is confirmed on Base<br />Cards ship in 24–48 hours</p>
-          <button onClick={onClose} className="bg-green-400 hover:bg-green-300 text-black px-24 py-7 rounded-2xl font-black text-4xl shadow-2xl transition">
+          <p className="text-white text-3xl mb-12">
+            Your order is confirmed on Base<br />
+            Cards ship in 24–48 hours
+          </p>
+          <button
+            onClick={onClose}
+            className="bg-green-400 hover:bg-green-300 text-black px-24 py-7 rounded-2xl font-black text-4xl shadow-2xl transition"
+          >
             BACK TO STORE
           </button>
         </div>
@@ -216,10 +267,12 @@ export default function Cart({
     );
   }
 
-  // MAIN CART — FIXED duplicated justify-center
   return (
     <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-gradient-to-br from-[#0a0a0a] to-black rounded-3xl border-4 border-yellow-400 w-full max-w-2xl max-h-[92vh] overflow-y-auto p-10 shadow-2xl" onClick={e => e.stopPropagation()}>
+      <div
+        className="bg-gradient-to-br from-[#0a0a0a] to-black rounded-3xl border-4 border-yellow-400 w-full max-w-2xl max-h-[92vh] overflow-y-auto p-10 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2 className="text-center text-yellow-400 text-6xl font-black mb-12 tracking-wider">
           YOUR CART ({totalItems})
         </h2>
@@ -267,14 +320,14 @@ export default function Cart({
         })}
 
         <div className="border-t-4 border-yellow-500/60 pt-10 text-center">
-          <p className="text-gray-400 text-2xl mb-4">Items Total: <span className="text-yellow-400 font-bold">${totalBaseUsd.toFixed(2)}</span></p>
-          <p className="text-gray-400 text-2xl mb-8">Shipping (US Only): <span className="text-yellow-400 font-bold">Calculated Next</span></p>
-          <p className="text-yellow-400 text-6xl font-black mb-4">
-            TOTAL: ${totalUsd.toFixed(2)}
+          <p className="text-gray-400 text-2xl mb-4">
+            Items Total: <span className="text-yellow-400 font-bold">${totalBaseUsd.toFixed(2)}</span>
           </p>
-          <p className="text-green-400 text-4xl font-black">
-            ≈ {amount.toLocaleString()} $CARDS
+          <p className="text-gray-400 text-2xl mb-8">
+            Shipping (US Only): <span className="text-yellow-400 font-bold">Calculated Next</span>
           </p>
+          <p className="text-yellow-400 text-6xl font-black mb-4">TOTAL: ${totalUsd.toFixed(2)}</p>
+          <p className="text-green-400 text-4xl font-black">≈ {amount.toLocaleString()} $CARDS</p>
         </div>
 
         <div className="grid grid-cols-2 gap-8 mt-16">
