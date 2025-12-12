@@ -139,7 +139,159 @@ export default function Home() {
 
       {/* Main Page */}
       <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #000 0%, #111 100%)", color: "#fff", fontFamily: "Inter, sans-serif" }}>
-        {/* Remove the header from here — it's in ClientLayout now */}
+        <header style={{ padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #333" }}>
+          {/* LOGO — PERFECT, NO STRETCH, CRISP */}
+          <div className="flex items-center h-20">
+            <img
+              src="/logo.png"
+              alt="$CARDS"
+              className="h-full w-auto max-w-none"
+              style={{ objectFit: "contain" }}
+            />
+          </div>
+
+          {/* CENTER: TITLE + PRICE + TREASURY — NOW PERFECTLY ALIGNED WITH THE REST OF THE SITE */}
+         <div style={{ textAlign: "center", flex: 1, paddingRight: "50px" }}>
+         <h1 style={{ 
+         fontSize: "48px", 
+         fontWeight: "bold", 
+         background: "linear-gradient(90deg, #ffd700, #ffed4e)", 
+         WebkitBackgroundClip: "text", 
+         WebkitTextFillColor: "transparent",
+         margin: "0 0 24px 0",
+         fontFamily: "'Cinzel', serif"
+         }}>
+         $CARDS TCG STORE
+        </h1>
+  <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live $CARDS Price</p>
+  <p style={{ 
+    fontSize: "32px", 
+    fontWeight: "bold", 
+    background: "linear-gradient(90deg, #ffd700, #00ff9d)", 
+    WebkitBackgroundClip: "text", 
+    WebkitTextFillColor: "transparent",
+    animation: "glow 2s ease-in-out infinite alternate",
+    textShadow: "0 0 15px rgba(255,215,0,0.4)"
+  }}>
+    ${price.toFixed(7)}
+  </p>
+  <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live Treasury Balance</p>
+  <p style={{ 
+    fontSize: "28px", 
+    fontWeight: "bold", 
+    background: "linear-gradient(90deg, #ffd700, #00ff9d)", 
+    WebkitBackgroundClip: "text", 
+    WebkitTextFillColor: "transparent",
+    animation: "glow 2s ease-in-out infinite alternate",
+    textShadow: "0 0 15px rgba(255,215,0,0.4)"
+  }}>
+    {treasuryEth.toFixed(4)} ETH
+  </p>
+</div>
+
+          {/* X LINK + DEXTOOLS + FARCASTER + BASESCAN + WALLET */}
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+            <a
+              href="https://x.com/cardsonbaseHQ"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "48px",
+                height: "48px",
+                background: "rgba(255,215,0,0.1)",
+                border: "2px solid #ffd700",
+                borderRadius: "50%",
+                transition: "all 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+            >
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="#ffd700">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 16.123h1.764L6.11 5.127H4.246z" />
+              </svg>
+            </a>
+
+            <a
+              href="https://www.dextools.io/app/en/token/cardsonbase?t=1765004739445"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "48px",
+                height: "48px",
+                background: "rgba(255,215,0,0.1)",
+                border: "2px solid #ffd700",
+                borderRadius: "50%",
+                transition: "all 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+            >
+              <img
+                src="/dextools.png"
+                alt="Dextools"
+                style={{ width: "32px", height: "32px", objectFit: "contain" }}
+              />
+            </a>
+
+            <a
+              href="https://farcaster.xyz/cardsonbase"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "48px",
+                height: "48px",
+                background: "rgba(255,215,0,0.1)",
+                border: "2px solid #ffd700",
+                borderRadius: "50%",
+                transition: "all 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+            >
+              <img
+                src="/farcaster.png"
+                alt="Farcaster"
+                style={{ width: "32px", height: "32px", objectFit: "contain" }}
+              />
+            </a>
+
+            <a
+              href="https://basescan.org/token/0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "48px",
+                height: "48px",
+                background: "rgba(255,215,0,0.1)",
+                border: "2px solid #ffd700",
+                borderRadius: "50%",
+                transition: "all 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+            >
+              <img
+                src="/basescan.svg"
+                alt="Basescan"
+                style={{ width: "32px", height: "32px", objectFit: "contain" }}
+              />
+            </a>
+
+            <ConnectWalletClient />
+          </div>
+        </header>
 
         {/* Fiat On-Ramp and Swap Section — Integrated, Centered, No Different BG */}
         <div style={{ textAlign: "center", margin: "40px 0" }}>
@@ -166,7 +318,7 @@ export default function Home() {
               onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
             >
-              <img
+              <img 
                 src="/coinbase.png" 
                 alt="Coinbase" 
                 style={{ height: "32px", width: "auto" }} 
@@ -232,7 +384,7 @@ export default function Home() {
                 background: "#ffd700",
                 color: "#000",
                 padding: "16px 32px",
-                borderRadius: "12px",
+                borderRadius: "24px",
                 fontWeight: "bold",
                 fontSize: "22px",
                 boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
@@ -268,7 +420,15 @@ export default function Home() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            style={{ padding: "14px", width: "340px", background: "#111", border: "1px solid #444", borderRadius: "12px", color: "#fff", fontSize: "18px" }}
+            style={{
+              padding: "14px",
+              width: "340px",
+              background: "#111",
+              border: "1px solid #444",
+              borderRadius: "12px",
+              color: "#fff",
+              fontSize: "18px",
+            }}
           >
             <option value="all">All Categories</option>
             <option value="avatar">Avatar:The Last Airbender</option>
@@ -516,6 +676,7 @@ export default function Home() {
               maxHeight: "90vh",
               overflowY: "auto",
               position: "relative",
+              color: "#fff",
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -533,7 +694,7 @@ export default function Home() {
   padding: "40px 20px 20px", 
   color: "#888", 
   fontSize: "14px", 
-  maxWidth: "800px",
+  maxWidth: "800px", 
   margin: "0 auto",
   lineHeight: "1.6"
 }}>
@@ -549,7 +710,7 @@ export default function Home() {
   <p style={{ margin: "8px 0" }}>
     DM → <a href="https://x.com/cardsonbaseHQ" target="_blank" style={{ color: "#ffd700", textDecoration: "underline" }}>@cardsonbaseHQ</a>
     <br />
-    Email → <a href="mailto:cardsonbasehq@gmail.com" style={{ color: "#ffd700", textDecoration: "underline" }}>cardsonbasehq@gmail.com</a>
+    Email → <a href="mailto:cardsonbaseHQ@gmail.com" style={{ color: "#ffd700", textDecoration: "underline" }}>cardsonbaseHQ@gmail.com</a>
   </p>
   <p style={{ margin: "12px 0 0", fontSize: "13px", color: "#666" }}>
     We ship thousands of cards. We know what we’re doing. You’re in good hands.

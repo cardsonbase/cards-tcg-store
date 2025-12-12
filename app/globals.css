@@ -1,40 +1,35 @@
-/* app/globals.css — FINAL, 100% WORKING */
+/* app/globals.css — FINAL WORKING (NO TAILWIND, NO ERRORS) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
-*,
-*::before,
-*::after {
+* {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
-html,
-body {
+html, body {
+  margin: 0;
+  padding: 0;
   height: 100%;
   font-family: 'Inter', sans-serif;
   background: linear-gradient(135deg, #000 0%, #111 100%);
   color: #fff;
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Gold glow animation for price/treasury */
+/* Gold glow animation for price */
 @keyframes glow {
-  from {
+  from { 
     text-shadow: 0 0 10px #ffd700, 0 0 20px #12c0f0;
   }
-  to {
+  to { 
     text-shadow: 0 0 20px #ffd700, 0 0 30px #0cc6f4;
   }
 }
 
 .glow-price {
-  animation: glow 3s ease-in-out infinite alternate;
+  animation: glow 3s ease-in-out infinite;
 }
 
-/* Pulse for loading states */
+/* Pulse for loading */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
@@ -42,22 +37,4 @@ body {
 
 .animate-pulse {
   animation: pulse 2s ease-in-out infinite;
-}
-
-/* Mobile fixes */
-@media (max-width: 768px) {
-  html {
-    font-size: 14px;
-  }
-}
-
-/* Ensure fixed elements don’t get cut off */
-main {
-  padding-top: 180px;     /* space for your fixed header */
-  padding-bottom: 100px;  /* space for footer */
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
 }
