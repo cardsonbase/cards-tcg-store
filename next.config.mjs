@@ -1,6 +1,7 @@
 // next.config.mjs
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Ignore ESLint/TS errors during build (as you had)
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
   images: { 
@@ -19,11 +20,9 @@ const nextConfig = {
     ],
   },
 
-  // Force Webpack for production builds (skips Turbopack bugs with WalletConnect)
+  // Force Webpack for builds (disables Turbopack globally — fixes thread-stream errors)
   experimental: {
-    turbo: {
-      loaders: false,  // Disables Turbopack loaders that cause test file errors
-    },
+    turbopack: false,  // Official way to disable (Next.js 16 docs)
   },
 
   webpack: (config) => {
@@ -34,11 +33,11 @@ const nextConfig = {
       "@react-native-async-storage/async-storage": false,
     };
 
-    // Ignore WalletConnect test files (fixes thread-stream/tap/desm errors)
+    // Ignore WalletConnect/Pino test files (null-loader skips them)
     config.module.rules.push({
       test: /\.(test|bench|spec)\.(js|ts|mjs)$/,
       include: /node_modules/,
-      loader: 'ignore-loader',
+      use: 'null-loader',
     });
 
     return config;
