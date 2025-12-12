@@ -35,6 +35,12 @@ export default function RootLayout({
       </head>
       <body>
         <ClientLayout>{children}</ClientLayout>
+
+        <footer className="text-center py-8 text-sm opacity-70">
+          <a href="/terms" className="underline hover:opacity-100">
+            Terms of Service
+          </a>
+        </footer>
       </body>
     </html>
   );

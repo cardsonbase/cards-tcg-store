@@ -165,7 +165,13 @@ export default function Cart({
               <input placeholder="State" value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} className="w-full p-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition" />
             </div>
           </div>
-
+<label className="flex items-center gap-2 text-sm">
+  <input type="checkbox" required className="rounded" />
+  I have read and agree to the{" "}
+  <a href="/terms" target="_blank" className="underline">
+    Terms of Service
+  </a>
+</label>
           <label className="text-yellow-400 text-xl font-bold mb-2 block">ZIP Code</label>
           <input placeholder="ZIP (5 digits)" value={form.zip} onChange={e => setForm({ ...form, zip: e.target.value })} className="w-full p-5 mb-8 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition" />
 
