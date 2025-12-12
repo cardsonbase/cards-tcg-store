@@ -699,7 +699,7 @@ export default function Home() {
   lineHeight: "1.6"
 }}>
   <p style={{ margin: "10px 0" }}>
-    All physical cards ship from the USA via USPS with tracking · 3–10 business days
+    Currently ships only within the United States via USPS with tracking (3–10 business days). International shipping coming soon.
   </p>
   <p style={{ margin: "10px 0" }}>
     Lost or damaged in transit? Send us a photo of the damage + your transaction hash and we’ll reship or refund within 24 hours.
