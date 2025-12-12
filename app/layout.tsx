@@ -10,7 +10,6 @@ export const metadata = {
     description: "The first On-Chain RWA TCG collectibles store",
     images: ["/og.png"],
     url: "https://cards-on-base.vercel.app",        // ← change to your real domain later
-    type: "website",
   },
   twitter: {
     card: "summary_large_image",
