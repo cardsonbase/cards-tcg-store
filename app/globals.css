@@ -94,29 +94,3 @@ html, body {
   }
 }
 
-/* Gold theme for wallet buttons */
-.mobile-connect-btn .wallet-button,
-.connect-wallet-btn .wallet-button,
-.connect-wallet-btn button {
-  background: #ffd700 !important;
-  color: #000 !important;
-  padding: 12px 24px !important;
-  border-radius: 16px !important;
-  font-weight: bold !important;
-  font-size: 18px !important;
-  box-shadow: 0 4px 20px rgba(255,215,0,0.4) !important;
-  border: none !important;
-}
-
-.mobile-connect-btn .wallet-button:hover,
-.connect-wallet-btn .wallet-button:hover,
-.connect-wallet-btn button:hover {
-  transform: scale(1.05) !important;
-  transition: transform 0.2s !important;
-}
-
-/* Ensure Wallet component buttons inherit the theme */
-[data-onchainkit-wallet] button {
-  background: #ffd700 !important;
-  color: #000 !important;
-}

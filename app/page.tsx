@@ -288,12 +288,7 @@ export default function Home() {
                 style={{ width: "32px", height: "32px", objectFit: "contain" }}
               />
             </a>
-{/* New to Crypto hint - mobile only */}
-<div className="block sm:hidden text-center mb-3 px-4">
-  <span style={{ fontSize: "14px", color: "#aaa" }}>
-    New? → Just choose "Coinbase Wallet" when connecting
-  </span>
-</div>
+
             <ConnectWalletClient />
           </div>
         </header>
