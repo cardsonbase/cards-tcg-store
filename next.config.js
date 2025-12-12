@@ -1,0 +1,20 @@
+// next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.imgur.com",     // ← this is the real host
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "imgur.com",       // ← fallback for old links
+        pathname: "/**",
+      },
+    ],
+  },
+};
+
+module.exports = nextConfig;
