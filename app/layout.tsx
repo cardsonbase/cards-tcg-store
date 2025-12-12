@@ -38,14 +38,10 @@ export default function RootLayout({
 
         {/* Footer now visible on every page */}
         <footer className="border-t border-gray-800 mt-16 py-8 text-center text-sm text-gray-500">
-          <a href="/terms" className="underline hover:text-white">
-            Terms of Service
-          </a>
-          {" • "}
-          <a href="/privacy" className="underline hover:text-white">
-            Privacy Policy
-          </a>
-        </footer>
+  <a href="/terms" className="underline hover:text-white">Terms of Service</a>
+  {" • "}
+  <a href="/privacy" className="underline hover:text-white">Privacy Policy</a>
+</footer>
       </body>
     </html>
   );
