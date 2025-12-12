@@ -651,84 +651,170 @@ export default function Home() {
         </div>
       )}
 
-      {/* HOW TO BUY MODAL */}
+            {/* HOW TO BUY GUIDE – ZERO-KNOWLEDGE ONBOARDING */}
       {showHowToBuy && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          background: "rgba(0,0,0,0.9)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1000,
-        }} onClick={() => setShowHowToBuy(false)}>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.95)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "20px",
+          }}
+          onClick={() => setShowHowToBuy(false)}
+        >
           <div
             style={{
               background: "#111",
               border: "3px solid #ffd700",
               borderRadius: "24px",
               padding: "40px",
-              maxWidth: "600px",
-              width: "90%",
-              maxHeight: "90vh",
+              maxWidth: "620px",
+              width: "100%",
+              maxHeight: "95vh",
               overflowY: "auto",
-              position: "relative",
               color: "#fff",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 style={{ textAlign: "center", color: "#ffd700", marginBottom: "20px" }}>How to Buy on $CARDS TCG Store</h2>
-            <ol style={{ listStyleType: "decimal", paddingLeft: "20px", fontSize: "18px", lineHeight: "1.6" }}>
-              <li>Connect your wallet using the button in the top right corner.</li>
-              <li>If you need Base ETH, click one of the "Buy Base ETH" buttons (Coinbase, Ramp, or MoonPay) to purchase with your card. The ETH will arrive directly on Base chain.</li>
-              <li>Swap your Base ETH for $CARDS using the "Trade $CARDS on Uniswap" button. The widget is pre-set to Base.</li>
-              <li>Browse categories or search for TCG items, then click "Add to Cart" on your favorites.</li>
-              <li>Click the floating gold cart button (bottom right) to review your items, enter shipping details, and complete the on-chain checkout with $CARDS.</li>
+            <h2
+              style={{
+                textAlign: "center",
+                color: "#ffd700",
+                fontSize: "32px",
+                marginBottom: "24px",
+              }}
+            >
+              How to Buy in 4 Simple Steps (Even if You’ve Never Touched Crypto)
+            </h2>
+
+            <ol style={{ fontSize: "19px", lineHeight: "1.8", paddingLeft: "24px" }}>
+              <li style={{ marginBottom: "20px" }}>
+                <strong>1. Get a Base wallet (30 seconds)</strong>
+                <br />
+                Tap the yellow “Connect Wallet” button → choose <strong>Coinbase Wallet</strong> or <strong>WalletConnect</strong> → it creates your wallet instantly (download Coinbase Wallet app if needed).
+                <br />
+                <span style={{ color: "#ffd700", fontSize: "16px" }}>
+                  No seed phrase needed first time — Base made it Apple-Pay easy.
+                </span>
+              </li>
+
+              <li style={{ marginBottom: "20px" }}>
+                <strong>2. Fund your wallet with Base ETH</strong>
+                <br />
+                Easiest ways (all take under 2 minutes):
+                <br />• Tap <strong>Coinbase</strong> button → buy with Apple Pay / card (lands directly on Base)
+                <br />• Tap <strong>Ramp</strong> or <strong>MoonPay</strong> → buy with card, arrives instantly
+                <br />• Already have ETH elsewhere? Bridge it at{" "}
+                <a
+                  href="https://bridge.base.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#00ff9d" }}
+                >
+                  bridge.base.org
+                </a>
+              </li>
+
+              <li style={{ marginBottom: "20px" }}>
+                <strong>3. Swap ETH → $CARDS</strong>
+                <br />
+                Tap the big gold “Trade $CARDS on Uniswap” button → widget opens right here → swap → done.
+                <br />
+                <span style={{ color: "#ffd700" }}>You never have to leave the site.</span>
+              </li>
+
+              <li style={{ marginBottom: "20px" }}>
+                <strong>4. Shop & checkout</strong>
+                <br />
+                Add cards to cart → tap floating gold cart → approve $CARDS → enter shipping → done!
+                <br />
+                We ship in 24–48h with USPS tracking.
+              </li>
             </ol>
-            {/* SHIPPING & SUPPORT DISCLAIMER — FINAL, SCAM-PROOF VERSION */}
-<div style={{ 
-  textAlign: "center", 
-  padding: "40px 20px 20px", 
-  color: "#888", 
-  fontSize: "14px", 
-  maxWidth: "800px", 
-  margin: "0 auto",
-  lineHeight: "1.6"
-}}>
-  <p style={{ margin: "10px 0" }}>
-    Currently ships only within the United States via USPS with tracking (3–10 business days). International shipping coming soon.
-  </p>
-  <p style={{ margin: "10px 0" }}>
-    Lost or damaged in transit? Send us a photo of the damage + your transaction hash and we’ll reship or refund within 24 hours.
-  </p>
-  <p style={{ margin: "16px 0 8px 0", fontWeight: "600", color: "#ffd700" }}>
-    Need help?
-  </p>
-  <p style={{ margin: "8px 0" }}>
-    DM → <a href="https://x.com/cardsonbaseHQ" target="_blank" style={{ color: "#ffd700", textDecoration: "underline" }}>@cardsonbaseHQ</a>
-    <br />
-    Email → <a href="mailto:cardsonbaseHQ@gmail.com" style={{ color: "#ffd700", textDecoration: "underline" }}>cardsonbaseHQ@gmail.com</a>
-  </p>
-  <p style={{ margin: "12px 0 0", fontSize: "13px", color: "#666" }}>
-    We ship thousands of cards. We know what we’re doing. You’re in good hands.
-  </p>
-</div>
+
+            <div
+              style={{
+                textAlign: "center",
+                margin: "30px 0",
+                padding: "20px",
+                background: "rgba(255,215,0,0.1)",
+                borderRadius: "16px",
+                border: "1px dashed #ffd700",
+              }}
+            >
+              <p style={{ fontSize: "18px", margin: "0 0 12px 0" }}>
+                <strong>Pro tip for absolute beginners:</strong>
+                <br />
+                Choose <strong>Coinbase Wallet</strong> → tap the <strong>Coinbase</strong> buy button → pay with Apple Pay → you now have a wallet + Base ETH in under 60 seconds.
+              </p>
+            </div>
+
+            {/* SHIPPING & SUPPORT */}
+            <div
+              style={{
+                textAlign: "center",
+                padding: "40px 20px 20px",
+                color: "#888",
+                fontSize: "14px",
+                lineHeight: "1.6",
+              }}
+            >
+              <p style={{ margin: "10px 0" }}>
+                Currently ships only within the United States via USPS with tracking (3–10 business days). International coming soon.
+              </p>
+              <p style={{ margin: "10px 0" }}>
+                Lost or damaged? Send photo + tx hash → we reship or refund in 24h.
+              </p>
+              <p style={{ margin: "16px 0 8px 0", fontWeight: "600", color: "#ffd700" }}>
+                Need help?
+              </p>
+              <p style={{ margin: "8px 0" }}>
+                DM →{" "}
+                <a
+                  href="https://x.com/cardsonbaseHQ"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#ffd700", textDecoration: "underline" }}
+                >
+                  @cardsonbaseHQ
+                </a>
+                <br />
+                Email →{" "}
+                <a
+                  href="mailto:cardsonbaseHQ@gmail.com"
+                  style={{ color: "#ffd700", textDecoration: "underline" }}
+                >
+                  cardsonbaseHQ@gmail.com
+                </a>
+              </p>
+              <p style={{ marginTop: "12px", fontSize: "13px", color: "#666" }}>
+                We ship thousands of cards. You’re in good hands.
+              </p>
+            </div>
+
             <button
               onClick={() => setShowHowToBuy(false)}
               style={{
                 display: "block",
-                margin: "20px auto 0",
+                margin: "30px auto 0",
                 background: "#ffd700",
                 color: "#000",
-                padding: "12px 24px",
-                borderRadius: "12px",
+                padding: "14px 32px",
+                borderRadius: "16px",
                 fontWeight: "bold",
+                fontSize: "18px",
+                border: "none",
+                cursor: "pointer",
               }}
             >
-              Close
+              Got it – Let’s Shop!
             </button>
           </div>
         </div>
