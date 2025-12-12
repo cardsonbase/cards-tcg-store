@@ -64,7 +64,7 @@ export default function TermsPage() {
 
       <h2>10. Governing Law</h2>
       <p>
-        These terms are governed by the laws of the United States and the State of [Your State]. Any disputes shall be resolved in the courts of [Your County/State].
+        These terms are governed by the laws of the United States and the State of Louisana. Any disputes shall be resolved in the courts of The United States/Lousiana.
       </p>
 
       <h2>11. Changes to Terms</h2>
