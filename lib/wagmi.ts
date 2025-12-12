@@ -1,10 +1,15 @@
-// lib/wagmi.ts — 100% WORKING FOR NEXT.JS 14 + WAGMI 2 + BASE
-import { createConfig, http } from "wagmi";
-import { base } from "wagmi/chains";
+// lib/wagmi.ts — Clean v2 Setup (No Manual Wallet Config)
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { base } from 'wagmi/chains';
 
-export const wagmiConfig = createConfig({
-  chains: [base],                     // ← THIS WAS MISSING THE ]
-  transports: {
-    [base.id]: http(),
-  },
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
+
+if (!projectId) {
+  throw new Error('You need to add NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID to .env.local');
+}
+
+export const wagmiConfig = getDefaultConfig({
+  appName: '$CARDS TCG Store',
+  projectId,
+  chains: [base],
 });

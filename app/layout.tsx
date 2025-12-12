@@ -2,6 +2,7 @@
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { Metadata } from "next";
+import { Providers } from "./providers";          // ← our new RainbowKit + wagmi wrapper
 
 export const metadata: Metadata = {
   title: "$CARDS TCG Store",
@@ -34,14 +35,15 @@ export default function RootLayout({
         <meta name="base:app_id" content="6939fa888a7c4e55fec73d3e" />
       </head>
       <body>
-        <ClientLayout>{children}</ClientLayout>
+        <Providers>                                 {/* ← THIS IS THE ONLY NEW LINE */}
+          <ClientLayout>{children}</ClientLayout>
 
-        {/* Footer now visible on every page */}
-        <footer className="border-t border-gray-800 mt-16 py-8 text-center text-sm text-gray-500">
-  <a href="/terms" className="underline hover:text-white">Terms of Service</a>
-  {" • "}
-  <a href="/privacy" className="underline hover:text-white">Privacy Policy</a>
-</footer>
+          <footer className="border-t border-gray-800 mt-16 py-8 text-center text-sm text-gray-500">
+            <a href="/terms" className="underline hover:text-white">Terms of Service</a>
+            {" • "}
+            <a href="/privacy" className="underline hover:text-white">Privacy Policy</a>
+          </footer>
+        </Providers>
       </body>
     </html>
   );

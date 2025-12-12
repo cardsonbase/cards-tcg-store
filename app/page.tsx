@@ -8,9 +8,6 @@ import Cart from "./components/Cart";
 import { db } from "@/lib/firebase";
 import { ref, onValue } from "firebase/database";
 import { useCart } from "@/lib/cart";
-import { base } from 'wagmi/chains';
-import { OnchainKitProvider } from '@coinbase/onchainkit';
-import '@coinbase/onchainkit/styles.css';
 
 export default function Home() {
   const [price, setPrice] = useState(0.00005);
@@ -111,7 +108,7 @@ export default function Home() {
   const cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <OnchainKitProvider apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY || ''} chain={base}>
+
       <>
         {/* Floating Gold Cart Button */}
         {cartCount > 0 && (
@@ -813,6 +810,6 @@ export default function Home() {
           </div>
         )}
       </>
-    </OnchainKitProvider>
+    
   );
 }
