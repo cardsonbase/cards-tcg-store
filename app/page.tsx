@@ -4,7 +4,6 @@
 import ConnectWalletClient from "./components/ConnectWalletClient";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useAccount, useDisconnect } from "wagmi";
 import Cart from "./components/Cart";
 import { db } from "@/lib/firebase";
 import { ref, onValue } from "firebase/database";
@@ -19,8 +18,6 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "slabs" | "boosters">("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const { address } = useAccount();
-  const { disconnect } = useDisconnect();
   const cart = useCart();
   const [showCart, setShowCart] = useState(false);
   const [showSwapModal, setShowSwapModal] = useState(false);

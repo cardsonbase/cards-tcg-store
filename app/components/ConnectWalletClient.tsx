@@ -1,26 +1,21 @@
-// app/components/ConnectWalletClient.tsx — FIXED: only shows Disconnect when actually connected
+// app/components/ConnectWalletClient.tsx
 "use client";
 
-import { useEffect, useState } from "react";
 import { ConnectWallet } from "@coinbase/onchainkit/wallet";
 import { useAccount, useDisconnect } from "wagmi";
+import { useEffect, useState } from "react";
 
 export default function ConnectWalletClient() {
-  const [mounted, setMounted] = useState(false);
-  const { address, isConnected } = useAccount(); // ← use isConnected, not just address
+  const [isMounted, setIsMounted] = useState(false);
+  const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-  if (!mounted) {
-    return (
-      <div className="w-48 h-16 bg-gray-800 rounded-2xl flex items-center justify-center animate-pulse">
-        <span className="text-gray-500 text-sm">Loading...</span>
-      </div>
-    );
-  }
+  if (!isMounted) return null; // prevents hydration issues
 
-  // Only show Disconnect button if wallet is ACTUALLY connected right now
   if (isConnected && address) {
     return (
       <button
@@ -32,6 +27,6 @@ export default function ConnectWalletClient() {
     );
   }
 
-  // Otherwise show the beautiful OnchainKit Connect button
+  // This is the magic — pure OnchainKit component, no extra wrappers
   return <ConnectWallet />;
 }
