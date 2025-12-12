@@ -1,8 +1,6 @@
 // next.config.mjs
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Ignore ESLint/TS errors during build (as you had)
-  eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
   images: { 
     unoptimized: true,
@@ -20,20 +18,18 @@ const nextConfig = {
     ],
   },
 
-  // Force Webpack for builds (disables Turbopack globally — fixes thread-stream errors)
-  experimental: {
-    turbopack: false,  // Official way to disable (Next.js 16 docs)
-  },
+  // Stable Turbopack config (empty = default; no experimental needed in v16)
+  turbopack: {},
 
   webpack: (config) => {
-    // Silence pino-pretty fallback (from your dev script)
+    // Silence pino-pretty fallback
     config.resolve.fallback = {
       ...config.resolve.fallback,
       "pino-pretty": false,
       "@react-native-async-storage/async-storage": false,
     };
 
-    // Ignore WalletConnect/Pino test files (null-loader skips them)
+    // Ignore WalletConnect test files (fixes thread-stream/tap/desm)
     config.module.rules.push({
       test: /\.(test|bench|spec)\.(js|ts|mjs)$/,
       include: /node_modules/,
