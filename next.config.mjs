@@ -1,22 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,   // this kills ESLint completely
-  },
-  typescript: {
-    ignoreBuildErrors: true,    // this kills TypeScript errors completely
-  },
-  swcMinify: true,
-  images: {
-    unoptimized: true,
-  },
-  // Fix the two module warnings so they don’t even show up
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
+  images: { unoptimized: true },
   webpack: (config) => {
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      "pino-pretty": false,
-      "@react-native-async-storage/async-storage": false,
-    };
+    config.resolve.fallback ||= {};
+    config.resolve.fallback["pino-pretty"] = false;
+    config.resolve.fallback["@react-native-async-storage/async-storage"] = false;
     return config;
   },
 };
