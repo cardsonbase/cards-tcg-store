@@ -4,9 +4,11 @@ const nextConfig = {
   typescript: { ignoreBuildErrors: true },
   images: { unoptimized: true },
   webpack: (config) => {
-    config.resolve.fallback ||= {};
-    config.resolve.fallback["pino-pretty"] = false;
-    config.resolve.fallback["@react-native-async-storage/async-storage"] = false;
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      "pino-pretty": false,
+      "@react-native-async-storage/async-storage": false,
+    };
     return config;
   },
 };
