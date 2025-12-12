@@ -139,7 +139,7 @@ export default function Home() {
 
       {/* Main Page */}
       <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #000 0%, #111 100%)", color: "#fff", fontFamily: "Inter, sans-serif" }}>
-        <header style={{ padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #333" }}>
+        <header className="header" style={{ padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #333" }}>
           {/* LOGO — PERFECT, NO STRETCH, CRISP */}
           <div className="flex items-center h-20">
             <img
@@ -151,7 +151,7 @@ export default function Home() {
           </div>
 
           {/* CENTER: TITLE + PRICE + TREASURY — NOW PERFECTLY ALIGNED WITH THE REST OF THE SITE */}
-         <div style={{ textAlign: "center", flex: 1, paddingRight: "50px" }}>
+         <div className="header-center" style={{ textAlign: "center", flex: 1, paddingRight: "50px" }}>
          <h1 style={{ 
          fontSize: "48px", 
          fontWeight: "bold", 
@@ -190,7 +190,7 @@ export default function Home() {
 </div>
 
           {/* X LINK + DEXTOOLS + FARCASTER + BASESCAN + WALLET */}
-          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <div className="header-right" style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <a
               href="https://x.com/cardsonbaseHQ"
               target="_blank"
