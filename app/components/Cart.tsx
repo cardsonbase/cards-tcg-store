@@ -39,7 +39,7 @@ export default function Cart({
 
   const [showForm, setShowForm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [form, setForm] = useState({ name: "", address: "", city: "", state: "", zip: "" });
+  const [form, setForm] = useState({ name: "", email: "", address: "", city: "", state: "", zip: "" });
   const [calculatedShipping, setCalculatedShipping] = useState<number | null>(null);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
@@ -118,21 +118,22 @@ export default function Cart({
       });
 
       fetch("/api/send-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          address: form.address,
-          city: form.city,
-          state: form.state,
-          zip: form.zip,
-          items: cart.items,
-          amount,
-          totalUsd,
-          shipping,
-          txHash,
-        }),
-      });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    name: form.name,
+    email: form.email,           // ← ADD THIS LINE
+    address: form.address,
+    city: form.city,
+    state: form.state,
+    zip: form.zip,
+    items: cart.items,
+    amount,
+    totalUsd,
+    shipping,
+    txHash,
+  }),
+});
 
       cart.clear();
       setShowForm(false);
@@ -193,6 +194,16 @@ export default function Cart({
             onChange={(e) => setForm({ ...form, zip: e.target.value })}
             className="w-full p-5 mb-8 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
           />
+
+          <label className="text-yellow-400 text-xl font-bold mb-2 block">Email (for receipt)</label>
+<input
+  type="email"
+  required
+  placeholder="you@gmail.com"
+  value={form.email || ""}
+  onChange={(e) => setForm({ ...form, email: e.target.value })}
+  className="w-full p-5 mb-8 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
+/>
 
           <button
             onClick={calculateShippingCost}

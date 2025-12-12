@@ -1,4 +1,4 @@
-// app/api/send-email/route.ts — 100% WORKING
+// app/api/send-email/route.ts — FINAL VERSION (sends to buyer + you)
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
@@ -10,46 +10,93 @@ export async function POST(request: Request) {
     console.log("Email payload:", body);
 
     const {
-      name = "Unknown",
+      name = "Valued Customer",
+      email = "", // ← NEW: buyer's email
       address = "",
       city = "",
       state = "",
       zip = "",
-      isInternational = false,
       items,
-      productName,
-      quantity = 1,
       amount,
       totalUsd,
-      shipping,
+      shipping = 0,
       txHash,
     } = body;
 
+    // Build item list
     const itemList = Array.isArray(items)
-      ? items.map((i: any) => `${i.quantity} × ${i.name}`).join("\n")
-      : `${quantity} × ${productName || "Item"}`;
+      ? items.map((i: any) => `• ${i.quantity} × ${i.name}`).join("\n")
+      : "Custom Order";
 
-    await resend.emails.send({
-      from: "CARDS Store <orders@cardsonbase.com>",
-      to: "cardsonbasehq@gmail.com",
-      subject: `NEW ORDER • $${totalUsd} • ${amount.toLocaleString()} $CARDS`,
-      text: `
-NEW ORDER!
+    const buyerEmail = email.trim();
+    const hasBuyerEmail = buyerEmail && buyerEmail.includes("@");
 
-Items:
-${itemList}
+    // HTML receipt (beautiful + mobile-friendly)
+    const htmlReceipt = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #0a0a0a; color: #fff; border: 3px solid #f5d742;">
+        <h1 style="color: #f5d742; text-align: center; font-size: 2.5em;">$CARDS TCG STORE</h1>
+        <h2 style="text-align: center; color: #4ade80;">Order Confirmed on Base</h2>
+        
+        <p style="font-size: 1.2em;">Hey ${name.split(" ")[0]},</p>
+        <p>Your order is confirmed and will ship in <strong>24–48 hours</strong>!</p>
 
-Total: $${totalUsd}
-Paid: ${amount.toLocaleString()} $CARDS
-Tx: https://basescan.org/tx/${txHash}
+        <hr style="border-color: #f5d742; margin: 30px 0;">
 
-Shipping:
-${name}
-${address}
-${city}, ${state} ${zip}
-International: ${isInternational ? "YES" : "No"}
-      `.trim(),
-    });
+        <h3>Items:</h3>
+        <pre style="background: #111; padding: 15px; border-radius: 12px; white-space: pre-wrap;">${itemList}</pre>
+
+        <h3>Shipping To:</h3>
+        <p style="background: #111; padding: 15px; border-radius: 12px;">
+          ${name}<br>
+          ${address}<br>
+          ${city}, ${state} ${zip}
+        </p>
+
+        <h3>Payment:</h3>
+        <p>
+          <strong>Total:</strong> $${Number(totalUsd).toFixed(2)}<br>
+          <strong>Paid with:</strong> ${amount.toLocaleString()} $CARDS<br>
+          <strong>Shipping:</strong> $${Number(shipping).toFixed(2)}
+        </p>
+
+        <p style="text-align: center; margin: 30px 0;">
+          <a href="https://basescan.org/tx/${txHash}" 
+             style="background: #4ade80; color: black; padding: 16px 32px; border-radius: 12px; font-weight: bold; text-decoration: none;">
+            View Transaction on Basescan
+          </a>
+        </p>
+
+        <p style="text-align: center; color: #888; font-size: 0.9em;">
+          Questions? Reply to this email or DM @cardsonbase on X.<br>
+          Thanks for being an early collector
+        </p>
+      </div>
+    `;
+
+    // Always send to YOU
+    const emailPromises = [
+      resend.emails.send({
+        from: "CARDS Store <orders@cardsonbase.com>",
+        to: "cardsonbasehq@gmail.com",
+        subject: `NEW ORDER • $${totalUsd} • ${amount.toLocaleString()} $CARDS`,
+        text: `New order from ${name} (${buyerEmail})\n\n${itemList}\n\nTotal: $${totalUsd}\nTx: https://basescan.org/tx/${txHash}`,
+        html: htmlReceipt,
+      }),
+    ];
+
+    // Also send receipt to buyer if they gave email
+    if (hasBuyerEmail) {
+      emailPromises.push(
+        resend.emails.send({
+          from: "CARDS Store <orders@cardsonbase.com>",
+          to: buyerEmail,
+          subject: "Your $CARDS TCG Order Receipt – Thank You!",
+          html: htmlReceipt,
+        })
+      );
+    }
+
+    await Promise.all(emailPromises);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
