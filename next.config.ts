@@ -2,13 +2,17 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,   // ← this kills all ESLint errors
+    ignoreDuringBuilds: true,        // kills all ESLint errors
   },
   typescript: {
-    ignoreBuildErrors: true,    // ← this kills all TS errors
+    ignoreBuildErrors: true,         // kills all TypeScript errors
   },
   images: {
-    unoptimized: true,          // optional – fixes any <img> warnings
+    unoptimized: true,
+  },
+  transpilePackages: ["@metamask/sdk"], // fixes the React-Native async-storage error
+  experimental: {
+    serverComponentsExternalPackages: ["pino"], // fixes pino-pretty error
   },
 };
 
