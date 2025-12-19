@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Your existing Vercel-specific keys (keep them!)
   framework: "nextjs",
   buildCommand: "npm run build",
   installCommand: "npm install",
@@ -7,15 +8,11 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/(.*)",  // Apply to all pages
+        source: "/(.*)",  // Apply to all routes
         headers: [
           {
-            key: "X-Frame-Options",
-            value: "ALLOW-FROM https://cardsonbase.com",  // Allows only your WP site
-          },
-          {
             key: "Content-Security-Policy",
-            value: "frame-ancestors 'self' https://cardsonbase.com https://www.cardsonbase.com;",  // Modern & preferred (add www if needed)
+            value: "frame-ancestors 'self' https://cardsonbase.com https://www.cardsonbase.com;",
           },
         ],
       },
