@@ -1,14 +1,26 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  framework: "nextjs",
+  buildCommand: "npm run build",
+  installCommand: "npm install",
 
-{
-  "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install"
-}
-{
-          "key": "X-Frame-Options",
-          "value": "ALLOW-FROM https://cardsonbase.com"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "frame-ancestors https://cardsonbase.com"
-        }
+  async headers() {
+    return [
+      {
+        source: "/(.*)",  // Apply to all pages
+        headers: [
+          {
+            key: "X-Frame-Options",
+            value: "ALLOW-FROM https://cardsonbase.com",  // Allows only your WP site
+          },
+          {
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'self' https://cardsonbase.com https://www.cardsonbase.com;",  // Modern & preferred (add www if needed)
+          },
+        ],
+      },
+    ];
+  },
+};
+
+module.exports = nextConfig;
