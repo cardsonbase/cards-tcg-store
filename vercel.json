@@ -1,22 +1,14 @@
-{
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "ALLOW-FROM https://yourdomain.com"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "frame-ancestors https://yourdomain.com"
-        }
-      ]
-    }
-  ]
-}
+
 {
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "installCommand": "npm install"
 }
+{
+          "key": "X-Frame-Options",
+          "value": "ALLOW-FROM https://cardsonbase.com"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors https://cardsonbase.com"
+        }
