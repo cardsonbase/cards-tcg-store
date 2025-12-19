@@ -1,14 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Your existing Vercel-specific keys (keep them!)
-  framework: "nextjs",
-  buildCommand: "npm run build",
-  installCommand: "npm install",
-
   async headers() {
     return [
       {
-        source: "/(.*)",  // Apply to all routes
+        source: "/(.*)",
         headers: [
           {
             key: "Content-Security-Policy",
@@ -20,4 +15,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
