@@ -189,6 +189,32 @@ export default function Home() {
 
             {/* X LINK + DEXTOOLS + FARCASTER + BASESCAN + WALLET */}
             <div className="header-right" style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+
+              <a
+                href="https://cardsonbase.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "48px",
+                  height: "48px",
+                  background: "rgba(255,215,0,0.1)",
+                  border: "2px solid #ffd700",
+                  borderRadius: "50%",
+                  transition: "all 0.3s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+              >
+                <img
+                  src="/logo.png"
+                  alt="Website"
+                  style={{ width: "32px", height: "32px", objectFit: "contain" }}
+                />
+              </a>
+              
               <a
                 href="https://x.com/cardsonbaseHQ"
                 target="_blank"
