@@ -574,7 +574,7 @@ export default function Home() {
 
          {/* Powered by Base + LLC Footer */}
 <footer style={{ textAlign: "center", padding: "40px 0", borderTop: "1px solid #333" }}>
-  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "40px", flexWrap: "wrap" }}>
+  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "60px", flexWrap: "wrap" }}>
     {/* Powered by Base */}
     <a
       href="https://base.org"
@@ -594,25 +594,21 @@ export default function Home() {
     </a>
 
     {/* CARDS Collectibles LLC */}
-    <a
-      href="https://cardsonbase.com"  //
-      target="_blank"
-      rel="noopener noreferrer"
+    <div
       style={{
         display: "inline-flex",
         alignItems: "center",
         gap: "8px",
         color: "#aaa",
-        textDecoration: "none",
         fontSize: "16px",
       }}
     >
       CARDS Collectibles LLC
       <img src="/logo.png" alt="CARDS" style={{ height: "24px", width: "auto" }} />
-    </a>
+    </div>
   </div>
 </footer>
-
+          
         {/* CART MODAL — appears on top */}
         {showCart && (
           <div style={{
