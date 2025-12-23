@@ -837,9 +837,9 @@ export default function Home() {
               </button>
                   </div>
           </div>
-        )}
-      </>  {/* Close the HowToBuy modal fragment */}
+                )}
+      </>
 
-    </>  {/* Close the main return fragment */}
+    </>
   );
 }
