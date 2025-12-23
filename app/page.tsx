@@ -818,7 +818,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <button
+                            <button
                 onClick={() => setShowHowToBuy(false)}
                 style={{
                   display: "block",
@@ -838,7 +838,9 @@ export default function Home() {
             </div>
           </div>
         )}
-      </>
-    </> 
+      </>}  {/* Close the HowToBuy modal fragment */}
+
+    </>  {/* Close the main return fragment */}
   );
+}
 }
