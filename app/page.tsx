@@ -572,31 +572,34 @@ export default function Home() {
             })}
           </div>
 
-        {/* Powered by Base — Bottom of Page */}
-          <footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
-            <a
-              href="https://base.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                color: "#aaa",
-                textDecoration: "none",
-                fontSize: "16px",
-              }}
-            >
-              Powered by
-              <img 
-                src="/base.jpg" 
-                alt="Base" 
-                style={{ height: "24px", width: "auto" }} 
-              />
-               >
-            </a>
-          </footer>
-        </div>
+        {/* Powered by Base + LLC — Bottom of Page */}
+<footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
+  <div style={{ display: "inline-flex", alignItems: "center", gap: "32px", color: "#aaa", fontSize: "16px" }}>
+    {/* Powered by Base */}
+    <a
+      href="https://base.org"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
+        color: "#aaa",
+        textDecoration: "none",
+      }}
+    >
+      Powered by
+      <img 
+        src="/base.jpg" 
+        alt="Base" 
+        style={{ height: "24px", width: "auto" }} 
+      />
+    </a>
+
+    {/* LLC Info */}
+    <span>© 2025 CARDS Collectibles LLC</span>
+  </div>
+</footer>
           
         {/* CART MODAL — appears on top */}
         {showCart && (
