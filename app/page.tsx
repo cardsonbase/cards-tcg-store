@@ -835,9 +835,9 @@ export default function Home() {
               >
                 Got it – Let’s Shop!
               </button>
-                  </div>
+             </div>
           </div>
-                )}
+        )}
       </>
 
     </>
