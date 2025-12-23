@@ -214,6 +214,31 @@ export default function Home() {
                   style={{ width: "32px", height: "32px", objectFit: "contain" }}
                 />
               </a>
+
+              <a
+                href="https://t.me/CARDSCollectibles"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "48px",
+                  height: "48px",
+                  background: "rgba(255,215,0,0.1)",
+                  border: "2px solid #ffd700",
+                  borderRadius: "50%",
+                  transition: "all 0.3s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+              >
+                <img
+                  src="/telegram.png"
+                  alt="telegram"
+                  style={{ width: "32px", height: "32px", objectFit: "contain" }}
+                />
+              </a>
               
               <a
                 href="https://x.com/cardsonbaseHQ"
