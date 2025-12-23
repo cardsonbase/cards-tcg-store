@@ -159,7 +159,7 @@ export default function Home() {
            margin: "0 0 24px 0",
            fontFamily: "'Cinzel', serif"
            }}>
-           CARDS Collectibles "OnChain"
+           $CARDS TCG STORE
           </h1>
     <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live $CARDS Price</p>
     <p style={{ 
@@ -573,32 +573,29 @@ export default function Home() {
           </div>
 
           {/* Powered by Base — Bottom of Page */}
-<footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
-  <a
-    href="https://base.org"
-    target="_blank"
-    rel="noopener noreferrer"
-    style={{
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "8px",
-      color: "#aaa",
-      textDecoration: "none",
-      fontSize: "16px",
-    }}
-  >
-    Powered by
-    <img 
-      src="/base.jpg" 
-      alt="Base" 
-      style={{ height: "24px", width: "auto" }} 
-    />
-  </a>
-
-  <p style={{ color: "#666", fontSize: "14px", marginTop: "12px" }}>
-    © 2025 CARDS Collectibles LLC. All rights reserved.
-  </p>
-</footer>
+          <footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
+            <a
+              href="https://base.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                color: "#aaa",
+                textDecoration: "none",
+                fontSize: "16px",
+              }}
+            >
+              Powered by
+              <img 
+                src="/base.jpg" 
+                alt="Base" 
+                style={{ height: "24px", width: "auto" }} 
+              />
+            </a>
+          </footer>
+        </div>
 
         {/* CART MODAL — appears on top */}
         {showCart && (
@@ -839,5 +836,6 @@ export default function Home() {
           </div>
         )}
       </>
-    );
-  }
+    
+  );
+}
