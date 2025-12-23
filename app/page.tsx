@@ -159,7 +159,7 @@ export default function Home() {
            margin: "0 0 24px 0",
            fontFamily: "'Cinzel', serif"
            }}>
-           $CARDS TCG STORE
+           CARDS COLLECTIBLES STORE
           </h1>
     <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live $CARDS Price</p>
     <p style={{ 
@@ -573,28 +573,34 @@ export default function Home() {
           </div>
 
           {/* Powered by Base — Bottom of Page */}
-          <footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
-            <a
-              href="https://base.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                color: "#aaa",
-                textDecoration: "none",
-                fontSize: "16px",
-              }}
-            >
-              Powered by
-              <img 
-                src="/base.jpg" 
-                alt="Base" 
-                style={{ height: "24px", width: "auto" }} 
-              />
-            </a>
-          </footer>
+<footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
+  <div style={{ marginBottom: "12px" }}>
+    <a
+      href="https://base.org"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
+        color: "#aaa",
+        textDecoration: "none",
+        fontSize: "16px",
+      }}
+    >
+      Powered by
+      <img 
+        src="/base.jpg" 
+        alt="Base" 
+        style={{ height: "24px", width: "auto" }} 
+      />
+    </a>
+  </div>
+
+  <p style={{ color: "#666", fontSize: "14px", margin: "0" }}>
+    © 2025 CARDS Collectibles LLC. All rights reserved.
+  </p>
+</footer>
         </div>
 
         {/* CART MODAL — appears on top */}
