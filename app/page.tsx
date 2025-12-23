@@ -572,7 +572,7 @@ export default function Home() {
             })}
           </div>
 
-         {/* Powered by Base — Bottom of Page */}
+        {/* Powered by Base — Bottom of Page */}
           <footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
             <a
               href="https://base.org"
