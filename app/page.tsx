@@ -594,12 +594,27 @@ export default function Home() {
                 style={{ height: "24px", width: "auto" }} 
               />
                >
+              <footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
+            <a
+              href="https://cardsonbase.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                color: "#aaa",
+                textDecoration: "none",
+                fontSize: "16px",
+              }}
+               >
               CARDS Collectibles LLC
               <img 
                 src="/logo.png" 
                 alt="CARDS" 
                 style={{ height: "24px", width: "auto" }} 
               />
+              >
             </a>
           </footer>
         </div>
