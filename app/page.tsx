@@ -159,7 +159,7 @@ export default function Home() {
            margin: "0 0 24px 0",
            fontFamily: "'Cinzel', serif"
            }}>
-           CARDS Collectibles TCG Store
+           CARDS TCG STORE
           </h1>
     <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live $CARDS Price</p>
     <p style={{ 
