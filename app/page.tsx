@@ -289,6 +289,31 @@ export default function Home() {
               </a>
 
               <a
+                href="https://dexscreener.com/base/0xd739228018b3d0b3222d34ce869e55891471549c"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "48px",
+                  height: "48px",
+                  background: "rgba(255,215,0,0.1)",
+                  border: "2px solid #ffd700",
+                  borderRadius: "50%",
+                  transition: "all 0.3s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+              >
+                <img
+                  src="/dexscreener.png"
+                  alt="Dexscreener"
+                  style={{ width: "32px", height: "32px", objectFit: "contain" }}
+                />
+              </a>
+
+              <a
                 href="https://farcaster.xyz/cardsonbase"
                 target="_blank"
                 rel="noopener noreferrer"
