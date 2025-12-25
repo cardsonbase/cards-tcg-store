@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     // Always send to YOU
     const emailPromises = [
       resend.emails.send({
-        from: "CARDS Store <orders@cardsonbase.com>",
+        from: "CARDS Store <cardscollectibles@cardsonbase.com>",
         to: "cardsonbasehq@gmail.com",
         subject: `NEW ORDER • $${totalUsd} • ${amount.toLocaleString()} $CARDS`,
         text: `New order from ${name} (${buyerEmail})\n\n${itemList}\n\nTotal: $${totalUsd}\nTx: https://basescan.org/tx/${txHash}`,
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
     if (hasBuyerEmail) {
       emailPromises.push(
         resend.emails.send({
-          from: "CARDS Store <orders@cardsonbase.com>",
+          from: "CARDS Store <cardscollectibles@cardsonbase.com>",
           to: buyerEmail,
           subject: "Your $CARDS TCG Order Receipt – Thank You!",
           html: htmlReceipt,
