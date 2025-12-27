@@ -9,7 +9,7 @@ export default function TermsPage() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 prose prose-invert">
       <h1>Terms of Service</h1>
-      <p className="text-sm opacity-70">Last updated: December 12, 2025</p>
+      <p className="text-sm opacity-70">Last updated: December 26, 2025</p>
 
       <h2>1. Acceptance of Terms</h2>
       <p>
@@ -75,7 +75,7 @@ export default function TermsPage() {
 
       <h2>12. CARDS Collectibles LLC</h2>
       <p>
-        © 2025 CARDS Collectibles LLC. All rights reserved.CARDS Collectibles LLC is a Wyoming limited liability company. $CARDS is a utility token for purchasing collectibles on the platform and is not an investment or security.Trading crypto involves risk. Past performance is not indicative of future results.
+        © 2025 CARDS Collectibles LLC. All rights reserved. CARDS Collectibles LLC is a Wyoming limited liability company. CARDS is a utility token for purchasing collectibles on the platform and is not an investment or security. Trading crypto involves risk. Past performance is not indicative of future results.
       </p>
 
       <p className="mt-12 text-sm opacity-70">
