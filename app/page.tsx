@@ -584,7 +584,7 @@ export default function Home() {
                     {Math.ceil(p.usd / price).toLocaleString()} $CARDS
                   </p>
                   <p style={{ color: "#888", fontSize: "16px", marginBottom: "20px" }}>
-                    ${p.usd.toFixed(2)} Free Shipping
+                    ${p.usd.toFixed(2)} + Free Shipping
                   </p>
 
                   {p.stock > 0 ? (
