@@ -73,8 +73,13 @@ export default function TermsPage() {
         We may update these terms at any time. Continued use of the Site after changes constitutes acceptance.
       </p>
 
+      <h2>12. CARDS Collectibles LLC</h2>
+      <p>
+        © 2025 CARDS Collectibles LLC. All rights reserved.CARDS Collectibles LLC is a Wyoming limited liability company. $CARDS is a utility token for purchasing collectibles on the platform and is not an investment or security.Trading crypto involves risk. Past performance is not indicative of future results.
+      </p>
+
       <p className="mt-12 text-sm opacity-70">
-        Questions? Contact us at [cardsonbasehq@gmail.com or https://x.com/cardsonbaseHQ]
+        Questions? Contact us at [cardscollectibles@cardsonbase.com or https://x.com/cardsonbaseHQ]
       </p>
     </div>
   );
