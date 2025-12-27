@@ -863,7 +863,7 @@ export default function Home() {
                     href="mailto:cardsonbaseHQ@gmail.com"
                     style={{ color: "#ffd700", textDecoration: "underline" }}
                   >
-                    cardsonbaseHQ@gmail.com
+                    cardscollectibles@cardsonbase.com
                   </a>
                 </p>
                 <p style={{ marginTop: "12px", fontSize: "13px", color: "#666" }}>
