@@ -23,8 +23,10 @@ export default function Home() {
   const [showHowToBuy, setShowHowToBuy] = useState(false);
 
 useEffect(() => {
-  // Signal to MiniKit that the app is ready (removes splash faster)
-  sdk.actions.ready();
+  // Only call ready() if we're inside Coinbase Wallet Mini App
+  if (typeof window !== "undefined" && (window as any).miniKit) {
+    sdk.actions.ready();
+  }
 }, []);
   
   useEffect(() => {
