@@ -86,13 +86,17 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-  // Only run in browser (not during prerender)
+  // Skip on server
   if (typeof window === "undefined") return;
-    const miniKit = (window as any).miniKit;
-    if (miniKit) {
-    // Call ready immediately — products load fast enough
-    miniKit.setFrameReady();
 
+  const miniKit = (window as any).miniKit;
+
+  // Call ready immediately (hides splash fast)
+  if (miniKit?.setFrameReady) {
+    miniKit.setFrameReady();
+  }
+
+  // Also call after products load (extra safety)
   const prodRef = ref(db, "products");
   return onValue(prodRef, (snap) => {
     const data = snap.val() || {};
@@ -107,9 +111,11 @@ export default function Home() {
     }));
     setProducts(list);
 
-    miniKit.setFrameReady();
-    });
-  }
+    // Extra ready call after data
+    if (miniKit?.setFrameReady) {
+      miniKit.setFrameReady();
+    }
+  });
 }, []);
 
   const visible = products
