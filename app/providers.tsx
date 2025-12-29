@@ -18,21 +18,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
-          apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
-          chain={base}
-          config={{
-            wagmiConfig,
-            wallet: {
-              display: 'modal', // ← THIS LINE IS CRITICAL
-            },
-            // Optional: brand the modal
-            appearance: {
-              name: 'CARDS Collectibles',
-              // logo: 'https://your-site.com/logo.png', // full URL if you want
-              mode: 'dark',
-            },
-          }}
-          miniKit={{ enabled: true }}
+  apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+  chain={base}
+  config={{
+    wagmiConfig,
+    wallet: {
+      display: 'modal', // ← THIS IS REQUIRED FOR CUSTOM RENDER TO OPEN MODAL
+    },
+    appearance: {
+      mode: 'dark',
+    },
+  }}
+  miniKit={{ enabled: true }}
+>
         >
           <RainbowKitProvider
             theme={darkTheme({
