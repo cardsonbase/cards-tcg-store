@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Cart from "./components/Cart";
 import { db } from "@/lib/firebase";
+import { sdk } from "@coinbase/onchainkit/minikit";
 import { ref, onValue } from "firebase/database";
 import { useCart } from "@/lib/cart";
 
@@ -21,6 +22,11 @@ export default function Home() {
   const [treasuryEth, setTreasuryEth] = useState(0);
   const [showHowToBuy, setShowHowToBuy] = useState(false);
 
+useEffect(() => {
+  // Signal to MiniKit that the app is ready (removes splash faster)
+  sdk.actions.ready();
+}, []);
+  
   useEffect(() => {
     const fetchPrice = async () => {
       try {
