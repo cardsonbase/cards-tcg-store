@@ -463,45 +463,7 @@ export default function Home() {
 
     <WalletDropdownDisconnect className="bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300" />
   </WalletDropdown>
-</Wallet>
-
-{/* Add this WalletModal anywhere in your return (e.g., right before the closing </div> of the main page) */}
-<WalletModal />
-            </div>
-          </header>
-
-          {/* Fiat On-Ramp and Swap Section — Integrated, Centered, No Different BG */}
-          <div style={{ textAlign: "center", margin: "40px 0" }}>
-            <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "16px" }}>
-              New to Base? Buy Base ETH with card in seconds:
-            </p>
-            <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-              {/* Coinbase — Interactive Button */}
-              <a 
-                href="https://buy.coinbase.com/?destination=base" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0 20px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "24px",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <img 
-                  src="/coinbase.png" 
-                  alt="Coinbase" 
-                  style={{ height: "32px", width: "auto" }} 
-                />
-              </a>
-              
+</Wallet> 
               {/* Ramp — Interactive Button, Updated for Base ETH */}
               <a 
                 href="https://ramp.network/buy?defaultOptions=DEFAULT&swapAsset=BASE_ETH&hostAppName=Cards%20on%20Base&hostLogoUrl=https%3A%2F%2Fcards-on-base.vercel.app%2Flogo.png&finalUrl=https%3A%2F%2Fcards-on-base.vercel.app" 
@@ -931,6 +893,43 @@ export default function Home() {
                 </p>
               </div>
 
+              {/* Add this WalletModal anywhere in your return (e.g., right before the closing </div> of the main page) */}
+<WalletModal />
+            </div>
+          </header>
+
+          {/* Fiat On-Ramp and Swap Section — Integrated, Centered, No Different BG */}
+          <div style={{ textAlign: "center", margin: "40px 0" }}>
+            <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "16px" }}>
+              New to Base? Buy Base ETH with card in seconds:
+            </p>
+            <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+              {/* Coinbase — Interactive Button */}
+              <a 
+                href="https://buy.coinbase.com/?destination=base" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 20px",
+                  height: "48px",
+                  background: "rgba(255,215,0,0.1)",
+                  border: "2px solid #ffd700",
+                  borderRadius: "24px",
+                  transition: "all 0.3s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+              >
+                <img 
+                  src="/coinbase.png" 
+                  alt="Coinbase" 
+                  style={{ height: "32px", width: "auto" }} 
+                />
+              </a>
+              
               {/* SHIPPING & SUPPORT */}
               <div
                 style={{
