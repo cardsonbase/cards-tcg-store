@@ -401,69 +401,104 @@ export default function Home() {
               </a>
 
               <Wallet>
-  {/* Fully custom gold button with render prop */}
-  <ConnectWallet
-    render={({
-      label,
-      onClick,
-      status,
-      isLoading,
-    }) => (
-      <button
-        onClick={onClick}
-        disabled={isLoading}
-        className="relative overflow-hidden bg-gradient-to-r from-[#ffd700] to-[#ffed4e] text-black font-bold text-lg px-6 py-3 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 hover:scale-105"
-        style={{
-          border: '3px solid #000',
-          boxShadow: '0 8px 20px rgba(0,0,0,0.6), inset 0 2px 8px rgba(255,255,255,0.4)',
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9 ring-2 ring-black" />
-          <span className="font-bold drop-shadow-md">
-            {status === 'disconnected' ? 'Connect Wallet' : label || <Name />}
-          </span>
-        </div>
-      </button>
-    )}
-  />
+                {/* Fully custom gold button with render prop */}
+                <ConnectWallet
+                  render={({
+                    label,
+                    onClick,
+                    status,
+                    isLoading,
+                  }) => (
+                    <button
+                      onClick={onClick}
+                      disabled={isLoading}
+                      className="relative overflow-hidden bg-gradient-to-r from-[#ffd700] to-[#ffed4e] text-black font-bold text-lg px-6 py-3 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 hover:scale-105"
+                      style={{
+                        border: '3px solid #000',
+                        boxShadow: '0 8px 20px rgba(0,0,0,0.6), inset 0 2px 8px rgba(255,255,255,0.4)',
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9 ring-2 ring-black" />
+                        <span className="font-bold drop-shadow-md">
+                          {status === 'disconnected' ? 'Connect Wallet' : label || <Name />}
+                        </span>
+                      </div>
+                    </button>
+                  )}
+                />
 
-  {/* Dropdown when connected */}
-  <WalletDropdown>
-    <Identity
-      className="px-6 pt-4 pb-3 bg-gradient-to-b from-[#111] to-[#000] border-b border-[#333]"
-      hasCopyAddressOnClick
-    >
-      <div className="flex items-center gap-4">
-        <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" />
-        <div>
-          <Name className="text-xl font-bold text-[#ffd700]" />
-          <Address className="text-sm text-gray-400" />
-        </div>
-      </div>
-    </Identity>
+                {/* Dropdown when connected */}
+                <WalletDropdown>
+                  <Identity
+                    className="px-6 pt-4 pb-3 bg-gradient-to-b from-[#111] to-[#000] border-b border-[#333]"
+                    hasCopyAddressOnClick
+                  >
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" />
+                      <div>
+                        <Name className="text-xl font-bold text-[#ffd700]" />
+                        <Address className="text-sm text-gray-400" />
+                      </div>
+                    </div>
+                  </Identity>
 
-    <WalletDropdownBasename />
+                  <WalletDropdownBasename />
 
-    <WalletDropdownLink
-      href="https://keys.coinbase.com"
-      icon="wallet"
-      className="text-[#ffd700] hover:bg-[#222] hover:text-white"
-    >
-      Smart Wallet
-    </WalletDropdownLink>
+                  <WalletDropdownLink
+                    href="https://keys.coinbase.com"
+                    icon="wallet"
+                    className="text-[#ffd700] hover:bg-[#222] hover:text-white"
+                  >
+                    Smart Wallet
+                  </WalletDropdownLink>
 
-    <WalletDropdownLink
-      href="https://portfolio.coinbase.com"
-      icon="activity"
-      className="text-[#ffd700] hover:bg-[#222] hover:text-white"
-    >
-      Portfolio
-    </WalletDropdownLink>
+                  <WalletDropdownLink
+                    href="https://portfolio.coinbase.com"
+                    icon="activity"
+                    className="text-[#ffd700] hover:bg-[#222] hover:text-white"
+                  >
+                    Portfolio
+                  </WalletDropdownLink>
 
-    <WalletDropdownDisconnect className="bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300" />
-  </WalletDropdown>
-</Wallet> 
+                  <WalletDropdownDisconnect className="bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300" />
+                </WalletDropdown>
+              </Wallet>
+            </div>
+          </header>
+
+          {/* Fiat On-Ramp and Swap Section — Integrated, Centered, No Different BG */}
+          <div style={{ textAlign: "center", margin: "40px 0" }}>
+            <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "16px" }}>
+              New to Base? Buy Base ETH with card in seconds:
+            </p>
+            <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+              {/* Coinbase — Interactive Button */}
+              <a 
+                href="https://buy.coinbase.com/?destination=base" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 20px",
+                  height: "48px",
+                  background: "rgba(255,215,0,0.1)",
+                  border: "2px solid #ffd700",
+                  borderRadius: "24px",
+                  transition: "all 0.3s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+              >
+                <img 
+                  src="/coinbase.png" 
+                  alt="Coinbase" 
+                  style={{ height: "32px", width: "auto" }} 
+                />
+              </a>
+              
               {/* Ramp — Interactive Button, Updated for Base ETH */}
               <a 
                 href="https://ramp.network/buy?defaultOptions=DEFAULT&swapAsset=BASE_ETH&hostAppName=Cards%20on%20Base&hostLogoUrl=https%3A%2F%2Fcards-on-base.vercel.app%2Flogo.png&finalUrl=https%3A%2F%2Fcards-on-base.vercel.app" 
@@ -553,7 +588,7 @@ export default function Home() {
               How to Buy Guide
             </button>
           </div>
-          
+
           {/* Category Dropdown — Centered for Better Flow */}
           <div style={{ textAlign: "center", marginBottom: "20px" }}>
             <select
@@ -688,34 +723,34 @@ export default function Home() {
           </div>
 
           {/* Powered by Base — Bottom of Page */}
-<footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
-  <div style={{ marginBottom: "12px" }}>
-    <a
-      href="https://base.org"
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "8px",
-        color: "#aaa",
-        textDecoration: "none",
-        fontSize: "16px",
-      }}
-    >
-      Powered by
-      <img 
-        src="/base.jpg" 
-        alt="Base" 
-        style={{ height: "24px", width: "auto" }} 
-      />
-    </a>
-  </div>
+          <footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
+            <div style={{ marginBottom: "12px" }}>
+              <a
+                href="https://base.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  color: "#aaa",
+                  textDecoration: "none",
+                  fontSize: "16px",
+                }}
+              >
+                Powered by
+                <img 
+                  src="/base.jpg" 
+                  alt="Base" 
+                  style={{ height: "24px", width: "auto" }} 
+                />
+              </a>
+            </div>
 
-  <p style={{ color: "#666", fontSize: "14px", margin: "0" }}>
-    © 2025 CARDS Collectibles LLC. All rights reserved.
-  </p>
-</footer>
+            <p style={{ color: "#666", fontSize: "14px", margin: "0" }}>
+              © 2025 CARDS Collectibles LLC. All rights reserved.
+            </p>
+          </footer>
         </div>
 
         {/* CART MODAL — appears on top */}
@@ -796,7 +831,7 @@ export default function Home() {
           </div>
         )}
 
-              {/* HOW TO BUY GUIDE – ZERO-KNOWLEDGE ONBOARDING */}
+        {/* HOW TO BUY GUIDE – ZERO-KNOWLEDGE ONBOARDING */}
         {showHowToBuy && (
           <div
             style={{
@@ -893,43 +928,6 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Add this WalletModal anywhere in your return (e.g., right before the closing </div> of the main page) */}
-<WalletModal />
-            </div>
-          </header>
-
-          {/* Fiat On-Ramp and Swap Section — Integrated, Centered, No Different BG */}
-          <div style={{ textAlign: "center", margin: "40px 0" }}>
-            <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "16px" }}>
-              New to Base? Buy Base ETH with card in seconds:
-            </p>
-            <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-              {/* Coinbase — Interactive Button */}
-              <a 
-                href="https://buy.coinbase.com/?destination=base" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0 20px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "24px",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <img 
-                  src="/coinbase.png" 
-                  alt="Coinbase" 
-                  style={{ height: "32px", width: "auto" }} 
-                />
-              </a>
-              
               {/* SHIPPING & SUPPORT */}
               <div
                 style={{
@@ -993,7 +991,8 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        <WalletModal />
       </>
-    
   );
 }
