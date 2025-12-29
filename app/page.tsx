@@ -10,6 +10,10 @@ import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import { ref, onValue } from "firebase/database";
 import { useCart } from "@/lib/cart";
 import dynamic from "next/dynamic";
+const useMiniKitDynamic = dynamic(
+  () => import("@coinbase/onchainkit/minikit").then((mod) => mod.useMiniKit),
+  { ssr: false }
+);
 
 export default function Home() {
   const [price, setPrice] = useState(0.00005);
@@ -22,11 +26,7 @@ export default function Home() {
   const [showSwapModal, setShowSwapModal] = useState(false);
   const [treasuryEth, setTreasuryEth] = useState(0);
   const [showHowToBuy, setShowHowToBuy] = useState(false);
-  const { setFrameReady } = useMiniKit();
-  const useMiniKit = dynamic(
-  () => import("@coinbase/onchainkit/minikit").then((mod) => mod.useMiniKit),
-  { ssr: false }
-);
+  const { setFrameReady } = useMiniKitDynamic();
   
   useEffect(() => {
     const fetchPrice = async () => {
