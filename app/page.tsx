@@ -93,6 +93,10 @@ export default function Home() {
   useEffect(() => {
   // Only run in browser (not during prerender)
   if (typeof window === "undefined") return;
+    const miniKit = (window as any).miniKit;
+    if (miniKit) {
+    // Call ready immediately — products load fast enough
+    miniKit.setFrameReady();
 
   const prodRef = ref(db, "products");
   return onValue(prodRef, (snap) => {
@@ -108,11 +112,9 @@ export default function Home() {
     }));
     setProducts(list);
 
-    const miniKit = (window as any).miniKit;  
-    if (miniKit?.setFrameReady) {
-      miniKit.setFrameReady();
-    }
-  });
+    miniKit.setFrameReady();
+    });
+  }
 }, []);
 
   const visible = products
