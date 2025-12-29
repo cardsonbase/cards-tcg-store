@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Cart from "./components/Cart";
 import { db } from "@/lib/firebase";
-import { sdk } from "@coinbase/onchainkit/minikit";
+import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import { ref, onValue } from "firebase/database";
 import { useCart } from "@/lib/cart";
 
@@ -21,6 +21,7 @@ export default function Home() {
   const [showSwapModal, setShowSwapModal] = useState(false);
   const [treasuryEth, setTreasuryEth] = useState(0);
   const [showHowToBuy, setShowHowToBuy] = useState(false);
+  const { setFrameReady } = useMiniKit();
   
   useEffect(() => {
     const fetchPrice = async () => {
@@ -99,21 +100,10 @@ export default function Home() {
     }));
     setProducts(list);
 
-    // Products loaded → app is now fully ready → hide splash
-    if (sdk) {
-      sdk.actions.ready();
-    }
+    // Products loaded → app ready → hide splash
+    setFrameReady();
   });
-}, []);
-
-  useEffect(() => {
-  // Fallback: Call ready after 5 seconds if something delays
-  const timeout = setTimeout(() => {
-    if (sdk) sdk.actions.ready();
-  }, 5000);
-
-  return () => clearTimeout(timeout);
-}, []);
+}, [setFrameReady]);
 
   const visible = products
     .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
