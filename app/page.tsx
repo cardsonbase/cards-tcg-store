@@ -103,10 +103,11 @@ export default function Home() {
     }));
     setProducts(list);
 
-    // Products loaded → app ready → hide splash (only in MiniKit)
-    setFrameReady();
+    if (miniKit?.setFrameReady) {
+      miniKit.setFrameReady();
+    }
   });
-}, [setFrameReady]);
+}, [miniKit]);
 
   const visible = products
     .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
