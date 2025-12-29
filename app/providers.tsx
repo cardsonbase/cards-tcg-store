@@ -6,10 +6,10 @@ import { WagmiProvider } from 'wagmi';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { OnchainKitProvider } from '@coinbase/onchainkit';
 import { wagmiConfig } from '@/lib/wagmi';
-import { base } from 'wagmi/chains'; // or viem/chains if you use viem
+import { base } from 'wagmi/chains';
 
 import '@rainbow-me/rainbowkit/styles.css';
-import '@coinbase/onchainkit/styles.css'; // Required for OnchainKit components
+import '@coinbase/onchainkit/styles.css';
 
 const queryClient = new QueryClient();
 
@@ -18,12 +18,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
-          apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY} // Optional but recommended
+          apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
           chain={base}
           config={{
-            wagmiConfig, // ← Important: pass your existing wagmi config
+            wagmiConfig,
+            wallet: {
+              display: 'modal', // ← THIS LINE IS CRITICAL
+            },
+            // Optional: brand the modal
+            appearance: {
+              name: 'CARDS Collectibles',
+              // logo: 'https://your-site.com/logo.png', // full URL if you want
+              mode: 'dark',
+            },
           }}
-          miniKit={{ enabled: true }} // ← This enables useMiniKit() and setFrameReady()
+          miniKit={{ enabled: true }}
         >
           <RainbowKitProvider
             theme={darkTheme({
