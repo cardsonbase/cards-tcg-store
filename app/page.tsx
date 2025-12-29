@@ -104,7 +104,7 @@ export default function Home() {
     }));
     setProducts(list);
 
-    if (miniKit?.setFrameReady) {
+    f (miniKit?.setFrameReady) {
       miniKit.setFrameReady();
     }
   });
