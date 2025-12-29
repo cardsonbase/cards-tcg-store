@@ -86,6 +86,9 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+  // Only run in browser (not during prerender)
+  if (typeof window === "undefined") return;
+
   const prodRef = ref(db, "products");
   return onValue(prodRef, (snap) => {
     const data = snap.val() || {};
@@ -100,7 +103,7 @@ export default function Home() {
     }));
     setProducts(list);
 
-    // Products loaded → app ready → hide splash
+    // Products loaded → app ready → hide splash (only in MiniKit)
     setFrameReady();
   });
 }, [setFrameReady]);
