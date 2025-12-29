@@ -553,7 +553,7 @@ export default function Home() {
               How to Buy Guide
             </button>
           </div>
-
+          
           {/* Category Dropdown — Centered for Better Flow */}
           <div style={{ textAlign: "center", marginBottom: "20px" }}>
             <select
