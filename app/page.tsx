@@ -22,6 +22,7 @@ export default function Home() {
   const [showSwapModal, setShowSwapModal] = useState(false);
   const [treasuryEth, setTreasuryEth] = useState(0);
   const [showHowToBuy, setShowHowToBuy] = useState(false);
+  const { setFrameReady, isFrameReady } = useMiniKit();
   
   useEffect(() => {
     const fetchPrice = async () => {
@@ -85,38 +86,42 @@ export default function Home() {
     return () => clearInterval(id);
   }, []);
 
+    // 1. Call setFrameReady IMMEDIATELY when the page loads (hides splash fastest)
   useEffect(() => {
-  // Skip on server
-  if (typeof window === "undefined") return;
-
-  const miniKit = (window as any).miniKit;
-
-  // Call ready immediately (hides splash fast)
-  if (miniKit?.setFrameReady) {
-    miniKit.setFrameReady();
-  }
-
-  // Also call after products load (extra safety)
-  const prodRef = ref(db, "products");
-  return onValue(prodRef, (snap) => {
-    const data = snap.val() || {};
-    const list = Object.entries(data).map(([id, p]: any) => ({
-      id,
-      name: p.name,
-      usd: Number(p.usd),
-      img: p.img || "/placeholder.png",
-      stock: Number(p.stock) || 0,
-      weightOz: Number(p.weightOz) || 8,
-      category: p.category || "uncategorized",
-    }));
-    setProducts(list);
-
-    // Extra ready call after data
-    if (miniKit?.setFrameReady) {
-      miniKit.setFrameReady();
+    if (!isFrameReady) {
+      setFrameReady();
     }
-  });
-}, []);
+  }, [isFrameReady, setFrameReady]);
+
+  // 2. Your existing Firebase products listener (updated with extra safety call)
+  useEffect(() => {
+    // Skip on server-side rendering
+    if (typeof window === "undefined") return;
+
+    const prodRef = ref(db, "products");
+
+    const unsubscribe = onValue(prodRef, (snap) => {
+      const data = snap.val() || {};
+      const list = Object.entries(data).map(([id, p]: any) => ({
+        id,
+        name: p.name,
+        usd: Number(p.usd),
+        img: p.img || "/placeholder.png",
+        stock: Number(p.stock) || 0,
+        weightOz: Number(p.weightOz) || 8,
+        category: p.category || "uncategorized",
+      }));
+
+      setProducts(list);
+
+      // Extra safety: call again after products load
+      if (!isFrameReady) {
+        setFrameReady();
+      }
+    });
+
+    return () => unsubscribe();
+  }, [isFrameReady, setFrameReady]);
 
   const visible = products
     .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
