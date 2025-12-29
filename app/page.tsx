@@ -22,7 +22,6 @@ export default function Home() {
   const [showSwapModal, setShowSwapModal] = useState(false);
   const [treasuryEth, setTreasuryEth] = useState(0);
   const [showHowToBuy, setShowHowToBuy] = useState(false);
-  const { setFrameReady } = useMiniKitDynamic();
   
   useEffect(() => {
     const fetchPrice = async () => {
