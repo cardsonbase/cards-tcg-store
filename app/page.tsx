@@ -21,13 +21,6 @@ export default function Home() {
   const [showSwapModal, setShowSwapModal] = useState(false);
   const [treasuryEth, setTreasuryEth] = useState(0);
   const [showHowToBuy, setShowHowToBuy] = useState(false);
-
-useEffect(() => {
-  // Only call ready() if we're inside Coinbase Wallet Mini App
-  if (typeof window !== "undefined" && (window as any).miniKit) {
-    sdk.actions.ready();
-  }
-}, []);
   
   useEffect(() => {
     const fetchPrice = async () => {
@@ -115,6 +108,13 @@ useEffect(() => {
 
   const cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
+useEffect(() => {
+  // Only call ready() if we're inside Coinbase Wallet Mini App
+  if (typeof window !== "undefined" && (window as any).miniKit) {
+    sdk.actions.ready();
+  }
+}, []);
+  
   return (
 
       <>
