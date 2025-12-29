@@ -22,6 +22,7 @@ export default function Home() {
   const [treasuryEth, setTreasuryEth] = useState(0);
   const [showHowToBuy, setShowHowToBuy] = useState(false);
   const { setFrameReady } = useMiniKit();
+  const miniKit = useMiniKit();
   
   useEffect(() => {
     const fetchPrice = async () => {
