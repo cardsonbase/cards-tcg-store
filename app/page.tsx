@@ -108,9 +108,11 @@ export default function Home() {
     }));
     setProducts(list);
 
-    setFrameReady();
+    setTimeout(() => {
+      miniKit?.setFrameReady?.();
+    }, 500);
   });
-}, [setFrameReady]);
+}, [miniKit]);
 
   const visible = products
     .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
