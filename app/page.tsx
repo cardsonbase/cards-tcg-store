@@ -8,6 +8,7 @@ import {
   WalletDropdownBasename,
   WalletDropdownDisconnect,
   WalletDropdownLink,
+  WalletModal,
 } from '@coinbase/onchainkit/wallet';
 import {
   Avatar,
@@ -400,17 +401,34 @@ export default function Home() {
               </a>
 
               <Wallet>
+  {/* Fully custom gold button with render prop */}
   <ConnectWallet
-    className="relative overflow-hidden bg-gradient-to-r from-[#ffd700] to-[#ffed4e] text-black font-bold text-lg px-6 py-3 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 hover:scale-105"
-    style={{
-      border: '3px solid #000',
-      boxShadow: '0 8px 20px rgba(0,0,0,0.6), inset 0 2px 8px rgba(255,255,255,0.4)',
-    }}
-  >
-    <Avatar className="h-9 w-9 ring-2 ring-black" />
-    <Name className="font-bold drop-shadow-md" />
-  </ConnectWallet>
+    render={({
+      label,
+      onClick,
+      status,
+      isLoading,
+    }) => (
+      <button
+        onClick={onClick}
+        disabled={isLoading}
+        className="relative overflow-hidden bg-gradient-to-r from-[#ffd700] to-[#ffed4e] text-black font-bold text-lg px-6 py-3 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 hover:scale-105"
+        style={{
+          border: '3px solid #000',
+          boxShadow: '0 8px 20px rgba(0,0,0,0.6), inset 0 2px 8px rgba(255,255,255,0.4)',
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9 ring-2 ring-black" />
+          <span className="font-bold drop-shadow-md">
+            {status === 'disconnected' ? 'Connect Wallet' : label || <Name />}
+          </span>
+        </div>
+      </button>
+    )}
+  />
 
+  {/* Dropdown when connected */}
   <WalletDropdown>
     <Identity
       className="px-6 pt-4 pb-3 bg-gradient-to-b from-[#111] to-[#000] border-b border-[#333]"
@@ -446,6 +464,9 @@ export default function Home() {
     <WalletDropdownDisconnect className="bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300" />
   </WalletDropdown>
 </Wallet>
+
+{/* Add this WalletModal anywhere in your return (e.g., right before the closing </div> of the main page) */}
+<WalletModal />
             </div>
           </header>
 
