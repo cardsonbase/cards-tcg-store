@@ -85,21 +85,35 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const prodRef = ref(db, "products");
-    return onValue(prodRef, (snap) => {
-      const data = snap.val() || {};
-      const list = Object.entries(data).map(([id, p]: any) => ({
-        id,
-        name: p.name,
-        usd: Number(p.usd),
-        img: p.img || "/placeholder.png",
-        stock: Number(p.stock) || 0,
-        weightOz: Number(p.weightOz) || 8,
-        category: p.category || "uncategorized",
-      }));
-      setProducts(list);
-    });
-  }, []);
+  const prodRef = ref(db, "products");
+  return onValue(prodRef, (snap) => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).map(([id, p]: any) => ({
+      id,
+      name: p.name,
+      usd: Number(p.usd),
+      img: p.img || "/placeholder.png",
+      stock: Number(p.stock) || 0,
+      weightOz: Number(p.weightOz) || 8,
+      category: p.category || "uncategorized",
+    }));
+    setProducts(list);
+
+    // Products loaded → app is now fully ready → hide splash
+    if (sdk) {
+      sdk.actions.ready();
+    }
+  });
+}, []);
+
+  useEffect(() => {
+  // Fallback: Call ready after 5 seconds if something delays
+  const timeout = setTimeout(() => {
+    if (sdk) sdk.actions.ready();
+  }, 5000);
+
+  return () => clearTimeout(timeout);
+}, []);
 
   const visible = products
     .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
@@ -107,13 +121,6 @@ export default function Home() {
     .filter((p) => filter === "all" || (filter === "slabs" && p.weightOz <= 5) || (filter === "boosters" && p.weightOz > 5));
 
   const cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
-
-useEffect(() => {
-  // Only call ready() if we're inside Coinbase Wallet Mini App
-  if (typeof window !== "undefined" && (window as any).miniKit) {
-    sdk.actions.ready();
-  }
-}, []);
   
   return (
 
