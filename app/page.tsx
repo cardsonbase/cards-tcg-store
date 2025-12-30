@@ -405,8 +405,14 @@ export default function Home() {
   <ConnectWallet
     render={({ onClick, status, isLoading }) => (
       <button
-        onClick={onClick}
-        disabled={isLoading}
+  onClick={() => {
+    if (status === 'disconnected') {
+      onClick(); // Opens the connection modal
+    } else {
+      setIsDropdownOpen((prev) => !prev); // Toggle dropdown when connected
+    }
+  }}
+  disabled={isLoading}
         className="relative overflow-hidden bg-gradient-to-r from-[#ffd700] to-[#ffed4e] text-black font-bold text-lg px-6 py-3 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 hover:scale-105 cursor-pointer"
         style={{
     position: 'relative',
