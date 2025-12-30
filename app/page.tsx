@@ -39,6 +39,8 @@ export default function Home() {
   const [showHowToBuy, setShowHowToBuy] = useState(false);
   const { setFrameReady, isFrameReady } = useMiniKit();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
   
   useEffect(() => {
     const fetchPrice = async () => {
@@ -402,42 +404,41 @@ export default function Home() {
                 />
               </a>
 
-             <Wallet>
+                          <Wallet>
   <ConnectWallet
     render={({ onClick, status, isLoading }) => (
       <button
-  onClick={() => {
-    if (status === 'disconnected') {
-      onClick(); // Opens the connection modal
-    } else {
-      setIsDropdownOpen((prev) => !prev); // Toggle dropdown when connected
-    }
-  }}
-  disabled={isLoading}
-        className="relative overflow-hidden bg-gradient-to-r from-[#ffd700] to-[#ffed4e] text-black font-bold text-lg px-6 py-3 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 hover:scale-105 cursor-pointer"
+        onClick={() => {
+          if (status === 'disconnected') {
+            onClick(); // Opens the connection modal
+          } else {
+            setIsDropdownOpen((prev) => !prev); // Toggle dropdown when connected
+          }
+        }}
+        disabled={isLoading}
         style={{
-    position: 'relative',
-    overflow: 'hidden',
-    background: 'linear-gradient(to right, #ffd700, #ffed4e)', // from-[#ffd700] to-[#ffed4e]
-    color: '#000', // text-black
-    fontWeight: 'bold',
-    fontSize: '18px', // text-lg
-    padding: '12px 24px', // px-6 py-3
-    borderRadius: '9999px', // rounded-full
-    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)', // shadow-2xl
-    transition: 'all 0.3s',
-    cursor: 'pointer',
-    border: '3px solid #000', // Existing style
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.boxShadow = '0 0 30px rgba(255,215,0,0.6)';
-    e.currentTarget.style.transform = 'scale(1.05)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)';
-    e.currentTarget.style.transform = 'scale(1)';
-  }}
->
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'linear-gradient(to right, #ffd700, #ffed4e)',
+          color: '#000',
+          fontWeight: 'bold',
+          fontSize: '18px',
+          padding: '12px 24px',
+          borderRadius: '9999px',
+          boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)',
+          transition: 'all 0.3s',
+          cursor: 'pointer',
+          border: '3px solid #000',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = '0 0 30px rgba(255,215,0,0.6)';
+          e.currentTarget.style.transform = 'scale(1.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)';
+          e.currentTarget.style.transform = 'scale(1)';
+        }}
+      >
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 ring-2 ring-black" />
           <span className="font-bold drop-shadow-md">
@@ -448,7 +449,7 @@ export default function Home() {
     )}
   />
 
-     {/* Custom Dropdown – now controlled correctly */}
+  {/* Custom Dropdown – properly conditional */}
   {isConnected && isDropdownOpen && (
     <>
       {/* Invisible overlay – only when dropdown is open */}
@@ -457,7 +458,7 @@ export default function Home() {
           position: "fixed",
           inset: 0,
           zIndex: 40,
-          background: "transparent", // invisible
+          background: "transparent",
         }}
         onClick={() => setIsDropdownOpen(false)}
       />
@@ -476,7 +477,6 @@ export default function Home() {
           boxShadow: "0 10px 30px rgba(0,0,0,0.8)",
           overflow: "hidden",
           zIndex: 50,
-          animation: "fadeInDown 0.2s ease-out",
         }}
       >
         <div style={{ padding: "16px 24px 12px", borderBottom: "1px solid #333" }}>
@@ -568,7 +568,6 @@ export default function Home() {
       </div>
     </>
   )}
-})()}
 </Wallet>
             </div>
           </header>
