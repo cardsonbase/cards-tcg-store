@@ -461,10 +461,11 @@ export default function Home() {
       Portfolio
     </WalletDropdownLink>
 
-    {/* THIS IS YOUR DISCONNECT BUTTON — IT'S ALREADY THERE! */}
     <WalletDropdownDisconnect 
-      className="bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300 px-6 py-4" 
-    />
+  className="bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300 px-6 py-4 font-bold"
+>
+  Disconnect Wallet
+</WalletDropdownDisconnect>
   </WalletDropdown>
 </Wallet>
             </div>
