@@ -278,11 +278,11 @@ export default function Cart({
 
         <div className="grid grid-cols-2 gap-8 mt-16">
           <button
-  onClick={onClose}
-  className="py-7 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl font-black text-3xl shadow-2xl transition bg-red-500 text-6xl"  // Add bg-red-500 text-6xl
->
-  KEEP SHOPPING
-</button>
+            onClick={onClose}
+            className="py-7 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl font-black text-3xl shadow-2xl transition border-2 border-gray-600/50 hover:border-gray-500 cursor-pointer"  // Enhanced with border + cursor-pointer
+          >
+            KEEP SHOPPING
+          </button>
           <button
             onClick={handleProceedToShipping}
             disabled={!address}
