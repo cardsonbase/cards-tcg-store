@@ -1,4 +1,5 @@
 // app/layout.tsx
+import '@coinbase/onchainkit/styles.css';
 import "../styles/globals.css";  // ← Your moved CSS import
 import { Metadata } from "next";
 import { Providers } from "./providers";  // wagmi + OnchainKit wrapper
