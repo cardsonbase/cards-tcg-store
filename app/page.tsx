@@ -409,10 +409,28 @@ export default function Home() {
         disabled={isLoading}
         className="relative overflow-hidden bg-gradient-to-r from-[#ffd700] to-[#ffed4e] text-black font-bold text-lg px-6 py-3 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 hover:scale-105 cursor-pointer"
         style={{
-          border: '3px solid #000',
-          boxShadow: '0 8px 20px rgba(0,0,0,0.6), inset 0 2px 8px rgba(255,255,255,0.4)',
-        }}
-      >
+    position: 'relative',
+    overflow: 'hidden',
+    background: 'linear-gradient(to right, #ffd700, #ffed4e)', // from-[#ffd700] to-[#ffed4e]
+    color: '#000', // text-black
+    fontWeight: 'bold',
+    fontSize: '18px', // text-lg
+    padding: '12px 24px', // px-6 py-3
+    borderRadius: '9999px', // rounded-full
+    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)', // shadow-2xl
+    transition: 'all 0.3s',
+    cursor: 'pointer',
+    border: '3px solid #000', // Existing style
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.boxShadow = '0 0 30px rgba(255,215,0,0.6)';
+    e.currentTarget.style.transform = 'scale(1.05)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)';
+    e.currentTarget.style.transform = 'scale(1)';
+  }}
+>
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 ring-2 ring-black" />
           <span className="font-bold drop-shadow-md">
@@ -431,48 +449,111 @@ export default function Home() {
     if (!isConnected) return null;
 
     return (
-      <div className="absolute top-full right-0 mt-4 w-80 bg-gradient-to-b from-[#111] to-[#000] rounded-2xl border-2 border-[#333] shadow-2xl overflow-hidden z-50">
-        <div className="px-6 pt-4 pb-3 border-b border-[#333]">
-          <Identity hasCopyAddressOnClick>
-            <div className="flex items-center gap-4">
-              <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" />
-              <div>
-                <Name className="text-xl font-bold text-[#ffd700]" />
-                <Address className="text-sm text-gray-400" />
-              </div>
-            </div>
-          </Identity>
+  <div
+    style={{
+      position: 'absolute',
+      top: '100%',
+      right: 0,
+      marginTop: '16px', // mt-4
+      width: '320px', // w-80
+      background: 'linear-gradient(to bottom, #111, #000)', // bg-gradient-to-b from-[#111] to-[#000]
+      borderRadius: '16px', // rounded-2xl
+      border: '2px solid #333', // border-2 border-[#333]
+      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)', // shadow-2xl (approx)
+      overflow: 'hidden',
+      zIndex: 50,
+    }}
+  >
+    <div
+      style={{
+        padding: '16px 24px 12px', // px-6 pt-4 pb-3
+        borderBottom: '1px solid #333', // border-b border-[#333]
+      }}
+    >
+      <Identity hasCopyAddressOnClick>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}> {/* flex items-center gap-4 */}
+          <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" /> {/* Keep class for Avatar */}
+          <div>
+            <Name className="text-xl font-bold text-[#ffd700]" /> {/* Keep, but if issues, move to style */}
+            <Address className="text-sm text-gray-400" /> {/* Same */}
+          </div>
         </div>
+      </Identity>
+    </div>
 
-        <div className="py-2">
-          <a
-            href="https://keys.coinbase.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block px-6 py-3 text-[#ffd700] hover:bg-[#222] hover:text-white transition"
-          >
-            Smart Wallet
-          </a>
-          <a
-            href="https://portfolio.coinbase.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block px-6 py-3 text-[#ffd700] hover:bg-[#222] hover:text-white transition"
-          >
-            Portfolio
-          </a>
-        </div>
+    <div style={{ padding: '8px 0' }}> {/* py-2 */}
+      <a
+        href="https://keys.coinbase.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: 'block',
+          padding: '12px 24px', // px-6 py-3
+          color: '#ffd700', // text-[#ffd700]
+          transition: 'all 0.3s',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = '#222';
+          e.currentTarget.style.color = '#fff';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.color = '#ffd700';
+        }}
+      >
+        Smart Wallet
+      </a>
+      <a
+        href="https://portfolio.coinbase.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: 'block',
+          padding: '12px 24px', // px-6 py-3
+          color: '#ffd700',
+          transition: 'all 0.3s',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = '#222';
+          e.currentTarget.style.color = '#fff';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.color = '#ffd700';
+        }}
+      >
+        Portfolio
+      </a>
+    </div>
 
-        <div className="border-t border-[#333] px-6 py-4">
-          <button
-            onClick={() => disconnect()}
-            className="w-full bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300 font-bold py-3 rounded-lg transition"
-          >
-            Disconnect Wallet
-          </button>
-        </div>
-      </div>
-    );
+    <div style={{ borderTop: '1px solid #333', padding: '16px 24px' }}> {/* border-t border-[#333] px-6 py-4 */}
+      <button
+        onClick={() => disconnect()}
+        style={{
+          width: '100%',
+          background: 'rgba(255,0,0,0.1)', // bg-red-900/30 (approx)
+          color: '#f56565', // text-red-400
+          fontWeight: 'bold',
+          padding: '12px', // py-3
+          borderRadius: '8px', // rounded-lg
+          transition: 'all 0.3s',
+          border: 'none',
+          cursor: 'pointer',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(255,0,0,0.2)';
+          e.currentTarget.style.color = '#fc8181';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'rgba(255,0,0,0.1)';
+          e.currentTarget.style.color = '#f56565';
+        }}
+      >
+        Disconnect Wallet
+      </button>
+    </div>
+  </div>
+);
   })()}
 </Wallet>
             </div>
