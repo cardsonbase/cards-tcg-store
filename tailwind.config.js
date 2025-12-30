@@ -1,3 +1,5 @@
+// Tailwind rebuild trigger - December 2025
+
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
