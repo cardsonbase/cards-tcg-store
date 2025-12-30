@@ -38,6 +38,7 @@ export default function Home() {
   const [treasuryEth, setTreasuryEth] = useState(0);
   const [showHowToBuy, setShowHowToBuy] = useState(false);
   const { setFrameReady, isFrameReady } = useMiniKit();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   useEffect(() => {
     const fetchPrice = async () => {
@@ -447,26 +448,21 @@ export default function Home() {
     )}
   />
 
-  {/* Custom Dropdown using Wagmi hooks */}
-  {(() => {
-  const { address, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  if (!isConnected) return null;
-
-  return (
+     {/* Custom Dropdown – now controlled correctly */}
+  {isConnected && isDropdownOpen && (
     <>
-      {/* Click outside to close */}
+      {/* Invisible overlay – only when dropdown is open */}
       <div
         style={{
           position: "fixed",
           inset: 0,
-          zIndex: 40, // Below dropdown (z-50)
+          zIndex: 40,
+          background: "transparent", // invisible
         }}
         onClick={() => setIsDropdownOpen(false)}
       />
 
+      {/* Dropdown panel */}
       <div
         style={{
           position: "absolute",
@@ -480,14 +476,9 @@ export default function Home() {
           boxShadow: "0 10px 30px rgba(0,0,0,0.8)",
           overflow: "hidden",
           zIndex: 50,
-          opacity: isDropdownOpen ? 1 : 0,
-          visibility: isDropdownOpen ? "visible" : "hidden",
-          transform: isDropdownOpen ? "translateY(0)" : "translateY(-10px)",
-          transition: "all 0.2s ease-out",
-          pointerEvents: isDropdownOpen ? "auto" : "none",
+          animation: "fadeInDown 0.2s ease-out",
         }}
       >
-        {/* existing dropdown content here */}
         <div style={{ padding: "16px 24px 12px", borderBottom: "1px solid #333" }}>
           <Identity hasCopyAddressOnClick>
             <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
@@ -549,7 +540,7 @@ export default function Home() {
           <button
             onClick={() => {
               disconnect();
-              setIsDropdownOpen(false); // Close on disconnect
+              setIsDropdownOpen(false);
             }}
             style={{
               width: "100%",
@@ -576,7 +567,7 @@ export default function Home() {
         </div>
       </div>
     </>
-  );
+  )}
 })()}
 </Wallet>
             </div>
