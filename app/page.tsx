@@ -443,118 +443,135 @@ export default function Home() {
 
   {/* Custom Dropdown using Wagmi hooks */}
   {(() => {
-    const { address, isConnected } = useAccount();
-    const { disconnect } = useDisconnect();
+  const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    if (!isConnected) return null;
+  if (!isConnected) return null;
 
-    return (
-  <div
-    style={{
-      position: 'absolute',
-      top: '100%',
-      right: 0,
-      marginTop: '16px', // mt-4
-      width: '320px', // w-80
-      background: 'linear-gradient(to bottom, #111, #000)', // bg-gradient-to-b from-[#111] to-[#000]
-      borderRadius: '16px', // rounded-2xl
-      border: '2px solid #333', // border-2 border-[#333]
-      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)', // shadow-2xl (approx)
-      overflow: 'hidden',
-      zIndex: 50,
-    }}
-  >
-    <div
-      style={{
-        padding: '16px 24px 12px', // px-6 pt-4 pb-3
-        borderBottom: '1px solid #333', // border-b border-[#333]
-      }}
-    >
-      <Identity hasCopyAddressOnClick>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}> {/* flex items-center gap-4 */}
-          <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" /> {/* Keep class for Avatar */}
-          <div>
-            <Name className="text-xl font-bold text-[#ffd700]" /> {/* Keep, but if issues, move to style */}
-            <Address className="text-sm text-gray-400" /> {/* Same */}
-          </div>
+  return (
+    <>
+      {/* Click outside to close */}
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 40, // Below dropdown (z-50)
+        }}
+        onClick={() => setIsDropdownOpen(false)}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          top: "100%",
+          right: 0,
+          marginTop: "16px",
+          width: "320px",
+          background: "linear-gradient(to bottom, #111, #000)",
+          borderRadius: "16px",
+          border: "2px solid #333",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.8)",
+          overflow: "hidden",
+          zIndex: 50,
+          opacity: isDropdownOpen ? 1 : 0,
+          visibility: isDropdownOpen ? "visible" : "hidden",
+          transform: isDropdownOpen ? "translateY(0)" : "translateY(-10px)",
+          transition: "all 0.2s ease-out",
+          pointerEvents: isDropdownOpen ? "auto" : "none",
+        }}
+      >
+        {/* existing dropdown content here */}
+        <div style={{ padding: "16px 24px 12px", borderBottom: "1px solid #333" }}>
+          <Identity hasCopyAddressOnClick>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" />
+              <div>
+                <Name className="text-xl font-bold text-[#ffd700]" />
+                <Address className="text-sm text-gray-400" />
+              </div>
+            </div>
+          </Identity>
         </div>
-      </Identity>
-    </div>
 
-    <div style={{ padding: '8px 0' }}> {/* py-2 */}
-      <a
-        href="https://keys.coinbase.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          display: 'block',
-          padding: '12px 24px', // px-6 py-3
-          color: '#ffd700', // text-[#ffd700]
-          transition: 'all 0.3s',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = '#222';
-          e.currentTarget.style.color = '#fff';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'transparent';
-          e.currentTarget.style.color = '#ffd700';
-        }}
-      >
-        Smart Wallet
-      </a>
-      <a
-        href="https://portfolio.coinbase.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          display: 'block',
-          padding: '12px 24px', // px-6 py-3
-          color: '#ffd700',
-          transition: 'all 0.3s',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = '#222';
-          e.currentTarget.style.color = '#fff';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'transparent';
-          e.currentTarget.style.color = '#ffd700';
-        }}
-      >
-        Portfolio
-      </a>
-    </div>
+        <div style={{ padding: "8px 0" }}>
+          <a
+            href="https://keys.coinbase.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "block",
+              padding: "12px 24px",
+              color: "#ffd700",
+              transition: "all 0.3s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#222";
+              e.currentTarget.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.color = "#ffd700";
+            }}
+          >
+            Smart Wallet
+          </a>
+          <a
+            href="https://portfolio.coinbase.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "block",
+              padding: "12px 24px",
+              color: "#ffd700",
+              transition: "all 0.3s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#222";
+              e.currentTarget.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.color = "#ffd700";
+            }}
+          >
+            Portfolio
+          </a>
+        </div>
 
-    <div style={{ borderTop: '1px solid #333', padding: '16px 24px' }}> {/* border-t border-[#333] px-6 py-4 */}
-      <button
-        onClick={() => disconnect()}
-        style={{
-          width: '100%',
-          background: 'rgba(255,0,0,0.1)', // bg-red-900/30 (approx)
-          color: '#f56565', // text-red-400
-          fontWeight: 'bold',
-          padding: '12px', // py-3
-          borderRadius: '8px', // rounded-lg
-          transition: 'all 0.3s',
-          border: 'none',
-          cursor: 'pointer',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(255,0,0,0.2)';
-          e.currentTarget.style.color = '#fc8181';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'rgba(255,0,0,0.1)';
-          e.currentTarget.style.color = '#f56565';
-        }}
-      >
-        Disconnect Wallet
-      </button>
-    </div>
-  </div>
-);
-  })()}
+        <div style={{ borderTop: "1px solid #333", padding: "16px 24px" }}>
+          <button
+            onClick={() => {
+              disconnect();
+              setIsDropdownOpen(false); // Close on disconnect
+            }}
+            style={{
+              width: "100%",
+              background: "rgba(255,0,0,0.1)",
+              color: "#f56565",
+              fontWeight: "bold",
+              padding: "12px",
+              borderRadius: "8px",
+              transition: "all 0.3s",
+              border: "none",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(255,0,0,0.2)";
+              e.currentTarget.style.color = "#fc8181";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(255,0,0,0.1)";
+              e.currentTarget.style.color = "#f56565";
+            }}
+          >
+            Disconnect Wallet
+          </button>
+        </div>
+      </div>
+    </>
+  );
+})()}
 </Wallet>
             </div>
           </header>
