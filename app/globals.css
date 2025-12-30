@@ -1,4 +1,8 @@
-/* app/globals.css — FINAL WORKING (NO TAILWIND, NO ERRORS) */
+/* app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 
