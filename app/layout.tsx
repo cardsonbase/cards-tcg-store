@@ -1,11 +1,11 @@
 // app/layout.tsx
-import "../styles/globals.css";  
+import "../styles/globals.css";  // ← Your moved CSS import
 import { Metadata } from "next";
-import { Providers } from "./providers";          // ← our new RainbowKit + wagmi wrapper
+import { Providers } from "./providers";  // wagmi + OnchainKit wrapper
 
 export const metadata: Metadata = {
   title: "$CARDS TCG Store",
-  description: "The first Onchain RWA TCG collectibles store on Base",
+  description: "The first Direct Onchain RWA TCG collectibles store on Base",
   openGraph: {
     title: "$CARDS TCG Store",
     description: "The first Onchain RWA TCG collectibles store on Base",
@@ -34,8 +34,8 @@ export default function RootLayout({
         <meta name="base:app_id" content="6939fa888a7c4e55fec73d3e" />
       </head>
       <body>
-        <Providers>                                 {/* ← THIS IS THE ONLY NEW LINE */}
-          <ClientLayout>{children}</ClientLayout>
+        <Providers>
+          {children}  {/* ← Directly render children here */}
 
           <footer className="border-t border-gray-800 mt-16 py-8 text-center text-sm text-gray-500">
             <a href="/terms" className="underline hover:text-white">Terms of Service</a>
