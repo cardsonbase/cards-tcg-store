@@ -24,6 +24,7 @@ import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import { ref, onValue } from "firebase/database";
 import { useCart } from "@/lib/cart";
 import dynamic from "next/dynamic";
+import { useAccount, useDisconnect } from 'wagmi';  // Add useDisconnect
 
 export default function Home() {
   const [price, setPrice] = useState(0.00005);
@@ -401,16 +402,10 @@ export default function Home() {
               </a>
 
              <Wallet>
-  {/* Custom gold connect button */}
   <ConnectWallet
-    render={({
-      label,
-      onClick,
-      status,
-      isLoading,
-    }) => (
+    render={({ onClick, status, isLoading }) => (
       <button
-        onClick={onClick}  // This opens modal when disconnected, dropdown when connected
+        onClick={onClick}
         disabled={isLoading}
         className="relative overflow-hidden bg-gradient-to-r from-[#ffd700] to-[#ffed4e] text-black font-bold text-lg px-6 py-3 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 hover:scale-105 cursor-pointer"
         style={{
@@ -421,52 +416,64 @@ export default function Home() {
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 ring-2 ring-black" />
           <span className="font-bold drop-shadow-md">
-            {status === 'disconnected' ? 'Connect Wallet' : label || <Name />}
+            {status === 'disconnected' ? 'Connect Wallet' : <Name />}
           </span>
         </div>
       </button>
     )}
   />
 
-  {/* Dropdown appears when button is clicked (while connected) */}
-  <WalletDropdown>
-    <Identity
-      className="px-6 pt-4 pb-3 bg-gradient-to-b from-[#111] to-[#000] border-b border-[#333]"
-      hasCopyAddressOnClick
-    >
-      <div className="flex items-center gap-4">
-        <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" />
-        <div>
-          <Name className="text-xl font-bold text-[#ffd700]" />
-          <Address className="text-sm text-gray-400" />
+  {/* Custom Dropdown using Wagmi hooks */}
+  {(() => {
+    const { address, isConnected } = useAccount();
+    const { disconnect } = useDisconnect();
+
+    if (!isConnected) return null;
+
+    return (
+      <div className="absolute top-full right-0 mt-4 w-80 bg-gradient-to-b from-[#111] to-[#000] rounded-2xl border-2 border-[#333] shadow-2xl overflow-hidden z-50">
+        <div className="px-6 pt-4 pb-3 border-b border-[#333]">
+          <Identity hasCopyAddressOnClick>
+            <div className="flex items-center gap-4">
+              <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" />
+              <div>
+                <Name className="text-xl font-bold text-[#ffd700]" />
+                <Address className="text-sm text-gray-400" />
+              </div>
+            </div>
+          </Identity>
+        </div>
+
+        <div className="py-2">
+          <a
+            href="https://keys.coinbase.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block px-6 py-3 text-[#ffd700] hover:bg-[#222] hover:text-white transition"
+          >
+            Smart Wallet
+          </a>
+          <a
+            href="https://portfolio.coinbase.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block px-6 py-3 text-[#ffd700] hover:bg-[#222] hover:text-white transition"
+          >
+            Portfolio
+          </a>
+        </div>
+
+        <div className="border-t border-[#333] px-6 py-4">
+          <button
+            onClick={() => disconnect()}
+            className="w-full bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300 font-bold py-3 rounded-lg transition"
+          >
+            Disconnect Wallet
+          </button>
         </div>
       </div>
-    </Identity>
-
-    <WalletDropdownBasename />
-
-    <WalletDropdownLink
-      href="https://keys.coinbase.com"
-      icon="wallet"
-      className="text-[#ffd700] hover:bg-[#222] hover:text-white"
-    >
-      Smart Wallet
-    </WalletDropdownLink>
-
-    <WalletDropdownLink
-      href="https://portfolio.coinbase.com"
-      icon="activity"
-      className="text-[#ffd700] hover:bg-[#222] hover:text-white"
-    >
-      Portfolio
-    </WalletDropdownLink>
-
-    <WalletDropdownDisconnect 
-  className="bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300 px-6 py-4 font-bold"
->
-  Disconnect Wallet
-</WalletDropdownDisconnect>
-  </WalletDropdown>
+    );
+  })()}
 </Wallet>
             </div>
           </header>
