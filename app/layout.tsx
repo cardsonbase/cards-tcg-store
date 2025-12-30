@@ -1,8 +1,8 @@
 // app/layout.tsx
-import '@coinbase/onchainkit/styles.css';
-import "../styles/globals.css";  // ← Your moved CSS import
+import '@coinbase/onchainkit/styles.css';  
+import "../styles/globals.css";           
 import { Metadata } from "next";
-import { Providers } from "./providers";  // wagmi + OnchainKit wrapper
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "$CARDS TCG Store",
