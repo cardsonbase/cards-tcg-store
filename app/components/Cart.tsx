@@ -204,7 +204,7 @@ export default function Cart({
           </p>
           <button
             onClick={onClose}
-            className="bg-green-400 hover:bg-green-300 text-black px-24 py-7 rounded-2xl font-black text-4xl shadow-2xl transition"
+            className="bg-green-400 hover:bg-green-300 text-black px-24 py-7 rounded-2xl font-black text-4xl shadow-2xl transition cursor-pointer"  // Added cursor-pointer
           >
             BACK TO STORE
           </button>
@@ -256,7 +256,7 @@ export default function Cart({
                 </select>
                 <button
                   onClick={() => cart.removeItem(item.id)}
-                  className="text-red-500 hover:text-red-400 text-5xl font-black"
+                  className="text-red-500 hover:text-red-400 text-5xl font-black cursor-pointer"  // Added cursor-pointer
                 >
                   ×
                 </button>
@@ -279,14 +279,14 @@ export default function Cart({
         <div className="grid grid-cols-2 gap-8 mt-16">
           <button
             onClick={onClose}
-            className="py-7 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl font-black text-3xl shadow-2xl transition"
+            className="py-7 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl font-black text-3xl shadow-2xl transition border-2 border-gray-600/50 hover:border-gray-500 cursor-pointer"  // Enhanced with border + cursor-pointer
           >
             KEEP SHOPPING
           </button>
           <button
             onClick={handleProceedToShipping}
             disabled={!address}
-            className="py-7 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-400 hover:to-green-300 text-black rounded-2xl font-black text-4xl shadow-2xl transition disabled:opacity-50"
+            className="py-7 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-400 hover:to-green-300 text-black rounded-2xl font-black text-4xl shadow-2xl transition disabled:opacity-50 border-2 border-green-600/50 hover:border-green-500 cursor-pointer disabled:cursor-not-allowed"  // Enhanced with border + cursor styles
           >
             PROCEED TO SHIPPING
           </button>
