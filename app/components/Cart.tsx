@@ -176,12 +176,12 @@ export default function Cart({
             </span>
           </label>
 
-          <button
+                    <button
             onClick={handlePay}
             disabled={isPending || !isTermsAccepted || !address}
-            className={`w-full mt-8 py-8 rounded-3xl font-black text-5xl shadow-2xl transition-all ${
+            className={`w-full mt-8 py-8 rounded-3xl font-black text-5xl shadow-2xl transition-all duration-200 active:scale-98 ${
               isTermsAccepted && !isPending && address
-                ? "bg-gradient-to-r from-green-400 to-green-500 hover:from-green-300 hover:to-green-400 text-black"
+                ? "bg-gradient-to-r from-green-400 to-green-500 hover:from-green-300 hover:to-green-400 active:from-green-500 active:to-green-600 text-black cursor-pointer"
                 : "bg-gray-800 text-gray-500 cursor-not-allowed"
             }`}
           >
@@ -276,17 +276,18 @@ export default function Cart({
           <p className="text-green-400 text-4xl font-black">≈ {amount.toLocaleString()} $CARDS</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 mt-16">
+        <div clas<div className="grid grid-cols-2 gap-8 mt-16">
+         <div className="grid grid-cols-2 gap-8 mt-16">
           <button
             onClick={onClose}
-            className="py-7 bg-gray-800 hover:bg-gray-700 text-white rounded-2xl font-black text-3xl shadow-2xl transition border-2 border-gray-600/50 hover:border-gray-500 cursor-pointer"  // Enhanced with border + cursor-pointer
+            className="py-7 bg-gray-800 hover:bg-gray-600 active:bg-gray-700 text-white rounded-2xl font-black text-3xl shadow-2xl transition-all duration-200 border-2 border-gray-600 hover:border-gray-400 active:scale-95 cursor-pointer"
           >
             KEEP SHOPPING
           </button>
           <button
             onClick={handleProceedToShipping}
             disabled={!address}
-            className="py-7 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-400 hover:to-green-300 text-black rounded-2xl font-black text-4xl shadow-2xl transition disabled:opacity-50 border-2 border-green-600/50 hover:border-green-500 cursor-pointer disabled:cursor-not-allowed"  // Enhanced with border + cursor styles
+            className="py-7 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-400 hover:to-green-300 active:from-green-600 active:to-green-500 text-black rounded-2xl font-black text-4xl shadow-2xl transition-all duration-200 border-2 border-green-600/50 hover:border-green-500 active:scale-95 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           >
             PROCEED TO SHIPPING
           </button>
