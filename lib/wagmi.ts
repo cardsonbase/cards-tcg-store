@@ -1,16 +1,20 @@
-// lib/wagmi.ts
-import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { http, createConfig, cookieStorage, createStorage } from 'wagmi';
 import { base } from 'wagmi/chains';
+import { coinbaseWallet } from 'wagmi/connectors';  // Direct Wagmi connector for Coinbase Smart Wallet
 
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
-
-if (!projectId) {
-  throw new Error('Missing NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in .env.local');
-}
-
-export const wagmiConfig = getDefaultConfig({
-  appName: '$CARDS TCG Store',
-  projectId,
+export const wagmiConfig = createConfig({
   chains: [base],
-  ssr: true,  // Add this back for Next.js SSR (Turbopack supports it in latest versions)
+  connectors: [
+    coinbaseWallet({
+      appName: 'CARDS TCG Store',
+      preference: 'smartWalletOnly',  // Focus on Smart Wallet for Base ecosystem
+      version: '4',  // Latest for 2025; supports advanced features
+    }),
+    // Add more if needed (e.g., injected() for MetaMask), but keep minimal for conformity
+  ],
+  storage: createStorage({ storage: cookieStorage }),
+  ssr: true,
+  transports: {
+    [base.id]: http(),
+  },
 });
