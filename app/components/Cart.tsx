@@ -265,7 +265,7 @@ export default function Cart({
           );
         })}
 
-        <div className="border-t-4 border-yellow-500/60 pt-10 text-center">
+                <div className="border-t-4 border-yellow-500/60 pt-10 text-center">
           <p className="text-gray-400 text-2xl mb-4">
             Items Total: <span className="text-yellow-400 font-bold">${totalBaseUsd.toFixed(2)}</span>
           </p>
@@ -276,8 +276,7 @@ export default function Cart({
           <p className="text-green-400 text-4xl font-black">≈ {amount.toLocaleString()} $CARDS</p>
         </div>
 
-        <div clas<div className="grid grid-cols-2 gap-8 mt-16">
-         <div className="grid grid-cols-2 gap-8 mt-16">
+        <div className="grid grid-cols-2 gap-8 mt-16">
           <button
             onClick={onClose}
             className="py-7 bg-gray-800 hover:bg-gray-600 active:bg-gray-700 text-white rounded-2xl font-black text-3xl shadow-2xl transition-all duration-200 border-2 border-gray-600 hover:border-gray-400 active:scale-95 cursor-pointer"
