@@ -105,10 +105,10 @@ export default function Cart({
   value={form.name}
   onChange={(e) => setForm({ ...form, name: e.target.value })}
   className="w-full p-5 mb-5 bg-[#1a1a1a] rounded-xl text-white text-xl placeholder-gray-500 
-             border-2 border-yellow-400/60 
-             focus:border-yellow-400 focus:outline-none focus:ring-4 focus:ring-yellow-400/40 
-             hover:border-yellow-400 
-             transition-all duration-200"
+           border-2 border-yellow-400/70 
+           focus:border-yellow-400 focus:outline-none focus:ring-4 focus:ring-yellow-400/40 
+           hover:border-yellow-400 
+           transition-all duration-200"
 />
 
           <label className="text-yellow-400 text-xl font-bold mb-2 block">Email (for receipt)</label>
