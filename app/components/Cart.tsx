@@ -26,13 +26,19 @@ export default function Cart({
 
   const [showForm, setShowForm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", address: "", city: "", state: "", zip: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+  });
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
   const totalBaseUsd = cart.items.reduce((s, i) => s + i.usd * i.quantity, 0);
   const totalItems = cart.items.reduce((s, i) => s + i.quantity, 0);
-
-  const shipping = 0; // FREE SHIPPING
+  const shipping = 0;
   const totalUsd = totalBaseUsd + shipping;
   const amount = Math.ceil(totalUsd / cardsPriceUsd);
   const amountWei = parseUnits(amount.toString(), DECIMALS);
@@ -90,125 +96,29 @@ export default function Cart({
     }
   }, [isSuccess, txHash]);
 
-  if (showForm) {
-    return (
-      <div className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center">
-        <div className="bg-gradient-to-br from-[#111] to-black p-12 rounded-3xl border-4 border-yellow-400 w-full max-w-lg shadow-2xl relative">
-          <button onClick={() => setShowForm(false)} className="absolute top-4 right-4 text-yellow-400 text-4xl hover:text-yellow-300">
-            ×
-          </button>
-          <h2 className="text-yellow-400 text-5xl font-black text-center mb-10">SHIPPING ADDRESS</h2>
-
-          <label className="text-yellow-400 text-xl font-bold mb-2 block">Name</label>
-          <input
-  placeholder="Enter full name"
-  value={form.name}
-  onChange={(e) => setForm({ ...form, name: e.target.value })}
-  className="w-full p-5 mb-5 bg-[#1a1a1a] rounded-xl text-white text-xl placeholder-gray-500 
-           border-2 border-yellow-400/70 
-           focus:border-yellow-400 focus:outline-none focus:ring-4 focus:ring-yellow-400/40 
-           hover:border-yellow-400 
-           transition-all duration-200"
-/>
-
-          <label className="text-yellow-400 text-xl font-bold mb-2 block">Email (for receipt)</label>
-          <input
-            type="email"
-            placeholder="you@gmail.com"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full p-5 mb-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
-          />
-
-          <label className="text-yellow-400 text-xl font-bold mb-2 block">Street Address</label>
-          <input
-            placeholder="Enter street address"
-            value={form.address}
-            onChange={(e) => setForm({ ...form, address: e.target.value })}
-            className="w-full p-5 mb-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
-          />
-
-          <div className="grid grid-cols-2 gap-4 mb-5">
-            <div>
-              <label className="text-yellow-400 text-xl font-bold mb-2 block">City</label>
-              <input
-                placeholder="City"
-                value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })}
-                className="w-full p-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
-              />
-            </div>
-            <div>
-              <label className="text-yellow-400 text-xl font-bold mb-2 block">State (e.g., CA)</label>
-              <input
-                placeholder="State"
-                value={form.state}
-                onChange={(e) => setForm({ ...form, state: e.target.value })}
-                className="w-full p-5 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
-              />
-            </div>
-          </div>
-
-          <label className="text-yellow-400 text-xl font-bold mb-2 block">ZIP Code</label>
-          <input
-            placeholder="ZIP (5 digits)"
-            value={form.zip}
-            onChange={(e) => setForm({ ...form, zip: e.target.value })}
-            className="w-full p-5 mb-8 bg-[#1a1a1a] border-2 border-yellow-400/50 rounded-xl text-white text-xl hover:border-yellow-400 transition"
-          />
-
-          <div className="text-center mb-8 bg-black/40 rounded-2xl p-6 border border-green-400/50">
-            <p className="text-green-400 text-2xl font-bold">Shipping: FREE</p>
-            <p className="text-green-400 text-3xl font-black mt-3">
-              Total: ${totalUsd.toFixed(2)} ≈ {amount.toLocaleString()} $CARDS
-            </p>
-          </div>
-
-          <label className="flex items-start gap-4 text-lg text-gray-200">
-            <input
-              type="checkbox"
-              checked={isTermsAccepted}
-              onChange={(e) => setIsTermsAccepted(e.target.checked)}
-              className="mt-1 h-6 w-6 rounded border-yellow-600 bg-gray-900 text-yellow-400 focus:ring-yellow-400"
-            />
-            <span>
-              I agree to the{" "}
-              <a href="/terms" target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-white">
-                Terms of Service
-              </a>{" "}
-              and understand all sales are final.
-            </span>
-          </label>
-
-                    <button
-            onClick={handlePay}
-            disabled={isPending || !isTermsAccepted || !address}
-            className={`w-full mt-8 py-8 rounded-3xl font-black text-5xl shadow-2xl transition-all duration-200 active:scale-98 ${
-              isTermsAccepted && !isPending && address
-                ? "bg-gradient-to-r from-green-400 to-green-500 hover:from-green-300 hover:to-green-400 active:from-green-500 active:to-green-600 text-black cursor-pointer"
-                : "bg-gray-800 text-gray-500 cursor-not-allowed"
-            }`}
-          >
-            {isPending ? "CONFIRMING ON BASE..." : "CONFIRM & PAY"}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  // SUCCESS SCREEN
   if (showSuccess) {
     return (
-      <div className="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center">
-        <div className="bg-gradient-to-br from-[#111] to-black p-16 rounded-3xl border-4 border-yellow-400 text-center shadow-2xl max-w-2xl">
-          <div className="text-green-400 text-9xl mb-8">Purchase Complete</div>
-          <h2 className="text-yellow-400 text-7xl font-black mb-8">THANK YOU!</h2>
-          <p className="text-white text-3xl mb-12">
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
+        <div style={{ background: "linear-gradient(to bottom, #111, #000)", padding: "60px", borderRadius: "32px", border: "4px solid #ffd700", textAlign: "center", maxWidth: "600px", boxShadow: "0 0 60px rgba(255,215,0,0.4)" }}>
+          <div style={{ fontSize: "120px", color: "#00ff9d" }}>✓</div>
+          <h2 style={{ color: "#ffd700", fontSize: "60px", fontWeight: "bold", margin: "20px 0" }}>THANK YOU!</h2>
+          <p style={{ color: "#fff", fontSize: "28px", marginBottom: "40px" }}>
             Your order is confirmed on Base<br />
             Cards ship in 24–48 hours
           </p>
           <button
             onClick={onClose}
-            className="bg-green-400 hover:bg-green-300 text-black px-24 py-7 rounded-2xl font-black text-4xl shadow-2xl transition cursor-pointer"  // Added cursor-pointer
+            style={{
+              background: "#00ff9d",
+              color: "#000",
+              padding: "20px 60px",
+              borderRadius: "24px",
+              fontWeight: "bold",
+              fontSize: "36px",
+              cursor: "pointer",
+              boxShadow: "0 10px 30px rgba(0,255,157,0.4)",
+            }}
           >
             BACK TO STORE
           </button>
@@ -217,29 +127,121 @@ export default function Cart({
     );
   }
 
+  // SHIPPING FORM
+  if (showForm) {
+    return (
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
+        <div style={{ background: "#111", padding: "50px", borderRadius: "32px", border: "4px solid #ffd700", width: "90%", maxWidth: "600px", boxShadow: "0 0 60px rgba(255,215,0,0.3)" }}>
+          <button onClick={() => setShowForm(false)} style={{ position: "absolute", top: "20px", right: "30px", fontSize: "40px", color: "#ffd700", background: "none", border: "none", cursor: "pointer" }}>
+            ×
+          </button>
+
+          <h2 style={{ color: "#ffd700", fontSize: "48px", fontWeight: "bold", textAlign: "center", marginBottom: "40px" }}>SHIPPING ADDRESS</h2>
+
+          <input
+            placeholder="Full Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            style={inputStyle}
+          />
+          <input
+            type="email"
+            placeholder="Email (for receipt & tracking)"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            style={inputStyle}
+          />
+          <input
+            placeholder="Street Address"
+            value={form.address}
+            onChange={(e) => setForm({ ...form, address: e.target.value })}
+            style={inputStyle}
+          />
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+            <input placeholder="City" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} style={inputStyle} />
+            <input placeholder="State (e.g. CA)" value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} style={inputStyle} />
+          </div>
+
+          <input placeholder="ZIP Code" value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })} style={inputStyle} />
+
+          <div style={{ background: "#000", padding: "30px", borderRadius: "20px", border: "2px solid #00ff9d", textAlign: "center", margin: "30px 0" }}>
+            <p style={{ color: "#00ff9d", fontSize: "28px", fontWeight: "bold" }}>Shipping: FREE</p>
+            <p style={{ color: "#00ff9d", fontSize: "36px", fontWeight: "bold", marginTop: "10px" }}>
+              Total: ${totalUsd.toFixed(2)} ≈ {amount.toLocaleString()} $CARDS
+            </p>
+          </div>
+
+          <label style={{ display: "flex", alignItems: "flex-start", gap: "16px", color: "#ccc", fontSize: "18px", marginBottom: "30px" }}>
+            <input
+              type="checkbox"
+              checked={isTermsAccepted}
+              onChange={(e) => setIsTermsAccepted(e.target.checked)}
+              style={{ width: "28px", height: "28px", marginTop: "4px", accentColor: "#ffd700" }}
+            />
+            <span>
+              I agree to the <a href="/terms" target="_blank" style={{ color: "#ffd700", textDecoration: "underline" }}>Terms of Service</a> and understand all sales are final.
+            </span>
+          </label>
+
+          <button
+            onClick={handlePay}
+            disabled={isPending || !isTermsAccepted || !address}
+            style={{
+              width: "100%",
+              padding: "28px",
+              borderRadius: "32px",
+              fontSize: "48px",
+              fontWeight: "bold",
+              cursor: isTermsAccepted && !isPending && address ? "pointer" : "not-allowed",
+              background: isTermsAccepted && !isPending && address ? "linear-gradient(to right, #00ff9d, #00cc7a)" : "#444",
+              color: "#000",
+              border: "none",
+              boxShadow: isTermsAccepted && address ? "0 15px 40px rgba(0,255,157,0.5)" : "none",
+              transition: "all 0.3s",
+            }}
+          >
+            {isPending ? "CONFIRMING ON BASE..." : "CONFIRM & PAY"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // MAIN CART VIEW
   return (
-    <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50" onClick={onClose}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onClick={onClose}>
       <div
-        className="bg-gradient-to-br from-[#0a0a0a] to-black rounded-3xl border-4 border-yellow-400 w-full max-w-2xl max-h-[92vh] overflow-y-auto p-10 shadow-2xl"
+        style={{
+          background: "linear-gradient(to bottom, #0a0a0a, #000)",
+          borderRadius: "32px",
+          border: "4px solid #ffd700",
+          width: "90%",
+          maxWidth: "700px",
+          maxHeight: "90vh",
+          overflowY: "auto",
+          padding: "40px",
+          boxShadow: "0 0 80px rgba(255,215,0,0.4)",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-center text-yellow-400 text-6xl font-black mb-12 tracking-wider">
+        <h2 style={{ textAlign: "center", color: "#ffd700", fontSize: "56px", fontWeight: "bold", marginBottom: "40px" }}>
           YOUR CART ({totalItems})
         </h2>
 
         {cart.items.map((item) => {
           const stock = products.find((p) => p.id === item.id)?.stock || 0;
           return (
-            <div key={item.id} className="bg-[#151515] rounded-2xl p-8 mb-8 border border-yellow-500/40 shadow-2xl">
-              <div className="text-yellow-400 text-3xl font-bold mb-4">{item.name}</div>
-              <div className="text-green-400 text-2xl">
+            <div key={item.id} style={{ background: "#151515", borderRadius: "24px", padding: "30px", marginBottom: "30px", border: "2px solid #ffd70040", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
+              <div style={{ color: "#ffd700", fontSize: "36px", fontWeight: "bold", marginBottom: "16px" }}>{item.name}</div>
+              <div style={{ color: "#00ff9d", fontSize: "28px" }}>
                 ${item.usd.toFixed(2)} × {item.quantity} ={" "}
-                <span className="text-yellow-300 font-black text-3xl">
+                <span style={{ color: "#ffd700", fontWeight: "bold", fontSize: "36px" }}>
                   ${(item.usd * item.quantity).toFixed(2)}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between mt-8">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "30px" }}>
                 <select
                   value={item.quantity}
                   onChange={(e) => {
@@ -250,17 +252,39 @@ export default function Cart({
                     }
                     cart.updateQuantity(item.id, q);
                   }}
-                  className="bg-[#222] text-yellow-400 px-8 py-4 rounded-2xl border-4 border-yellow-400 font-bold text-xl"
+                  style={{
+                    background: "#222",
+                    color: "#ffd700",
+                    padding: "16px 24px",
+                    borderRadius: "20px",
+                    border: "4px solid #ffd700",
+                    fontSize: "24px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
                 >
                   {Array.from({ length: stock }, (_, i) => i + 1).map((n) => (
-                    <option key={n} value={n} className="bg-black text-yellow-400">
+                    <option key={n} value={n} style={{ background: "#000", color: "#ffd700" }}>
                       {n}
                     </option>
                   ))}
                 </select>
+
                 <button
                   onClick={() => cart.removeItem(item.id)}
-                  className="text-red-500 hover:text-red-400 text-5xl font-black cursor-pointer"  // Added cursor-pointer
+                  style={{
+                    color: "#ff4444",
+                    fontSize: "48px",
+                    fontWeight: "bold",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "10px 20px",
+                    borderRadius: "12px",
+                    transition: "all 0.3s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#ff444430")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
                 >
                   ×
                 </button>
@@ -269,28 +293,56 @@ export default function Cart({
           );
         })}
 
-                <div className="border-t-4 border-yellow-500/60 pt-10 text-center">
-          <p className="text-gray-400 text-2xl mb-4">
-            Items Total: <span className="text-yellow-400 font-bold">${totalBaseUsd.toFixed(2)}</span>
+        <div style={{ borderTop: "4px solid #ffd70060", paddingTop: "40px", textAlign: "center" }}>
+          <p style={{ color: "#aaa", fontSize: "28px", marginBottom: "16px" }}>
+            Items Total: <span style={{ color: "#ffd700", fontWeight: "bold" }}>${totalBaseUsd.toFixed(2)}</span>
           </p>
-          <p className="text-green-400 text-3xl font-bold mb-8">
+          <p style={{ color: "#00ff9d", fontSize: "36px", fontWeight: "bold", marginBottom: "30px" }}>
             Shipping: FREE
           </p>
-          <p className="text-yellow-400 text-6xl font-black mb-4">TOTAL: ${totalUsd.toFixed(2)}</p>
-          <p className="text-green-400 text-4xl font-black">≈ {amount.toLocaleString()} $CARDS</p>
+          <p style={{ color: "#ffd700", fontSize: "64px", fontWeight: "bold", marginBottom: "10px" }}>
+            TOTAL: ${totalUsd.toFixed(2)}
+          </p>
+          <p style={{ color: "#00ff9d", fontSize: "48px", fontWeight: "bold" }}>
+            ≈ {amount.toLocaleString()} $CARDS
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 mt-16">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "30px", marginTop: "50px" }}>
           <button
             onClick={onClose}
-            className="py-7 bg-gray-800 hover:bg-gray-600 active:bg-gray-700 text-white rounded-2xl font-black text-3xl shadow-2xl transition-all duration-200 border-2 border-gray-600 hover:border-gray-400 active:scale-95 cursor-pointer"
+            style={{
+              padding: "24px",
+              background: "#333",
+              color: "#fff",
+              borderRadius: "24px",
+              fontSize: "32px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              border: "2px solid #666",
+              transition: "all 0.3s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#555")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#333")}
           >
             KEEP SHOPPING
           </button>
+
           <button
             onClick={handleProceedToShipping}
             disabled={!address}
-            className="py-7 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-400 hover:to-green-300 active:from-green-600 active:to-green-500 text-black rounded-2xl font-black text-4xl shadow-2xl transition-all duration-200 border-2 border-green-600/50 hover:border-green-500 active:scale-95 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            style={{
+              padding: "24px",
+              background: address ? "linear-gradient(to right, #00ff9d, #00cc7a)" : "#444",
+              color: "#000",
+              borderRadius: "24px",
+              fontSize: "36px",
+              fontWeight: "bold",
+              cursor: address ? "pointer" : "not-allowed",
+              border: "none",
+              boxShadow: address ? "0 15px 40px rgba(0,255,157,0.5)" : "none",
+              transition: "all 0.3s",
+            }}
           >
             PROCEED TO SHIPPING
           </button>
@@ -298,4 +350,32 @@ export default function Cart({
       </div>
     </div>
   );
+}
+
+// Reusable input style
+const inputStyle = {
+  width: "100%",
+  padding: "24px",
+  marginBottom: "24px",
+  background: "#1a1a1a",
+  border: "3px solid #ffd70060",
+  borderRadius: "20px",
+  color: "#fff",
+  fontSize: "24px",
+  outline: "none",
+  transition: "all 0.3s",
+} as const;
+
+// Add hover/focus effects via JS (optional, but nice)
+if (typeof window !== "undefined") {
+  document.querySelectorAll("input").forEach((input) => {
+    input.addEventListener("focus", (e: any) => {
+      e.target.style.border = "3px solid #ffd700";
+      e.target.style.boxShadow = "0 0 20px rgba(255,215,0,0.4)";
+    });
+    input.addEventListener("blur", (e: any) => {
+      e.target.style.border = "3px solid #ffd70060";
+      e.target.style.boxShadow = "none";
+    });
+  });
 }
