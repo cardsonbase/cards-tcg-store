@@ -400,70 +400,73 @@ export default function Home() {
                 />
               </a>
 
-              <Wallet>
-                {/* Fully custom gold button with render prop */}
-                <ConnectWallet
-                  render={({
-                    label,
-                    onClick,
-                    status,
-                    isLoading,
-                  }) => (
-                    <button
-                      onClick={onClick}
-                      disabled={isLoading}
-                      className="relative overflow-hidden bg-gradient-to-r from-[#ffd700] to-[#ffed4e] text-black font-bold text-lg px-6 py-3 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 hover:scale-105"
-                      style={{
-                        border: '3px solid #000',
-                        boxShadow: '0 8px 20px rgba(0,0,0,0.6), inset 0 2px 8px rgba(255,255,255,0.4)',
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9 ring-2 ring-black" />
-                        <span className="font-bold drop-shadow-md">
-                          {status === 'disconnected' ? 'Connect Wallet' : label || <Name />}
-                        </span>
-                      </div>
-                    </button>
-                  )}
-                />
+             <Wallet>
+  {/* Custom gold connect button */}
+  <ConnectWallet
+    render={({
+      label,
+      onClick,
+      status,
+      isLoading,
+    }) => (
+      <button
+        onClick={onClick}  // This opens modal when disconnected, dropdown when connected
+        disabled={isLoading}
+        className="relative overflow-hidden bg-gradient-to-r from-[#ffd700] to-[#ffed4e] text-black font-bold text-lg px-6 py-3 rounded-full shadow-2xl hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 hover:scale-105 cursor-pointer"
+        style={{
+          border: '3px solid #000',
+          boxShadow: '0 8px 20px rgba(0,0,0,0.6), inset 0 2px 8px rgba(255,255,255,0.4)',
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9 ring-2 ring-black" />
+          <span className="font-bold drop-shadow-md">
+            {status === 'disconnected' ? 'Connect Wallet' : label || <Name />}
+          </span>
+        </div>
+      </button>
+    )}
+  />
 
-                {/* Dropdown when connected */}
-                <WalletDropdown>
-                  <Identity
-                    className="px-6 pt-4 pb-3 bg-gradient-to-b from-[#111] to-[#000] border-b border-[#333]"
-                    hasCopyAddressOnClick
-                  >
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" />
-                      <div>
-                        <Name className="text-xl font-bold text-[#ffd700]" />
-                        <Address className="text-sm text-gray-400" />
-                      </div>
-                    </div>
-                  </Identity>
+  {/* Dropdown appears when button is clicked (while connected) */}
+  <WalletDropdown>
+    <Identity
+      className="px-6 pt-4 pb-3 bg-gradient-to-b from-[#111] to-[#000] border-b border-[#333]"
+      hasCopyAddressOnClick
+    >
+      <div className="flex items-center gap-4">
+        <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" />
+        <div>
+          <Name className="text-xl font-bold text-[#ffd700]" />
+          <Address className="text-sm text-gray-400" />
+        </div>
+      </div>
+    </Identity>
 
-                  <WalletDropdownBasename />
+    <WalletDropdownBasename />
 
-                  <WalletDropdownLink
-                    href="https://keys.coinbase.com"
-                    icon="wallet"
-                    className="text-[#ffd700] hover:bg-[#222] hover:text-white"
-                  >
-                    Smart Wallet
-                  </WalletDropdownLink>
+    <WalletDropdownLink
+      href="https://keys.coinbase.com"
+      icon="wallet"
+      className="text-[#ffd700] hover:bg-[#222] hover:text-white"
+    >
+      Smart Wallet
+    </WalletDropdownLink>
 
-                  <WalletDropdownLink
-                    href="https://portfolio.coinbase.com"
-                    icon="activity"
-                    className="text-[#ffd700] hover:bg-[#222] hover:text-white"
-                  >
-                    Portfolio
-                  </WalletDropdownLink>
+    <WalletDropdownLink
+      href="https://portfolio.coinbase.com"
+      icon="activity"
+      className="text-[#ffd700] hover:bg-[#222] hover:text-white"
+    >
+      Portfolio
+    </WalletDropdownLink>
 
-                  <WalletDropdownDisconnect className="bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300" />
-                </WalletDropdown>
-              </Wallet>
+    {/* THIS IS YOUR DISCONNECT BUTTON — IT'S ALREADY THERE! */}
+    <WalletDropdownDisconnect 
+      className="bg-red-900/30 text-red-400 hover:bg-red-900/50 hover:text-red-300 px-6 py-4" 
+    />
+  </WalletDropdown>
+</Wallet>
             </div>
           </header>
 
