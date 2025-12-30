@@ -100,10 +100,10 @@ export default function Cart({
   if (showSuccess) {
     return (
       <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
-        <div style={{ background: "linear-gradient(to bottom, #111, #000)", padding: "60px", borderRadius: "32px", border: "4px solid #ffd700", textAlign: "center", maxWidth: "600px", boxShadow: "0 0 60px rgba(255,215,0,0.4)" }}>
-          <div style={{ fontSize: "120px", color: "#00ff9d" }}>✓</div>
-          <h2 style={{ color: "#ffd700", fontSize: "60px", fontWeight: "bold", margin: "20px 0" }}>THANK YOU!</h2>
-          <p style={{ color: "#fff", fontSize: "28px", marginBottom: "40px" }}>
+        <div style={{ background: "linear-gradient(to bottom, #111, #000)", padding: "40px 20px", borderRadius: "32px", border: "4px solid #ffd700", textAlign: "center", maxWidth: "90%", boxShadow: "0 0 60px rgba(255,215,0,0.4)" }}>
+          <div style={{ fontSize: "80px", color: "#00ff9d" }}>✓</div>
+          <h2 style={{ color: "#ffd700", fontSize: "40px", fontWeight: "bold", margin: "20px 0" }}>THANK YOU!</h2>
+          <p style={{ color: "#fff", fontSize: "20px", marginBottom: "30px", lineHeight: "1.6" }}>
             Your order is confirmed on Base<br />
             Cards ship in 24–48 hours
           </p>
@@ -112,10 +112,10 @@ export default function Cart({
             style={{
               background: "#00ff9d",
               color: "#000",
-              padding: "20px 60px",
+              padding: "16px 40px",
               borderRadius: "24px",
               fontWeight: "bold",
-              fontSize: "36px",
+              fontSize: "24px",
               cursor: "pointer",
               boxShadow: "0 10px 30px rgba(0,255,157,0.4)",
             }}
@@ -127,57 +127,55 @@ export default function Cart({
     );
   }
 
-  // SHIPPING FORM
+  // SHIPPING FORM — Now fully scrollable and fits on mobile
   if (showForm) {
     return (
-      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
-        <div style={{ background: "#111", padding: "50px", borderRadius: "32px", border: "4px solid #ffd700", width: "90%", maxWidth: "600px", boxShadow: "0 0 60px rgba(255,215,0,0.3)" }}>
-          <button onClick={() => setShowForm(false)} style={{ position: "absolute", top: "20px", right: "30px", fontSize: "40px", color: "#ffd700", background: "none", border: "none", cursor: "pointer" }}>
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
+        <div
+          style={{
+            background: "#111",
+            borderRadius: "24px",
+            border: "4px solid #ffd700",
+            width: "100%",
+            maxWidth: "500px",
+            maxHeight: "90vh",
+            overflowY: "auto",
+            padding: "30px 20px",
+            boxShadow: "0 0 60px rgba(255,215,0,0.3)",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <button onClick={() => setShowForm(false)} style={{ alignSelf: "flex-end", fontSize: "36px", color: "#ffd700", background: "none", border: "none", cursor: "pointer", marginBottom: "10px" }}>
             ×
           </button>
 
-          <h2 style={{ color: "#ffd700", fontSize: "48px", fontWeight: "bold", textAlign: "center", marginBottom: "40px" }}>SHIPPING ADDRESS</h2>
+          <h2 style={{ color: "#ffd700", fontSize: "36px", fontWeight: "bold", textAlign: "center", marginBottom: "30px" }}>SHIPPING ADDRESS</h2>
 
-          <input
-            placeholder="Full Name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            style={inputStyle}
-          />
-          <input
-            type="email"
-            placeholder="Email (for receipt & tracking)"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            style={inputStyle}
-          />
-          <input
-            placeholder="Street Address"
-            value={form.address}
-            onChange={(e) => setForm({ ...form, address: e.target.value })}
-            style={inputStyle}
-          />
+          <input placeholder="Full Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} style={inputStyle} />
+          <input type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} style={inputStyle} />
+          <input placeholder="Street Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} style={inputStyle} />
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
             <input placeholder="City" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} style={inputStyle} />
-            <input placeholder="State (e.g. CA)" value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} style={inputStyle} />
+            <input placeholder="State" value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} style={inputStyle} />
           </div>
 
           <input placeholder="ZIP Code" value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })} style={inputStyle} />
 
-          <div style={{ background: "#000", padding: "30px", borderRadius: "20px", border: "2px solid #00ff9d", textAlign: "center", margin: "30px 0" }}>
-            <p style={{ color: "#00ff9d", fontSize: "28px", fontWeight: "bold" }}>Shipping: FREE</p>
-            <p style={{ color: "#00ff9d", fontSize: "36px", fontWeight: "bold", marginTop: "10px" }}>
+          <div style={{ background: "#000", padding: "20px", borderRadius: "16px", border: "2px solid #00ff9d", textAlign: "center", margin: "20px 0" }}>
+            <p style={{ color: "#00ff9d", fontSize: "20px", fontWeight: "bold" }}>Shipping: FREE</p>
+            <p style={{ color: "#00ff9d", fontSize: "28px", fontWeight: "bold", marginTop: "8px" }}>
               Total: ${totalUsd.toFixed(2)} ≈ {amount.toLocaleString()} $CARDS
             </p>
           </div>
 
-          <label style={{ display: "flex", alignItems: "flex-start", gap: "16px", color: "#ccc", fontSize: "18px", marginBottom: "30px" }}>
+          <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#ccc", fontSize: "16px", margin: "20px 0" }}>
             <input
               type="checkbox"
               checked={isTermsAccepted}
               onChange={(e) => setIsTermsAccepted(e.target.checked)}
-              style={{ width: "28px", height: "28px", marginTop: "4px", accentColor: "#ffd700" }}
+              style={{ width: "24px", height: "24px", accentColor: "#ffd700", flexShrink: 0, marginTop: "2px" }}
             />
             <span>
               I agree to the <a href="/terms" target="_blank" style={{ color: "#ffd700", textDecoration: "underline" }}>Terms of Service</a> and understand all sales are final.
@@ -189,59 +187,56 @@ export default function Cart({
             disabled={isPending || !isTermsAccepted || !address}
             style={{
               width: "100%",
-              padding: "28px",
-              borderRadius: "32px",
-              fontSize: "48px",
+              padding: "20px",
+              borderRadius: "24px",
+              fontSize: "32px",
               fontWeight: "bold",
               cursor: isTermsAccepted && !isPending && address ? "pointer" : "not-allowed",
               background: isTermsAccepted && !isPending && address ? "linear-gradient(to right, #00ff9d, #00cc7a)" : "#444",
               color: "#000",
               border: "none",
-              boxShadow: isTermsAccepted && address ? "0 15px 40px rgba(0,255,157,0.5)" : "none",
-              transition: "all 0.3s",
+              marginTop: "auto", // Pushes button to bottom if space
+              boxShadow: isTermsAccepted && address ? "0 10px 30px rgba(0,255,157,0.5)" : "none",
             }}
           >
-            {isPending ? "CONFIRMING ON BASE..." : "CONFIRM & PAY"}
+            {isPending ? "CONFIRMING..." : "CONFIRM & PAY"}
           </button>
         </div>
       </div>
     );
   }
 
-  // MAIN CART VIEW
+  // MAIN CART VIEW — Now properly scrollable
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onClick={onClose}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" }} onClick={onClose}>
       <div
         style={{
           background: "linear-gradient(to bottom, #0a0a0a, #000)",
-          borderRadius: "32px",
+          borderRadius: "24px",
           border: "4px solid #ffd700",
-          width: "90%",
-          maxWidth: "700px",
+          width: "100%",
+          maxWidth: "600px",
           maxHeight: "90vh",
           overflowY: "auto",
-          padding: "40px",
+          padding: "30px 20px",
           boxShadow: "0 0 80px rgba(255,215,0,0.4)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 style={{ textAlign: "center", color: "#ffd700", fontSize: "56px", fontWeight: "bold", marginBottom: "40px" }}>
+        <h2 style={{ textAlign: "center", color: "#ffd700", fontSize: "40px", fontWeight: "bold", marginBottom: "30px" }}>
           YOUR CART ({totalItems})
         </h2>
 
         {cart.items.map((item) => {
           const stock = products.find((p) => p.id === item.id)?.stock || 0;
           return (
-            <div key={item.id} style={{ background: "#151515", borderRadius: "24px", padding: "30px", marginBottom: "30px", border: "2px solid #ffd70040", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
-              <div style={{ color: "#ffd700", fontSize: "36px", fontWeight: "bold", marginBottom: "16px" }}>{item.name}</div>
-              <div style={{ color: "#00ff9d", fontSize: "28px" }}>
-                ${item.usd.toFixed(2)} × {item.quantity} ={" "}
-                <span style={{ color: "#ffd700", fontWeight: "bold", fontSize: "36px" }}>
-                  ${(item.usd * item.quantity).toFixed(2)}
-                </span>
+            <div key={item.id} style={{ background: "#151515", borderRadius: "20px", padding: "20px", marginBottom: "20px", border: "2px solid #ffd70040" }}>
+              <div style={{ color: "#ffd700", fontSize: "28px", fontWeight: "bold", marginBottom: "10px" }}>{item.name}</div>
+              <div style={{ color: "#00ff9d", fontSize: "22px" }}>
+                ${item.usd.toFixed(2)} × {item.quantity} = <span style={{ color: "#ffd700", fontWeight: "bold", fontSize: "28px" }}>${(item.usd * item.quantity).toFixed(2)}</span>
               </div>
 
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "30px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "20px" }}>
                 <select
                   value={item.quantity}
                   onChange={(e) => {
@@ -255,18 +250,16 @@ export default function Cart({
                   style={{
                     background: "#222",
                     color: "#ffd700",
-                    padding: "16px 24px",
-                    borderRadius: "20px",
-                    border: "4px solid #ffd700",
-                    fontSize: "24px",
+                    padding: "12px 20px",
+                    borderRadius: "16px",
+                    border: "3px solid #ffd700",
+                    fontSize: "20px",
                     fontWeight: "bold",
                     cursor: "pointer",
                   }}
                 >
                   {Array.from({ length: stock }, (_, i) => i + 1).map((n) => (
-                    <option key={n} value={n} style={{ background: "#000", color: "#ffd700" }}>
-                      {n}
-                    </option>
+                    <option key={n} value={n} style={{ background: "#000", color: "#ffd700" }}>{n}</option>
                   ))}
                 </select>
 
@@ -274,14 +267,12 @@ export default function Cart({
                   onClick={() => cart.removeItem(item.id)}
                   style={{
                     color: "#ff4444",
-                    fontSize: "48px",
-                    fontWeight: "bold",
+                    fontSize: "40px",
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    padding: "10px 20px",
+                    padding: "8px 16px",
                     borderRadius: "12px",
-                    transition: "all 0.3s",
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.background = "#ff444430")}
                   onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
@@ -293,34 +284,27 @@ export default function Cart({
           );
         })}
 
-        <div style={{ borderTop: "4px solid #ffd70060", paddingTop: "40px", textAlign: "center" }}>
-          <p style={{ color: "#aaa", fontSize: "28px", marginBottom: "16px" }}>
+        <div style={{ borderTop: "3px solid #ffd70060", paddingTop: "30px", textAlign: "center" }}>
+          <p style={{ color: "#aaa", fontSize: "22px", marginBottom: "10px" }}>
             Items Total: <span style={{ color: "#ffd700", fontWeight: "bold" }}>${totalBaseUsd.toFixed(2)}</span>
           </p>
-          <p style={{ color: "#00ff9d", fontSize: "36px", fontWeight: "bold", marginBottom: "30px" }}>
-            Shipping: FREE
-          </p>
-          <p style={{ color: "#ffd700", fontSize: "64px", fontWeight: "bold", marginBottom: "10px" }}>
-            TOTAL: ${totalUsd.toFixed(2)}
-          </p>
-          <p style={{ color: "#00ff9d", fontSize: "48px", fontWeight: "bold" }}>
-            ≈ {amount.toLocaleString()} $CARDS
-          </p>
+          <p style={{ color: "#00ff9d", fontSize: "28px", fontWeight: "bold", marginBottom: "20px" }}>Shipping: FREE</p>
+          <p style={{ color: "#ffd700", fontSize: "48px", fontWeight: "bold" }}>TOTAL: ${totalUsd.toFixed(2)}</p>
+          <p style={{ color: "#00ff9d", fontSize: "36px", fontWeight: "bold" }}>≈ {amount.toLocaleString()} $CARDS</p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "30px", marginTop: "50px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "40px" }}>
           <button
             onClick={onClose}
             style={{
-              padding: "24px",
+              padding: "18px",
               background: "#333",
               color: "#fff",
-              borderRadius: "24px",
-              fontSize: "32px",
+              borderRadius: "20px",
+              fontSize: "24px",
               fontWeight: "bold",
               cursor: "pointer",
               border: "2px solid #666",
-              transition: "all 0.3s",
             }}
             onMouseEnter={(e) => (e.currentTarget.style.background = "#555")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "#333")}
@@ -332,16 +316,15 @@ export default function Cart({
             onClick={handleProceedToShipping}
             disabled={!address}
             style={{
-              padding: "24px",
+              padding: "18px",
               background: address ? "linear-gradient(to right, #00ff9d, #00cc7a)" : "#444",
               color: "#000",
-              borderRadius: "24px",
-              fontSize: "36px",
+              borderRadius: "20px",
+              fontSize: "28px",
               fontWeight: "bold",
               cursor: address ? "pointer" : "not-allowed",
               border: "none",
-              boxShadow: address ? "0 15px 40px rgba(0,255,157,0.5)" : "none",
-              transition: "all 0.3s",
+              boxShadow: address ? "0 10px 30px rgba(0,255,157,0.5)" : "none",
             }}
           >
             PROCEED TO SHIPPING
@@ -352,30 +335,15 @@ export default function Cart({
   );
 }
 
-// Reusable input style
 const inputStyle = {
   width: "100%",
-  padding: "24px",
-  marginBottom: "24px",
+  padding: "18px",
+  marginBottom: "18px",
   background: "#1a1a1a",
   border: "3px solid #ffd70060",
-  borderRadius: "20px",
+  borderRadius: "16px",
   color: "#fff",
-  fontSize: "24px",
+  fontSize: "20px",
   outline: "none",
-  transition: "all 0.3s",
+  transition: "border 0.3s",
 } as const;
-
-// Add hover/focus effects via JS (optional, but nice)
-if (typeof window !== "undefined") {
-  document.querySelectorAll("input").forEach((input) => {
-    input.addEventListener("focus", (e: any) => {
-      e.target.style.border = "3px solid #ffd700";
-      e.target.style.boxShadow = "0 0 20px rgba(255,215,0,0.4)";
-    });
-    input.addEventListener("blur", (e: any) => {
-      e.target.style.border = "3px solid #ffd70060";
-      e.target.style.boxShadow = "none";
-    });
-  });
-}
