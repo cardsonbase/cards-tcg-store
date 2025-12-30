@@ -25,6 +25,9 @@ import { ref, onValue } from "firebase/database";
 import { useCart } from "@/lib/cart";
 import dynamic from "next/dynamic";
 import { useAccount, useDisconnect } from 'wagmi';  // Add useDisconnect
+import { FundButton, getOnrampBuyUrl } from '@coinbase/onchainkit/fund';
+import { base } from 'wagmi/chains';
+import { useBalance } from 'wagmi';
 
 export default function Home() {
   const [price, setPrice] = useState(0.00005);
@@ -41,6 +44,15 @@ export default function Home() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { isConnected } = useAccount();
   const { disconnect } = useDisconnect();
+  const { address, isConnected } = useAccount();
+  const { data: balance } = useBalance({ address, chainId: base.id });
+  const [showOnramp, setShowOnramp] = useState(false);
+  const onrampUrl = isConnected && address ? getOnrampBuyUrl({
+  projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!, // Add this to .env
+  addresses: { [address]: ['base'] },
+  assets: ['ETH'],
+  presetFiatAmount: 50, // optional suggestion
+}) : undefined;
   
   useEffect(() => {
     const fetchPrice = async () => {
@@ -572,110 +584,58 @@ export default function Home() {
             </div>
           </header>
 
-          {/* Fiat On-Ramp and Swap Section — Integrated, Centered, No Different BG */}
-          <div style={{ textAlign: "center", margin: "40px 0" }}>
-            <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "16px" }}>
-              New to Base? Buy Base ETH with card in seconds:
-            </p>
-            <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-              {/* Coinbase — Interactive Button */}
-              <a 
-                href="https://buy.coinbase.com/?destination=base" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0 20px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "24px",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <img 
-                  src="/coinbase.png" 
-                  alt="Coinbase" 
-                  style={{ height: "32px", width: "auto" }} 
-                />
-              </a>
-              
-              {/* Ramp — Interactive Button, Updated for Base ETH */}
-              <a 
-                href="https://ramp.network/buy?defaultOptions=DEFAULT&swapAsset=BASE_ETH&hostAppName=Cards%20on%20Base&hostLogoUrl=https%3A%2F%2Fcards-on-base.vercel.app%2Flogo.png&finalUrl=https%3A%2F%2Fcards-on-base.vercel.app" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0 20px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "24px",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <img 
-                  src="/ramp.png" 
-                  alt="Ramp" 
-                  style={{ height: "32px", width: "auto" }} 
-                />
-              </a>
-              
-              {/* MoonPay — Interactive Button */}
-              <a 
-                href="https://buy.moonpay.com/?currencyCode=eth&chainId=8453" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0 20px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "24px",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <img 
-                  src="/moonpay.png" 
-                  alt="MoonPay" 
-                  style={{ height: "32px", width: "auto" }} 
-                />
-              </a>
+          {/* Beginner-Friendly Funding + Swap Section */}
+<div style={{ textAlign: "center", margin: "40px 0", padding: "20px", background: "rgba(255,215,0,0.05)", borderRadius: "24px", border: "2px dashed #ffd700" }}>
+  <p style={{ color: "#ffd700", fontSize: "24px", fontWeight: "bold", marginBottom: "16px" }}>
+    New here? Start in 60 seconds – no experience needed!
+  </p>
+  <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "24px" }}>
+    1. Connect wallet → 2. Add money with card → 3. Trade for $CARDS → 4. Shop with 10% off!
+  </p>
 
-              {/* Swap Widget Button — Next to Fiat Buttons */}
-              <button
-                onClick={() => setShowSwapModal(true)}
-                style={{
-                  background: "#ffd700",
-                  color: "#000",
-                  padding: "16px 32px",
-                  borderRadius: "24px",
-                  fontWeight: "bold",
-                  fontSize: "22px",
-                  boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-                  transition: "transform 0.3s",
-                  border: "none",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-              >
-                Trade $CARDS on Uniswap
-              </button>
-            </div>
+  {/* Only show funding options after wallet connect */}
+  {!isConnected ? (
+    <p style={{ color: "#fff", fontSize: "20px" }}>First, tap "Connect Wallet" above ↑</p>
+  ) : (
+    <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+      {/* Low balance? Prompt to fund */}
+      {balance && Number(balance.formatted) < 0.01 && (
+        <>
+          <p style={{ color: "#ff6666", fontWeight: "bold" }}>Low funds – add money to start:</p>
+          <FundButton fundingUrl={onrampUrl} />
+          {/* Or inline iframe if you prefer modal style
+          <button onClick={() => setShowOnramp(true)} style={goldButtonStyle}>
+            Add Money with Card (Instant)
+          </button> */}
+        </>
+      )}
+
+      {/* Always show swap for $CARDS */}
+      <button
+        onClick={() => setShowSwapModal(true)}
+        style={{
+          background: "#ffd700",
+          color: "#000",
+          padding: "16px 32px",
+          borderRadius: "24px",
+          fontWeight: "bold",
+          fontSize: "22px",
+          boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+          border: "none",
+        }}
+      >
+        Trade for $CARDS (10% OFF + Free Shipping)
+      </button>
+    </div>
+  )}
+
+  <button
+    onClick={() => setShowHowToBuy(true)}
+    style={{ marginTop: "20px", color: "#ffd700", fontSize: "16px", textDecoration: "underline", background: "transparent", border: "none" }}
+  >
+    Detailed step-by-step guide →
+  </button>
+</div>
             {/* How to Buy Button */}
             <button
               onClick={() => setShowHowToBuy(true)}
@@ -977,61 +937,121 @@ export default function Home() {
                 }}
               >
                 How to Buy in 4 Simple Steps (Even if You’ve Never Touched Crypto)
-              </h2>
+              <h2
+  style={{
+    textAlign: "center",
+    color: "#ffd700",
+    fontSize: "32px",
+    marginBottom: "24px",
+  }}
+>
+  How to Shop in 3 Dead-Simple Steps (Perfect for Beginners)
+</h2>
 
-              <ol style={{ fontSize: "19px", lineHeight: "1.8", paddingLeft: "24px" }}>
-                <li style={{ marginBottom: "20px" }}>
-                  <strong>1. Get a Base wallet (30 seconds)</strong>
-                  <br />
-                  Tap the “Connect Wallet” button → choose Coinbase Wallet or WalletConnect → it creates your wallet instantly (download Coinbase Wallet app if needed).
-                  <br />
-                  <span style={{ color: "#ffd700", fontSize: "16px" }}>
-                    No seed phrase needed first time — Base made it Apple-Pay easy.
-                  </span>
-                </li>
+<ol style={{ fontSize: "19px", lineHeight: "1.8", paddingLeft: "24px" }}>
+  <li style={{ marginBottom: "20px" }}>
+    <strong>1. Connect a wallet (30 seconds)</strong>
+    <br />
+    Tap the gold “Connect Wallet” button at the top right → Choose “Coinbase” (easiest for new users).
+    <br />
+    <span style={{ color: "#ffd700", fontSize: "16px" }}>
+      It instantly creates a secure digital wallet for you — no complicated setup or seed phrases needed the first time.
+    </span>
+  </li>
 
-                <li style={{ marginBottom: "20px" }}>
-                  <strong>2. Fund your wallet with Base ETH</strong>
-                  <br />
-                  Easiest ways (all take under 2 minutes):
-                  <br />• Tap Coinbase button → buy with Apple Pay / card (lands directly on Base)
-                  <br />• Tap Ramp or MoonPay → buy with card, arrives instantly
-                  <br />• Already have ETH elsewhere? Swap it across networks using the Uniswap widget (it handles bridging automatically)
-                </li>
+  <li style={{ marginBottom: "20px" }}>
+    <strong>2. Add money with your card (arrives instantly)</strong>
+    <br />
+    After connecting, you’ll see an “Add Money with Card” button.
+    <br />
+    Tap it → Pay with Apple Pay, Google Pay, or card → Funds land directly on Base ready to use.
+    <br />
+    <span style={{ color: "#ffd700", fontSize: "16px" }}>
+      No multi-day waits like some exchanges.
+    </span>
+  </li>
 
-                <li style={{ marginBottom: "20px" }}>
-                  <strong>3. Swap ETH → $CARDS</strong>
-                  <br />
-                  Tap the big gold “Trade $CARDS on Uniswap” button → widget opens right here → swap → done.
-                  <br />
-                  <span style={{ color: "#ffd700" }}>You never have to leave the site.</span>
-                </li>
+  <li style={{ marginBottom: "20px" }}>
+    <strong>3. Get $CARDS for 10% off + free shipping (optional but best deal)</strong>
+    <br />
+    Tap the big gold “Trade for $CARDS” button → A safe trading window opens right here in the app.
+    <br />
+    Swap a little of your funds for $CARDS → Done!
+    <br />
+    <span style={{ color: "#ffd700", fontSize: "16px" }}>
+      Using $CARDS at checkout automatically gives you 10% off and free shipping.
+    </span>
+  </li>
 
-                <li style={{ marginBottom: "20px" }}>
-                  <strong>4. Shop & checkout</strong>
-                  <br />
-                  Add products to cart → tap floating gold cart → enter shipping info → shipping quote → confirm and pay → done!
-                  <br />
-                  We ship in 24–48h with USPS tracking.
-                </li>
-              </ol>
+  <li style={{ marginBottom: "20px" }}>
+    <strong>4. Shop & checkout</strong>
+    <br />
+    Add products to your cart → Tap the floating gold cart button → Enter shipping info → Choose payment ($CARDS for discount, or ETH/USDC for full price) → Confirm → We ship in 24–48 hours!
+  </li>
+</ol>
 
-              <div
-                style={{
-                  textAlign: "center",
-                  margin: "30px 0",
-                  padding: "20px",
-                  background: "rgba(255,215,0,0.1)",
-                  borderRadius: "16px",
-                  border: "1px dashed #ffd700",
-                }}
-              >
-                <p style={{ fontSize: "18px", margin: "0 0 12px 0" }}>
-                  <strong>Pro tip for absolute beginners:</strong>
-                  <br />
-                  Choose Coinbase Wallet → tap the Coinbase buy button → pay with Apple Pay → you now have a wallet + Base ETH in under 60 seconds.
-                </p>
-              </div>
+<div
+  style={{
+    textAlign: "center",
+    margin: "30px 0",
+    padding: "20px",
+    background: "rgba(255,215,0,0.1)",
+    borderRadius: "16px",
+    border: "1px dashed #ffd700",
+  }}
+>
+  <p style={{ fontSize: "18px", margin: "0 0 12px 0" }}>
+    <strong>Easiest path for absolute beginners:</strong>
+    <br />
+    Connect Coinbase Wallet → Add Money with Card → Trade for $CARDS → Enjoy your discount!
+  </p>
+</div>
+
+<div
+  style={{
+    textAlign: "center",
+    padding: "40px 20px 20px",
+    color: "#888",
+    fontSize: "14px",
+    lineHeight: "1.6",
+  }}
+>
+  <p style={{ margin: "10px 0" }}>
+    U.S. shipping only for now via USPS with tracking (3–10 business days). International coming soon!
+  </p>
+  <p style={{ margin: "16px 0 8px 0", fontWeight: "600", color: "#ffd700" }}>
+    Need help?
+  </p>
+  <p style={{ margin: "8px 0" }}>
+    DM us on X →{" "}
+    <a
+      href="https://x.com/cardsonbaseHQ"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: "#ffd700", textDecoration: "underline" }}
+    >
+      @cardsonbaseHQ
+    </a>
+  </p>
+</div>
+
+<button
+  onClick={() => setShowHowToBuy(false)}
+  style={{
+    display: "block",
+    margin: "30px auto 0",
+    background: "#ffd700",
+    color: "#000",
+    padding: "14px 32px",
+    borderRadius: "16px",
+    fontWeight: "bold",
+    fontSize: "18px",
+    border: "none",
+    cursor: "pointer",
+  }}
+>
+  Got it – Let’s Shop!
+</button>
 
               {/* SHIPPING & SUPPORT */}
               <div
