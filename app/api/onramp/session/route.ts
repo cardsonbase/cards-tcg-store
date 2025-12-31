@@ -1,34 +1,43 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-const API_KEY_NAME = process.env.CDP_SECRET_API_KEY_NAME;
-const PRIVATE_KEY = process.env.CDP_SECRET_API_KEY_PRIVATE_KEY;  // Multiline PEM – no .replace() needed
+const API_KEY_NAME = process.env.CDP_SECRET_API_KEY_NAME?.trim();
+const PRIVATE_KEY_WITH_ESCAPES = process.env.CDP_SECRET_API_KEY_PRIVATE_KEY?.trim();
+
+if (!API_KEY_NAME || !PRIVATE_KEY_WITH_ESCAPES) {
+  console.error('Missing env vars – check Vercel settings');
+}
+
+// Convert \n escapes to actual newlines for PEM
+const PRIVATE_KEY = PRIVATE_KEY_WITH_ESCAPES?.replace(/\\n/g, '\n');
 
 export async function POST(request: Request) {
   try {
     if (!API_KEY_NAME || !PRIVATE_KEY) {
-      console.error('Missing CDP API key config – check Vercel env vars');
-      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
+      return NextResponse.json({ error: 'Server misconfigured – missing keys' }, { status: 500 });
     }
 
     const { address } = await request.json();
     if (!address) {
-      return NextResponse.json({ error: 'Missing wallet address' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing address' }, { status: 400 });
     }
 
-    console.log('Generating session token for address:', address);
+    console.log('Generating token for address:', address);
 
     const payload = {
       iss: API_KEY_NAME,
       nbf: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + 60,  // 1 minute validity
+      exp: Math.floor(Date.now() / 1000) + 60,
       uri: 'https://api.developer.coinbase.com/onramp/v1/token',
     };
 
+    // Use full name for kid (standard for Onramp from docs examples)
     const token = jwt.sign(payload, PRIVATE_KEY, {
       algorithm: 'ES256',
       header: { kid: API_KEY_NAME },
     });
+
+    console.log('JWT signed');
 
     const res = await fetch('https://api.developer.coinbase.com/onramp/v1/token', {
       method: 'POST',
@@ -44,15 +53,17 @@ export async function POST(request: Request) {
 
     const data = await res.json();
 
+    console.log('Coinbase response status:', res.status);
+
     if (!res.ok) {
-      console.error('Coinbase API error:', res.status, data);
-      return NextResponse.json({ error: 'Failed to generate token', details: data }, { status: 500 });
+      console.error('Coinbase error details:', data);
+      return NextResponse.json({ error: 'Token generation failed', details: data }, { status: 500 });
     }
 
-    console.log('Session token generated successfully');
+    console.log('Success – sessionToken generated');
     return NextResponse.json({ sessionToken: data.sessionToken });
   } catch (error: any) {
-    console.error('Unexpected error in session route:', error.message);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Error:', error.message);
+    return NextResponse.json({ error: 'JWT or fetch failed', msg: error.message }, { status: 500 });
   }
 }
