@@ -42,17 +42,16 @@ export default function Home() {
   const [showHowToBuy, setShowHowToBuy] = useState(false);
   const { setFrameReady, isFrameReady } = useMiniKit();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
   const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
   const { data: balance } = useBalance({ address, chainId: base.id });
   const [showOnramp, setShowOnramp] = useState(false);
   const onrampUrl = isConnected && address ? getOnrampBuyUrl({
-  projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!, // Add this to .env
-  addresses: { [address]: ['base'] },
-  assets: ['ETH'],
-  presetFiatAmount: 50, // optional suggestion
-}) : undefined;
+    projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!, // Add this to .env
+    addresses: { [address]: ['base'] },
+    assets: ['ETH'],
+    presetFiatAmount: 50, // optional suggestion
+  }) : undefined;
   
   useEffect(() => {
     const fetchPrice = async () => {
@@ -116,7 +115,7 @@ export default function Home() {
     return () => clearInterval(id);
   }, []);
 
-    // 1. Call setFrameReady IMMEDIATELY when the page loads (hides splash fastest)
+  // 1. Call setFrameReady IMMEDIATELY when the page loads (hides splash fastest)
   useEffect(() => {
     if (!isFrameReady) {
       setFrameReady();
@@ -161,963 +160,875 @@ export default function Home() {
   const cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
   
   return (
-
-      <>
-        {/* Floating Gold Cart Button */}
-        {cartCount > 0 && (
-          <button
-            onClick={() => setShowCart(true)}
-            style={{
-              position: "fixed",
-              bottom: "30px",
-              right: "30px",
-              background: "#ffd700",
-              color: "#000",
-              width: "70px",
-              height: "70px",
-              borderRadius: "50%",
-              fontSize: "28px",
-              fontWeight: "bold",
-              boxShadow: "0 8px 30px rgba(255,215,0,0.5)",
-              zIndex: 999,
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            {cartCount}
-          </button>
-        )}
-
-        {/* Main Page */}
-        <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #000 0%, #111 100%)", color: "#fff", fontFamily: "Inter, sans-serif" }}>
-          <header className="header" style={{ padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #333" }}>
-            {/* LOGO — PERFECT, NO STRETCH, CRISP */}
-            <div className="flex items-center h-20">
-              <img
-                src="/logo.png"
-                alt="$CARDS"
-                className="h-full w-auto max-w-none"
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-
-            {/* CENTER: TITLE + PRICE + TREASURY — NOW PERFECTLY ALIGNED WITH THE REST OF THE SITE */}
-           <div className="header-center" style={{ textAlign: "center", flex: 1, paddingRight: "50px" }}>
-           <h1 style={{ 
-           fontSize: "48px", 
-           fontWeight: "bold", 
-           background: "linear-gradient(90deg, #ffd700, #ffed4e)", 
-           WebkitBackgroundClip: "text", 
-           WebkitTextFillColor: "transparent",
-           margin: "0 0 24px 0",
-           fontFamily: "'Cinzel', serif"
-           }}>
-           CARDS COLLECTIBLES
-          </h1>
-    <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live $CARDS Price</p>
-    <p style={{ 
-      fontSize: "32px", 
-      fontWeight: "bold", 
-      background: "linear-gradient(90deg, #ffd700, #00ff9d)", 
-      WebkitBackgroundClip: "text", 
-      WebkitTextFillColor: "transparent",
-      animation: "glow 2s ease-in-out infinite alternate",
-      textShadow: "0 0 15px rgba(255,215,0,0.4)"
-    }}>
-      ${price.toFixed(7)}
-    </p>
-    <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live Treasury Balance</p>
-    <p style={{ 
-      fontSize: "28px", 
-      fontWeight: "bold", 
-      background: "linear-gradient(90deg, #ffd700, #00ff9d)", 
-      WebkitBackgroundClip: "text", 
-      WebkitTextFillColor: "transparent",
-      animation: "glow 2s ease-in-out infinite alternate",
-      textShadow: "0 0 15px rgba(255,215,0,0.4)"
-    }}>
-      {treasuryEth.toFixed(4)} ETH
-    </p>
-  </div>
-
-            {/* X LINK + DEXTOOLS + FARCASTER + BASESCAN + WALLET */}
-            <div className="header-right" style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-
-              <a
-                href="https://cardsonbase.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "50%",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <img
-                  src="/logo.png"
-                  alt="Website"
-                  style={{ width: "32px", height: "32px", objectFit: "contain" }}
-                />
-              </a>
-
-              <a
-                href="https://t.me/CARDSCollectibles"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "50%",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <img
-                  src="/telegram.png"
-                  alt="telegram"
-                  style={{ width: "32px", height: "32px", objectFit: "contain" }}
-                />
-              </a>
-              
-              <a
-                href="https://x.com/cardsonbaseHQ"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "50%",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="#ffd700">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 16.123h1.764L6.11 5.127H4.246z" />
-                </svg>
-              </a>
-
-              <a
-                href="https://www.dextools.io/app/en/token/cardsonbase?t=1765004739445"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "50%",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <img
-                  src="/dextools.png"
-                  alt="Dextools"
-                  style={{ width: "32px", height: "32px", objectFit: "contain" }}
-                />
-              </a>
-
-              <a
-                href="https://dexscreener.com/base/0xd739228018b3d0b3222d34ce869e55891471549c"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "50%",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <img
-                  src="/dexscreener.png"
-                  alt="Dexscreener"
-                  style={{ width: "32px", height: "32px", objectFit: "contain" }}
-                />
-              </a>
-
-              <a
-                href="https://farcaster.xyz/cardsonbase"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "50%",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <img
-                  src="/farcaster.png"
-                  alt="Farcaster"
-                  style={{ width: "32px", height: "32px", objectFit: "contain" }}
-                />
-              </a>
-
-              <a
-                href="https://basescan.org/token/0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "48px",
-                  height: "48px",
-                  background: "rgba(255,215,0,0.1)",
-                  border: "2px solid #ffd700",
-                  borderRadius: "50%",
-                  transition: "all 0.3s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
-              >
-                <img
-                  src="/basescan.svg"
-                  alt="Basescan"
-                  style={{ width: "32px", height: "32px", objectFit: "contain" }}
-                />
-              </a>
-
-                          <Wallet>
-  <ConnectWallet
-    render={({ onClick, status, isLoading }) => (
-      <button
-        onClick={() => {
-          if (status === 'disconnected') {
-            onClick(); // Opens the connection modal
-          } else {
-            setIsDropdownOpen((prev) => !prev); // Toggle dropdown when connected
-          }
-        }}
-        disabled={isLoading}
-        style={{
-          position: 'relative',
-          overflow: 'hidden',
-          background: 'linear-gradient(to right, #ffd700, #ffed4e)',
-          color: '#000',
-          fontWeight: 'bold',
-          fontSize: '18px',
-          padding: '12px 24px',
-          borderRadius: '9999px',
-          boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)',
-          transition: 'all 0.3s',
-          cursor: 'pointer',
-          border: '3px solid #000',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = '0 0 30px rgba(255,215,0,0.6)';
-          e.currentTarget.style.transform = 'scale(1.05)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)';
-          e.currentTarget.style.transform = 'scale(1)';
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9 ring-2 ring-black" />
-          <span className="font-bold drop-shadow-md">
-            {status === 'disconnected' ? 'Connect Wallet' : <Name />}
-          </span>
-        </div>
-      </button>
-    )}
-  />
-
-  {/* Custom Dropdown – properly conditional */}
-  {isConnected && isDropdownOpen && (
     <>
-      {/* Invisible overlay – only when dropdown is open */}
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 40,
-          background: "transparent",
-        }}
-        onClick={() => setIsDropdownOpen(false)}
-      />
-
-      {/* Dropdown panel */}
-      <div
-        style={{
-          position: "absolute",
-          top: "100%",
-          right: 0,
-          marginTop: "16px",
-          width: "320px",
-          background: "linear-gradient(to bottom, #111, #000)",
-          borderRadius: "16px",
-          border: "2px solid #333",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.8)",
-          overflow: "hidden",
-          zIndex: 50,
-        }}
-      >
-        <div style={{ padding: "16px 24px 12px", borderBottom: "1px solid #333" }}>
-          <Identity hasCopyAddressOnClick>
-            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-              <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" />
-              <div>
-                <Name className="text-xl font-bold text-[#ffd700]" />
-                <Address className="text-sm text-gray-400" />
-              </div>
-            </div>
-          </Identity>
-        </div>
-
-        <div style={{ padding: "8px 0" }}>
-          <a
-            href="https://keys.coinbase.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "block",
-              padding: "12px 24px",
-              color: "#ffd700",
-              transition: "all 0.3s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#222";
-              e.currentTarget.style.color = "#fff";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
-              e.currentTarget.style.color = "#ffd700";
-            }}
-          >
-            Smart Wallet
-          </a>
-          <a
-            href="https://portfolio.coinbase.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "block",
-              padding: "12px 24px",
-              color: "#ffd700",
-              transition: "all 0.3s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#222";
-              e.currentTarget.style.color = "#fff";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
-              e.currentTarget.style.color = "#ffd700";
-            }}
-          >
-            Portfolio
-          </a>
-        </div>
-
-        <div style={{ borderTop: "1px solid #333", padding: "16px 24px" }}>
-          <button
-            onClick={() => {
-              disconnect();
-              setIsDropdownOpen(false);
-            }}
-            style={{
-              width: "100%",
-              background: "rgba(255,0,0,0.1)",
-              color: "#f56565",
-              fontWeight: "bold",
-              padding: "12px",
-              borderRadius: "8px",
-              transition: "all 0.3s",
-              border: "none",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(255,0,0,0.2)";
-              e.currentTarget.style.color = "#fc8181";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(255,0,0,0.1)";
-              e.currentTarget.style.color = "#f56565";
-            }}
-          >
-            Disconnect Wallet
-          </button>
-        </div>
-      </div>
-    </>
-  )}
-</Wallet>
-            </div>
-          </header>
-
-          {/* Beginner-Friendly Funding + Swap Section */}
-<div style={{ textAlign: "center", margin: "40px 0", padding: "20px", background: "rgba(255,215,0,0.05)", borderRadius: "24px", border: "2px dashed #ffd700" }}>
-  <p style={{ color: "#ffd700", fontSize: "24px", fontWeight: "bold", marginBottom: "16px" }}>
-    New here? Start in 60 seconds – no experience needed!
-  </p>
-  <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "24px" }}>
-    1. Connect wallet → 2. Add money with card → 3. Trade for $CARDS → 4. Shop with 10% off!
-  </p>
-
-  {/* Only show funding options after wallet connect */}
-  {!isConnected ? (
-    <p style={{ color: "#fff", fontSize: "20px" }}>First, tap "Connect Wallet" above ↑</p>
-  ) : (
-    <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-      {/* Low balance? Prompt to fund */}
-      {balance && Number(balance.formatted) < 0.01 && (
-        <>
-          <p style={{ color: "#ff6666", fontWeight: "bold" }}>Low funds – add money to start:</p>
-          <FundButton fundingUrl={onrampUrl} />
-          {/* Or inline iframe if you prefer modal style
-          <button onClick={() => setShowOnramp(true)} style={goldButtonStyle}>
-            Add Money with Card (Instant)
-          </button> */}
-        </>
+      {/* Floating Gold Cart Button */}
+      {cartCount > 0 && (
+        <button
+          onClick={() => setShowCart(true)}
+          style={{
+            position: "fixed",
+            bottom: "30px",
+            right: "30px",
+            background: "#ffd700",
+            color: "#000",
+            width: "70px",
+            height: "70px",
+            borderRadius: "50%",
+            fontSize: "28px",
+            fontWeight: "bold",
+            boxShadow: "0 8px 30px rgba(255,215,0,0.5)",
+            zIndex: 999,
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          {cartCount}
+        </button>
       )}
 
-      {/* Always show swap for $CARDS */}
-      <button
-        onClick={() => setShowSwapModal(true)}
-        style={{
-          background: "#ffd700",
-          color: "#000",
-          padding: "16px 32px",
-          borderRadius: "24px",
-          fontWeight: "bold",
-          fontSize: "22px",
-          boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-          border: "none",
-        }}
-      >
-        Trade for $CARDS (10% OFF + Free Shipping)
-      </button>
-    </div>
-  )}
+      {/* Main Page */}
+      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #000 0%, #111 100%)", color: "#fff", fontFamily: "Inter, sans-serif" }}>
+        <header className="header" style={{ padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #333" }}>
+          {/* LOGO — PERFECT, NO STRETCH, CRISP */}
+          <div className="flex items-center h-20">
+            <img
+              src="/logo.png"
+              alt="$CARDS"
+              className="h-full w-auto max-w-none"
+              style={{ objectFit: "contain" }}
+            />
+          </div>
 
-  <button
-    onClick={() => setShowHowToBuy(true)}
-    style={{ marginTop: "20px", color: "#ffd700", fontSize: "16px", textDecoration: "underline", background: "transparent", border: "none" }}
-  >
-    Detailed step-by-step guide →
-  </button>
-</div>
-            {/* How to Buy Button */}
-            <button
-              onClick={() => setShowHowToBuy(true)}
+          {/* CENTER: TITLE + PRICE + TREASURY — NOW PERFECTLY ALIGNED WITH THE REST OF THE SITE */}
+          <div className="header-center" style={{ textAlign: "center", flex: 1, paddingRight: "50px" }}>
+            <h1 style={{ 
+              fontSize: "48px", 
+              fontWeight: "bold", 
+              background: "linear-gradient(90deg, #ffd700, #ffed4e)", 
+              WebkitBackgroundClip: "text", 
+              WebkitTextFillColor: "transparent",
+              margin: "0 0 24px 0",
+              fontFamily: "'Cinzel', serif"
+            }}>
+              CARDS COLLECTIBLES
+            </h1>
+            <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live $CARDS Price</p>
+            <p style={{ 
+              fontSize: "32px", 
+              fontWeight: "bold", 
+              background: "linear-gradient(90deg, #ffd700, #00ff9d)", 
+              WebkitBackgroundClip: "text", 
+              WebkitTextFillColor: "transparent",
+              animation: "glow 2s ease-in-out infinite alternate",
+              textShadow: "0 0 15px rgba(255,215,0,0.4)"
+            }}>
+              ${price.toFixed(7)}
+            </p>
+            <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live Treasury Balance</p>
+            <p style={{ 
+              fontSize: "28px", 
+              fontWeight: "bold", 
+              background: "linear-gradient(90deg, #ffd700, #00ff9d)", 
+              WebkitBackgroundClip: "text", 
+              WebkitTextFillColor: "transparent",
+              animation: "glow 2s ease-in-out infinite alternate",
+              textShadow: "0 0 15px rgba(255,215,0,0.4)"
+            }}>
+              {treasuryEth.toFixed(4)} ETH
+            </p>
+          </div>
+
+          {/* X LINK + DEXTOOLS + FARCASTER + BASESCAN + WALLET */}
+          <div className="header-right" style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+
+            <a
+              href="https://cardsonbase.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
-                marginTop: "20px",
-                background: "transparent",
-                color: "#ffd700",
-                padding: "8px 16px",
-                border: "1px solid #ffd700",
-                borderRadius: "12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "48px",
+                height: "48px",
+                background: "rgba(255,215,0,0.1)",
+                border: "2px solid #ffd700",
+                borderRadius: "50%",
+                transition: "all 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+            >
+              <img
+                src="/logo.png"
+                alt="Website"
+                style={{ width: "32px", height: "32px", objectFit: "contain" }}
+              />
+            </a>
+
+            <a
+              href="https://t.me/CARDSCollectibles"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "48px",
+                height: "48px",
+                background: "rgba(255,215,0,0.1)",
+                border: "2px solid #ffd700",
+                borderRadius: "50%",
+                transition: "all 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+            >
+              <img
+                src="/telegram.png"
+                alt="telegram"
+                style={{ width: "32px", height: "32px", objectFit: "contain" }}
+              />
+            </a>
+            
+            <a
+              href="https://x.com/cardsonbaseHQ"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "48px",
+                height: "48px",
+                background: "rgba(255,215,0,0.1)",
+                border: "2px solid #ffd700",
+                borderRadius: "50%",
+                transition: "all 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+            >
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="#ffd700">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 16.123h1.764L6.11 5.127H4.246z" />
+              </svg>
+            </a>
+
+            <a
+              href="https://www.dextools.io/app/en/token/cardsonbase?t=1765004739445"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "48px",
+                height: "48px",
+                background: "rgba(255,215,0,0.1)",
+                border: "2px solid #ffd700",
+                borderRadius: "50%",
+                transition: "all 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+            >
+              <img
+                src="/dextools.png"
+                alt="Dextools"
+                style={{ width: "32px", height: "32px", objectFit: "contain" }}
+              />
+            </a>
+
+            <a
+              href="https://dexscreener.com/base/0xd739228018b3d0b3222d34ce869e55891471549c"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "48px",
+                height: "48px",
+                background: "rgba(255,215,0,0.1)",
+                border: "2px solid #ffd700",
+                borderRadius: "50%",
+                transition: "all 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+            >
+              <img
+                src="/dexscreener.png"
+                alt="Dexscreener"
+                style={{ width: "32px", height: "32px", objectFit: "contain" }}
+              />
+            </a>
+
+            <a
+              href="https://farcaster.xyz/cardsonbase"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "48px",
+                height: "48px",
+                background: "rgba(255,215,0,0.1)",
+                border: "2px solid #ffd700",
+                borderRadius: "50%",
+                transition: "all 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+            >
+              <img
+                src="/farcaster.png"
+                alt="Farcaster"
+                style={{ width: "32px", height: "32px", objectFit: "contain" }}
+              />
+            </a>
+
+            <a
+              href="https://basescan.org/token/0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "48px",
+                height: "48px",
+                background: "rgba(255,215,0,0.1)",
+                border: "2px solid #ffd700",
+                borderRadius: "50%",
+                transition: "all 0.3s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#ffd700")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,215,0,0.1)")}
+            >
+              <img
+                src="/basescan.svg"
+                alt="Basescan"
+                style={{ width: "32px", height: "32px", objectFit: "contain" }}
+              />
+            </a>
+
+            <Wallet>
+              <ConnectWallet
+                render={({ onClick, status, isLoading }) => (
+                  <button
+                    onClick={() => {
+                      if (status === 'disconnected') {
+                        onClick(); // Opens the connection modal
+                      } else {
+                        setIsDropdownOpen((prev) => !prev); // Toggle dropdown when connected
+                      }
+                    }}
+                    disabled={isLoading}
+                    style={{
+                      position: 'relative',
+                      overflow: 'hidden',
+                      background: 'linear-gradient(to right, #ffd700, #ffed4e)',
+                      color: '#000',
+                      fontWeight: 'bold',
+                      fontSize: '18px',
+                      padding: '12px 24px',
+                      borderRadius: '9999px',
+                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)',
+                      transition: 'all 0.3s',
+                      cursor: 'pointer',
+                      border: '3px solid #000',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 30px rgba(255,215,0,0.6)';
+                      e.currentTarget.style.transform = 'scale(1.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)';
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-9 w-9 ring-2 ring-black" />
+                      <span className="font-bold drop-shadow-md">
+                        {status === 'disconnected' ? 'Connect Wallet' : <Name />}
+                      </span>
+                    </div>
+                  </button>
+                )}
+              />
+
+              {/* Custom Dropdown – properly conditional */}
+              {isConnected && isDropdownOpen && (
+                <>
+                  {/* Invisible overlay – only when dropdown is open */}
+                  <div
+                    style={{
+                      position: "fixed",
+                      inset: 0,
+                      zIndex: 40,
+                      background: "transparent",
+                    }}
+                    onClick={() => setIsDropdownOpen(false)}
+                  />
+
+                  {/* Dropdown panel */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      right: 0,
+                      marginTop: "16px",
+                      width: "320px",
+                      background: "linear-gradient(to bottom, #111, #000)",
+                      borderRadius: "16px",
+                      border: "2px solid #333",
+                      boxShadow: "0 10px 30px rgba(0,0,0,0.8)",
+                      overflow: "hidden",
+                      zIndex: 50,
+                    }}
+                  >
+                    <div style={{ padding: "16px 24px 12px", borderBottom: "1px solid #333" }}>
+                      <Identity hasCopyAddressOnClick>
+                        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                          <Avatar className="h-12 w-12 ring-4 ring-[#ffd700]" />
+                          <div>
+                            <Name className="text-xl font-bold text-[#ffd700]" />
+                            <Address className="text-sm text-gray-400" />
+                          </div>
+                        </div>
+                      </Identity>
+                    </div>
+
+                    <div style={{ padding: "8px 0" }}>
+                      <a
+                        href="https://keys.coinbase.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "block",
+                          padding: "12px 24px",
+                          color: "#ffd700",
+                          transition: "all 0.3s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#222";
+                          e.currentTarget.style.color = "#fff";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.color = "#ffd700";
+                        }}
+                      >
+                        Smart Wallet
+                      </a>
+                      <a
+                        href="https://portfolio.coinbase.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "block",
+                          padding: "12px 24px",
+                          color: "#ffd700",
+                          transition: "all 0.3s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#222";
+                          e.currentTarget.style.color = "#fff";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.color = "#ffd700";
+                        }}
+                      >
+                        Portfolio
+                      </a>
+                    </div>
+
+                    <div style={{ borderTop: "1px solid #333", padding: "16px 24px" }}>
+                      <button
+                        onClick={() => {
+                          disconnect();
+                          setIsDropdownOpen(false);
+                        }}
+                        style={{
+                          width: "100%",
+                          background: "rgba(255,0,0,0.1)",
+                          color: "#f56565",
+                          fontWeight: "bold",
+                          padding: "12px",
+                          borderRadius: "8px",
+                          transition: "all 0.3s",
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "rgba(255,0,0,0.2)";
+                          e.currentTarget.style.color = "#fc8181";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "rgba(255,0,0,0.1)";
+                          e.currentTarget.style.color = "#f56565";
+                        }}
+                      >
+                        Disconnect Wallet
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </Wallet>
+          </div>
+        </header>
+
+        {/* Beginner-Friendly Funding + Swap Section */}
+        <div style={{ textAlign: "center", margin: "40px 0", padding: "20px", background: "rgba(255,215,0,0.05)", borderRadius: "24px", border: "2px dashed #ffd700" }}>
+          <p style={{ color: "#ffd700", fontSize: "24px", fontWeight: "bold", marginBottom: "16px" }}>
+            New here? Start in 60 seconds – no experience needed!
+          </p>
+          <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "24px" }}>
+            1. Connect wallet → 2. Add money with card → 3. Trade for $CARDS → 4. Shop with 10% off!
+          </p>
+
+          {/* Only show funding options after wallet connect */}
+          {!isConnected ? (
+            <p style={{ color: "#fff", fontSize: "20px" }}>First, tap "Connect Wallet" above ↑</p>
+          ) : (
+            <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+              {/* Low balance? Prompt to fund */}
+              {balance && Number(balance.formatted) < 0.01 && (
+                <>
+                  <p style={{ color: "#ff6666", fontWeight: "bold" }}>Low funds – add money to start:</p>
+                  <FundButton fundingUrl={onrampUrl} />
+                  {/* Or inline iframe if you prefer modal style
+                  <button onClick={() => setShowOnramp(true)} style={goldButtonStyle}>
+                    Add Money with Card (Instant)
+                  </button> */}
+                </>
+              )}
+
+              {/* Always show swap for $CARDS */}
+              <button
+                onClick={() => setShowSwapModal(true)}
+                style={{
+                  background: "#ffd700",
+                  color: "#000",
+                  padding: "16px 32px",
+                  borderRadius: "24px",
+                  fontWeight: "bold",
+                  fontSize: "22px",
+                  boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+                  border: "none",
+                }}
+              >
+                Trade for $CARDS (10% OFF + Free Shipping)
+              </button>
+            </div>
+          )}
+
+          <button
+            onClick={() => setShowHowToBuy(true)}
+            style={{ marginTop: "20px", color: "#ffd700", fontSize: "16px", textDecoration: "underline", background: "transparent", border: "none" }}
+          >
+            Detailed step-by-step guide →
+          </button>
+        </div>
+
+        {/* Category Dropdown — Centered for Better Flow */}
+        <div style={{ textAlign: "center", marginBottom: "20px" }}>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            style={{
+              padding: "14px",
+              width: "340px",
+              background: "#111",
+              border: "1px solid #444",
+              borderRadius: "12px",
+              color: "#fff",
+              fontSize: "18px",
+            }}
+          >
+            <option value="all">All Categories</option>
+            <option value="avatar">Avatar:The Last Airbender</option>
+            <option value="azurelane">Azure Lane</option>
+            <option value="digimon">Digimon</option>
+            <option value="disneylorcana">Disney Lorcana</option>
+            <option value="magic">Magic the Gathering</option>
+            <option value="mlb">MLB</option>
+            <option value="nba">NBA</option>
+            <option value="nfl">NFL</option>
+            <option value="onepiece">One Piece</option>
+            <option value="pokemon">Pokémon</option>
+            <option value="riftbound">Riftbound:League Of Legends</option>
+            <option value="starwars">Star Wars</option>
+            <option value="yugioh">Yu-GI-Oh!</option>
+            {/* Add more here as you add categories in Firebase */}
+          </select>
+        </div>
+
+        <div style={{ maxWidth: "1200px", margin: "0 auto 50px", display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}>
+          {/* SEARCH BAR — BACK AND WORKING */}
+          <input
+            type="text"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ padding: "14px", width: "340px", background: "#111", border: "1px solid #444", borderRadius: "12px", color: "#fff" }}
+          />
+
+          {/* TABS — FIXED LABELS */}
+          <div style={{ display: "flex", gap: "12px" }}>
+            {([
+              { key: "all", label: "All" },
+              { key: "slabs", label: "Slabs/Singles/Packs" },
+              { key: "boosters", label: "Boosters" },
+            ] as const).map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setFilter(key)}
+                style={{
+                  padding: "12px 24px",
+                  background: filter === key ? "#ffd700" : "#111",
+                  color: filter === key ? "#000" : "#ffd700",
+                  border: "1px solid #ffd700",
+                  borderRadius: "12px",
+                  fontWeight: "bold",
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 20px 140px", display: "grid", gap: "40px", gridTemplateColumns: "repeat(auto-fit, 340px)", justifyContent: "center" }}>
+          {visible.map((p) => {
+            const currentInCart = cart.items.find((i) => i.id === p.id)?.quantity || 0;
+            const canAddMore = currentInCart < p.stock;
+
+            return (
+              <div
+                key={p.id}
+                style={{
+                  background: "linear-gradient(145deg, #111, #000)",
+                  border: "3px solid #ffd700",
+                  borderRadius: "24px",
+                  padding: "24px",
+                  textAlign: "center",
+                  boxShadow: "0 15px 40px rgba(255,215,0,0.3)",
+                  transition: "transform 0.3s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-8px)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
+              >
+                <Image src={p.img} alt={p.name} width={400} height={560} style={{ borderRadius: "16px", width: "100%", height: "auto" }} />
+                <h3 style={{ margin: "20px 0 12px", color: "#ffd700", fontSize: "24px" }}>{p.name}</h3>
+
+                <p style={{ fontSize: "32px", fontWeight: "bold", color: "#00ff9d", margin: "10px 0" }}>
+                  {Math.ceil(p.usd / price).toLocaleString()} $CARDS
+                </p>
+                <p style={{ color: "#888", fontSize: "16px", marginBottom: "20px" }}>
+                  ${p.usd.toFixed(2)} + Free Shipping
+                </p>
+
+                {p.stock > 0 ? (
+                  <div>
+                    <button
+                      onClick={() => {
+                        if (!canAddMore) {
+                          alert("No more stock!");
+                          return;
+                        }
+                        cart.addItem({ id: p.id, name: p.name, usd: p.usd, weightOz: p.weightOz }, 1);
+                      }}
+                      style={{
+                        background: canAddMore ? "#ffd700" : "#444",
+                        color: "black",
+                        padding: "18px",
+                        width: "100%",
+                        borderRadius: "16px",
+                        fontWeight: "bold",
+                        fontSize: "20px",
+                        marginBottom: "12px",
+                      }}
+                    >
+                      {currentInCart > 0 ? `Add Another (${currentInCart} in cart)` : "Add to Cart"}
+                    </button>
+
+                  </div>
+                ) : (
+                  <div style={{ height: "70px", display: "flex", alignItems: "center", justifyContent: "center", color: "#666", fontSize: "20px" }}>
+                    Out of Stock
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Powered by Base — Bottom of Page */}
+        <footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
+          <div style={{ marginBottom: "12px" }}>
+            <a
+              href="https://base.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                color: "#aaa",
+                textDecoration: "none",
                 fontSize: "16px",
+              }}
+            >
+              Powered by
+              <img 
+                src="/base.jpg" 
+                alt="Base" 
+                style={{ height: "24px", width: "auto" }} 
+              />
+            </a>
+          </div>
+
+          <p style={{ color: "#666", fontSize: "14px", margin: "0" }}>
+            © 2025 CARDS Collectibles LLC. All rights reserved.
+          </p>
+        </footer>
+      </div>
+
+      {/* CART MODAL — appears on top */}
+      {showCart && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          background: "rgba(0,0,0,0.9)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+        }} onClick={() => setShowCart(false)}>
+          <div
+            style={{
+              background: "#111",
+              border: "3px solid #ffd700",
+              borderRadius: "24px",
+              padding: "40px",
+              maxWidth: "600px",
+              width: "90%",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              position: "relative",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Cart
+              cardsPriceUsd={price}
+              onClose={() => setShowCart(false)}
+              products={products}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* SWAP MODAL — Uniswap Widget */}
+      {showSwapModal && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          background: "rgba(0,0,0,0.9)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+        }} onClick={() => setShowSwapModal(false)}>
+          <div
+            style={{
+              background: "#111",
+              border: "3px solid #ffd700",
+              borderRadius: "24px",
+              padding: "40px",
+              maxWidth: "600px",
+              width: "90%",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              position: "relative",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <iframe
+              src="https://app.uniswap.org/swap?inputCurrency=ETH&outputCurrency=0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d&chain=base"
+              height="660"
+              width="100%"
+              style={{
+                border: "0",
+                borderRadius: "16px",
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* HOW TO BUY GUIDE – ZERO-KNOWLEDGE ONBOARDING */}
+      {showHowToBuy && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.95)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "20px",
+          }}
+          onClick={() => setShowHowToBuy(false)}
+        >
+          <div
+            style={{
+              background: "#111",
+              border: "3px solid #ffd700",
+              borderRadius: "24px",
+              padding: "40px",
+              maxWidth: "620px",
+              width: "100%",
+              maxHeight: "95vh",
+              overflowY: "auto",
+              color: "#fff",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2
+              style={{
+                textAlign: "center",
+                color: "#ffd700",
+                fontSize: "32px",
+                marginBottom: "24px",
+              }}
+            >
+              How to Shop in 3 Dead-Simple Steps (Perfect for Beginners)
+            </h2>
+
+            <ol style={{ fontSize: "19px", lineHeight: "1.8", paddingLeft: "24px" }}>
+              <li style={{ marginBottom: "20px" }}>
+                <strong>1. Connect a wallet (30 seconds)</strong>
+                <br />
+                Tap the gold “Connect Wallet” button at the top right → Choose “Coinbase” (easiest for new users).
+                <br />
+                <span style={{ color: "#ffd700", fontSize: "16px" }}>
+                  It instantly creates a secure digital wallet for you — no complicated setup or seed phrases needed the first time.
+                </span>
+              </li>
+
+              <li style={{ marginBottom: "20px" }}>
+                <strong>2. Add money with your card (arrives instantly)</strong>
+                <br />
+                After connecting, you’ll see an “Add Money with Card” button.
+                <br />
+                Tap it → Pay with Apple Pay, Google Pay, or card → Funds land directly on Base ready to use.
+                <br />
+                <span style={{ color: "#ffd700", fontSize: "16px" }}>
+                  No multi-day waits like some exchanges.
+                </span>
+              </li>
+
+              <li style={{ marginBottom: "20px" }}>
+                <strong>3. Get $CARDS for 10% off + free shipping (optional but best deal)</strong>
+                <br />
+                Tap the big gold “Trade for $CARDS” button → A safe trading window opens right here in the app.
+                <br />
+                Swap a little of your funds for $CARDS → Done!
+                <br />
+                <span style={{ color: "#ffd700", fontSize: "16px" }}>
+                  Using $CARDS at checkout automatically gives you 10% off and free shipping.
+                </span>
+              </li>
+
+              <li style={{ marginBottom: "20px" }}>
+                <strong>4. Shop & checkout</strong>
+                <br />
+                Add products to your cart → Tap the floating gold cart button → Enter shipping info → Choose payment ($CARDS for discount, or ETH/USDC for full price) → Confirm → We ship in 24–48 hours!
+              </li>
+            </ol>
+
+            <div
+              style={{
+                textAlign: "center",
+                margin: "30px 0",
+                padding: "20px",
+                background: "rgba(255,215,0,0.1)",
+                borderRadius: "16px",
+                border: "1px dashed #ffd700",
+              }}
+            >
+              <p style={{ fontSize: "18px", margin: "0 0 12px 0" }}>
+                <strong>Easiest path for absolute beginners:</strong>
+                <br />
+                Connect Coinbase Wallet → Add Money with Card → Trade for $CARDS → Enjoy your discount!
+              </p>
+            </div>
+
+            <div
+              style={{
+                textAlign: "center",
+                padding: "40px 20px 20px",
+                color: "#888",
+                fontSize: "14px",
+                lineHeight: "1.6",
+              }}
+            >
+              <p style={{ margin: "10px 0" }}>
+                U.S. shipping only for now via USPS with tracking (3–10 business days). International coming soon!
+              </p>
+              <p style={{ margin: "16px 0 8px 0", fontWeight: "600", color: "#ffd700" }}>
+                Need help?
+              </p>
+              <p style={{ margin: "8px 0" }}>
+                DM us on X →{" "}
+                <a
+                  href="https://x.com/cardsonbaseHQ"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#ffd700", textDecoration: "underline" }}
+                >
+                  @cardsonbaseHQ
+                </a>
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowHowToBuy(false)}
+              style={{
+                display: "block",
+                margin: "30px auto 0",
+                background: "#ffd700",
+                color: "#000",
+                padding: "14px 32px",
+                borderRadius: "16px",
+                fontWeight: "bold",
+                fontSize: "18px",
+                border: "none",
                 cursor: "pointer",
               }}
             >
-              How to Buy Guide
+              Got it – Let’s Shop!
             </button>
           </div>
-
-          {/* Category Dropdown — Centered for Better Flow */}
-          <div style={{ textAlign: "center", marginBottom: "20px" }}>
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              style={{
-                padding: "14px",
-                width: "340px",
-                background: "#111",
-                border: "1px solid #444",
-                borderRadius: "12px",
-                color: "#fff",
-                fontSize: "18px",
-              }}
-            >
-              <option value="all">All Categories</option>
-              <option value="avatar">Avatar:The Last Airbender</option>
-              <option value="azurelane">Azure Lane</option>
-              <option value="digimon">Digimon</option>
-              <option value="disneylorcana">Disney Lorcana</option>
-              <option value="magic">Magic the Gathering</option>
-              <option value="mlb">MLB</option>
-              <option value="nba">NBA</option>
-              <option value="nfl">NFL</option>
-              <option value="onepiece">One Piece</option>
-              <option value="pokemon">Pokémon</option>
-              <option value="riftbound">Riftbound:League Of Legends</option>
-              <option value="starwars">Star Wars</option>
-              <option value="yugioh">Yu-GI-Oh!</option>
-              {/* Add more here as you add categories in Firebase */}
-            </select>
-          </div>
-
-          <div style={{ maxWidth: "1200px", margin: "0 auto 50px", display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}>
-            {/* SEARCH BAR — BACK AND WORKING */}
-            <input
-              type="text"
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ padding: "14px", width: "340px", background: "#111", border: "1px solid #444", borderRadius: "12px", color: "#fff" }}
-            />
-
-            {/* TABS — FIXED LABELS */}
-            <div style={{ display: "flex", gap: "12px" }}>
-              {([
-                { key: "all", label: "All" },
-                { key: "slabs", label: "Slabs/Singles/Packs" },
-                { key: "boosters", label: "Boosters" },
-              ] as const).map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setFilter(key)}
-                  style={{
-                    padding: "12px 24px",
-                    background: filter === key ? "#ffd700" : "#111",
-                    color: filter === key ? "#000" : "#ffd700",
-                    border: "1px solid #ffd700",
-                    borderRadius: "12px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 20px 140px", display: "grid", gap: "40px", gridTemplateColumns: "repeat(auto-fit, 340px)", justifyContent: "center" }}>
-            {visible.map((p) => {
-              const currentInCart = cart.items.find((i) => i.id === p.id)?.quantity || 0;
-              const canAddMore = currentInCart < p.stock;
-
-              return (
-                <div
-                  key={p.id}
-                  style={{
-                    background: "linear-gradient(145deg, #111, #000)",
-                    border: "3px solid #ffd700",
-                    borderRadius: "24px",
-                    padding: "24px",
-                    textAlign: "center",
-                    boxShadow: "0 15px 40px rgba(255,215,0,0.3)",
-                    transition: "transform 0.3s",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-8px)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
-                >
-                  <Image src={p.img} alt={p.name} width={400} height={560} style={{ borderRadius: "16px", width: "100%", height: "auto" }} />
-                  <h3 style={{ margin: "20px 0 12px", color: "#ffd700", fontSize: "24px" }}>{p.name}</h3>
-
-                  <p style={{ fontSize: "32px", fontWeight: "bold", color: "#00ff9d", margin: "10px 0" }}>
-                    {Math.ceil(p.usd / price).toLocaleString()} $CARDS
-                  </p>
-                  <p style={{ color: "#888", fontSize: "16px", marginBottom: "20px" }}>
-                    ${p.usd.toFixed(2)} + Free Shipping
-                  </p>
-
-                  {p.stock > 0 ? (
-                    <div>
-                      <button
-                        onClick={() => {
-                          if (!canAddMore) {
-                            alert("No more stock!");
-                            return;
-                          }
-                          cart.addItem({ id: p.id, name: p.name, usd: p.usd, weightOz: p.weightOz }, 1);
-                        }}
-                        style={{
-                          background: canAddMore ? "#ffd700" : "#444",
-                          color: "black",
-                          padding: "18px",
-                          width: "100%",
-                          borderRadius: "16px",
-                          fontWeight: "bold",
-                          fontSize: "20px",
-                          marginBottom: "12px",
-                        }}
-                      >
-                        {currentInCart > 0 ? `Add Another (${currentInCart} in cart)` : "Add to Cart"}
-                      </button>
-
-                    </div>
-                  ) : (
-                    <div style={{ height: "70px", display: "flex", alignItems: "center", justifyContent: "center", color: "#666", fontSize: "20px" }}>
-                      Out of Stock
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Powered by Base — Bottom of Page */}
-          <footer style={{ textAlign: "center", padding: "20px 0", borderTop: "1px solid #333" }}>
-            <div style={{ marginBottom: "12px" }}>
-              <a
-                href="https://base.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  color: "#aaa",
-                  textDecoration: "none",
-                  fontSize: "16px",
-                }}
-              >
-                Powered by
-                <img 
-                  src="/base.jpg" 
-                  alt="Base" 
-                  style={{ height: "24px", width: "auto" }} 
-                />
-              </a>
-            </div>
-
-            <p style={{ color: "#666", fontSize: "14px", margin: "0" }}>
-              © 2025 CARDS Collectibles LLC. All rights reserved.
-            </p>
-          </footer>
         </div>
+      )}
 
-        {/* CART MODAL — appears on top */}
-        {showCart && (
-          <div style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            background: "rgba(0,0,0,0.9)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-          }} onClick={() => setShowCart(false)}>
-            <div
-              style={{
-                background: "#111",
-                border: "3px solid #ffd700",
-                borderRadius: "24px",
-                padding: "40px",
-                maxWidth: "600px",
-                width: "90%",
-                maxHeight: "90vh",
-                overflowY: "auto",
-                position: "relative",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Cart
-                cardsPriceUsd={price}
-                onClose={() => setShowCart(false)}
-                products={products}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* SWAP MODAL — Uniswap Widget */}
-        {showSwapModal && (
-          <div style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            background: "rgba(0,0,0,0.9)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-          }} onClick={() => setShowSwapModal(false)}>
-            <div
-              style={{
-                background: "#111",
-                border: "3px solid #ffd700",
-                borderRadius: "24px",
-                padding: "40px",
-                maxWidth: "600px",
-                width: "90%",
-                maxHeight: "90vh",
-                overflowY: "auto",
-                position: "relative",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <iframe
-                src="https://app.uniswap.org/swap?inputCurrency=ETH&outputCurrency=0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d&chain=base"
-                height="660"
-                width="100%"
-                style={{
-                  border: "0",
-                  borderRadius: "16px",
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* HOW TO BUY GUIDE – ZERO-KNOWLEDGE ONBOARDING */}
-        {showHowToBuy && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              background: "rgba(0,0,0,0.95)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1000,
-              padding: "20px",
-            }}
-            onClick={() => setShowHowToBuy(false)}
-          >
-            <div
-              style={{
-                background: "#111",
-                border: "3px solid #ffd700",
-                borderRadius: "24px",
-                padding: "40px",
-                maxWidth: "620px",
-                width: "100%",
-                maxHeight: "95vh",
-                overflowY: "auto",
-                color: "#fff",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2
-                style={{
-                  textAlign: "center",
-                  color: "#ffd700",
-                  fontSize: "32px",
-                  marginBottom: "24px",
-                }}
-              >
-                How to Buy in 4 Simple Steps (Even if You’ve Never Touched Crypto)
-              <h2
-  style={{
-    textAlign: "center",
-    color: "#ffd700",
-    fontSize: "32px",
-    marginBottom: "24px",
-  }}
->
-  How to Shop in 3 Dead-Simple Steps (Perfect for Beginners)
-</h2>
-
-<ol style={{ fontSize: "19px", lineHeight: "1.8", paddingLeft: "24px" }}>
-  <li style={{ marginBottom: "20px" }}>
-    <strong>1. Connect a wallet (30 seconds)</strong>
-    <br />
-    Tap the gold “Connect Wallet” button at the top right → Choose “Coinbase” (easiest for new users).
-    <br />
-    <span style={{ color: "#ffd700", fontSize: "16px" }}>
-      It instantly creates a secure digital wallet for you — no complicated setup or seed phrases needed the first time.
-    </span>
-  </li>
-
-  <li style={{ marginBottom: "20px" }}>
-    <strong>2. Add money with your card (arrives instantly)</strong>
-    <br />
-    After connecting, you’ll see an “Add Money with Card” button.
-    <br />
-    Tap it → Pay with Apple Pay, Google Pay, or card → Funds land directly on Base ready to use.
-    <br />
-    <span style={{ color: "#ffd700", fontSize: "16px" }}>
-      No multi-day waits like some exchanges.
-    </span>
-  </li>
-
-  <li style={{ marginBottom: "20px" }}>
-    <strong>3. Get $CARDS for 10% off + free shipping (optional but best deal)</strong>
-    <br />
-    Tap the big gold “Trade for $CARDS” button → A safe trading window opens right here in the app.
-    <br />
-    Swap a little of your funds for $CARDS → Done!
-    <br />
-    <span style={{ color: "#ffd700", fontSize: "16px" }}>
-      Using $CARDS at checkout automatically gives you 10% off and free shipping.
-    </span>
-  </li>
-
-  <li style={{ marginBottom: "20px" }}>
-    <strong>4. Shop & checkout</strong>
-    <br />
-    Add products to your cart → Tap the floating gold cart button → Enter shipping info → Choose payment ($CARDS for discount, or ETH/USDC for full price) → Confirm → We ship in 24–48 hours!
-  </li>
-</ol>
-
-<div
-  style={{
-    textAlign: "center",
-    margin: "30px 0",
-    padding: "20px",
-    background: "rgba(255,215,0,0.1)",
-    borderRadius: "16px",
-    border: "1px dashed #ffd700",
-  }}
->
-  <p style={{ fontSize: "18px", margin: "0 0 12px 0" }}>
-    <strong>Easiest path for absolute beginners:</strong>
-    <br />
-    Connect Coinbase Wallet → Add Money with Card → Trade for $CARDS → Enjoy your discount!
-  </p>
-</div>
-
-<div
-  style={{
-    textAlign: "center",
-    padding: "40px 20px 20px",
-    color: "#888",
-    fontSize: "14px",
-    lineHeight: "1.6",
-  }}
->
-  <p style={{ margin: "10px 0" }}>
-    U.S. shipping only for now via USPS with tracking (3–10 business days). International coming soon!
-  </p>
-  <p style={{ margin: "16px 0 8px 0", fontWeight: "600", color: "#ffd700" }}>
-    Need help?
-  </p>
-  <p style={{ margin: "8px 0" }}>
-    DM us on X →{" "}
-    <a
-      href="https://x.com/cardsonbaseHQ"
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{ color: "#ffd700", textDecoration: "underline" }}
-    >
-      @cardsonbaseHQ
-    </a>
-  </p>
-</div>
-
-<button
-  onClick={() => setShowHowToBuy(false)}
-  style={{
-    display: "block",
-    margin: "30px auto 0",
-    background: "#ffd700",
-    color: "#000",
-    padding: "14px 32px",
-    borderRadius: "16px",
-    fontWeight: "bold",
-    fontSize: "18px",
-    border: "none",
-    cursor: "pointer",
-  }}
->
-  Got it – Let’s Shop!
-</button>
-
-              {/* SHIPPING & SUPPORT */}
-              <div
-                style={{
-                  textAlign: "center",
-                  padding: "40px 20px 20px",
-                  color: "#888",
-                  fontSize: "14px",
-                  lineHeight: "1.6",
-                }}
-              >
-                <p style={{ margin: "10px 0" }}>
-                  Currently ships only within the United States via USPS with tracking (3–10 business days). International coming soon.
-                </p>
-                <p style={{ margin: "10px 0" }}>
-                  Lost or damaged? Send photo + tx hash → we reship or refund in 24h.
-                </p>
-                <p style={{ margin: "16px 0 8px 0", fontWeight: "600", color: "#ffd700" }}>
-                  Need help?
-                </p>
-                <p style={{ margin: "8px 0" }}>
-                  DM →{" "}
-                  <a
-                    href="https://x.com/cardsonbaseHQ"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: "#ffd700", textDecoration: "underline" }}
-                  >
-                    @cardsonbaseHQ
-                  </a>
-                  <br />
-                  Email →{" "}
-                  <a
-                    href="mailto:cardsonbaseHQ@gmail.com"
-                    style={{ color: "#ffd700", textDecoration: "underline" }}
-                  >
-                    cardscollectibles@cardsonbase.com
-                  </a>
-                </p>
-                <p style={{ marginTop: "12px", fontSize: "13px", color: "#666" }}>
-                  We ship thousands of cards. You’re in good hands.
-                </p>
-              </div>
-
-              <button
-                onClick={() => setShowHowToBuy(false)}
-                style={{
-                  display: "block",
-                  margin: "30px auto 0",
-                  background: "#ffd700",
-                  color: "#000",
-                  padding: "14px 32px",
-                  borderRadius: "16px",
-                  fontWeight: "bold",
-                  fontSize: "18px",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                Got it – Let’s Shop!
-              </button>
-            </div>
-          </div>
-        )}
-
-        <WalletModal />
-      </>
+      <WalletModal />
+    </>
   );
 }
