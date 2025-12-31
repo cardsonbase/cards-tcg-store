@@ -580,8 +580,7 @@ export default function Home() {
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
     {/* Fund Button — only show when connected */}
     {isConnected && (
-  <button
-    onClick={() => alert("Fund button works!")}
+  <div
     style={{
       background: "#ffd700",
       color: "#000",
@@ -590,12 +589,19 @@ export default function Home() {
       fontWeight: "bold",
       fontSize: "22px",
       boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+      transition: "transform 0.3s",
       border: "none",
+      display: "inline-block",
       cursor: "pointer",
     }}
+    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
   >
-    TEST FUND CLICK
-  </button>
+    <FundButton 
+      text="Buy ETH/USDC with Card"
+      hideIcon={true}  // Removes the blue Coinbase logo
+    />
+  </div>
 )}
 
     {/* Swap Button — only show when connected */}
