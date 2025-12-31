@@ -618,9 +618,9 @@ export default function Home() {
     >
       Trade $CARDS on Uniswap
     </button>
-  </div>
+      </div>
 
-  {/* How to Buy Guide */}
+    {/* How to Buy Guide */}
   <button
     onClick={() => setShowHowToBuy(true)}
     style={{
