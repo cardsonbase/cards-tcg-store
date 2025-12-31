@@ -43,11 +43,10 @@ export default function Home() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const [sessionToken, setSessionToken] = useState(null);
-  const fundingUrl = isConnected && address
+  const fundingUrl = isConnected && address && sessionToken
   ? getOnrampBuyUrl({
       projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
-      addresses: { [address]: ['base'] },
-      assets: ['ETH', 'USDC'],  // Let user choose
+      sessionToken: sessionToken,  // Use the fetched token
       presetFiatAmount: 20,
       fiatCurrency: 'USD',
     })
