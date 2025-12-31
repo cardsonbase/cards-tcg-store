@@ -4,8 +4,8 @@ import { NextResponse, NextRequest } from 'next/server';
 import { sign } from '@noble/ed25519';
 import { randomBytes } from 'crypto';
 
-const API_KEY_ID = process.env.CDP_API_KEY_ID?.trim(); // ← Your Ed25519 key ID/name
-const PRIVATE_KEY_BASE64 = process.env.CDP_API_KEY_SECRET?.trim(); // ← Base64 private key
+const API_KEY_ID = process.env.CDP_API_KEY_ID?.trim();
+const PRIVATE_KEY_BASE64 = process.env.CDP_API_KEY_SECRET?.trim();
 
 export async function POST(request: NextRequest) {
   try {
