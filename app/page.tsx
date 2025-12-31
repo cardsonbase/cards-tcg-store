@@ -579,8 +579,9 @@ export default function Home() {
   </p>
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
     {/* Fund Button — only show when connected */}
-    {isConnected && (
+    {isConnected && address && (
   <div
+    key={address}  // forces re-mount after connect
     style={{
       background: "#ffd700",
       color: "#000",
@@ -599,7 +600,7 @@ export default function Home() {
   >
     <FundButton 
       text="Buy ETH/USDC with Card"
-      hideIcon={true}  // Removes the blue Coinbase logo
+      hideIcon={true}
     />
   </div>
 )}
