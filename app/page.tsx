@@ -24,6 +24,7 @@ import { ref, onValue } from "firebase/database";
 import { useCart } from "@/lib/cart";
 import dynamic from "next/dynamic";
 import { useAccount, useDisconnect } from 'wagmi';  // Add useDisconnect
+import { FundButton } from '@coinbase/onchainkit/fund';
 
 export default function Home() {
   const [price, setPrice] = useState(0.00005);
@@ -577,43 +578,62 @@ export default function Home() {
               New to Base? Connect your wallet and buy ETH directly inside it with card.
             </p>
             <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-              {/* Swap Widget Button */}
-              <button
-                onClick={() => setShowSwapModal(true)}
-                style={{
-                  background: "#ffd700",
-                  color: "#000",
-                  padding: "16px 32px",
-                  borderRadius: "24px",
-                  fontWeight: "bold",
-                  fontSize: "22px",
-                  boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-                  transition: "transform 0.3s",
-                  border: "none",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-              >
-                Trade $CARDS on Uniswap
-              </button>
-            </div>
-            {/* How to Buy Button */}
-            <button
-              onClick={() => setShowHowToBuy(true)}
-              style={{
-                marginTop: "20px",
-                background: "transparent",
-                color: "#ffd700",
-                padding: "8px 16px",
-                border: "1px solid #ffd700",
-                borderRadius: "12px",
-                fontSize: "16px",
-                cursor: "pointer",
-              }}
-            >
-              How to Buy Guide
-            </button>
-          </div>
+
+              <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+             <FundButton 
+                text="Buy ETH/USDC with Card"
+                // Optional: customize
+                // asset="ETH" or "USDC"
+              />
+              {/* Swap Section — Focused on In-App */}
+<div style={{ textAlign: "center", margin: "40px 0" }}>
+  <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "16px" }}>
+    New to Base? Connect your wallet and buy ETH directly inside it with card.
+  </p>
+  <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+    <FundButton 
+      text="Buy ETH/USDC with Card"
+    />
+
+    {/* Swap Widget Button */}
+    <button
+      onClick={() => setShowSwapModal(true)}
+      style={{
+        background: "#ffd700",
+        color: "#000",
+        padding: "16px 32px",
+        borderRadius: "24px",
+        fontWeight: "bold",
+        fontSize: "22px",
+        boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+        transition: "transform 0.3s",
+        border: "none",
+        cursor: "pointer",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+    >
+      Trade $CARDS on Uniswap
+    </button>
+  </div>
+
+  {/* How to Buy Button */}
+  <button
+    onClick={() => setShowHowToBuy(true)}
+    style={{
+      marginTop: "20px",
+      background: "transparent",
+      color: "#ffd700",
+      padding: "8px 16px",
+      border: "1px solid #ffd700",
+      borderRadius: "12px",
+      fontSize: "16px",
+      cursor: "pointer",
+    }}
+  >
+    How to Buy Guide
+  </button>
+</div>
 
           {/* Category Dropdown — Centered for Better Flow */}
           <div style={{ textAlign: "center", marginBottom: "20px" }}>
