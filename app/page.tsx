@@ -42,14 +42,15 @@ export default function Home() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const [sessionToken, setSessionToken] = useState(null);
-  let fundingUrl = null;
-if (isConnected && address) {
-  fundingUrl = getOnrampBuyUrl({
-    projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID,  // Your loaded ID
-    addresses: { [address]: ['base'] },
-    assets: ['ETH'],  // Or ['USDC']
-    presetFiatAmount: 20,  // Optional preset
-    fiatCurrency: 'USD',
+  const fundingUrl = isConnected && address
+  ? getOnrampBuyUrl({
+      projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
+      addresses: { [address]: ['base'] },
+      assets: ['ETH', 'USDC'],  // Let user choose
+      presetFiatAmount: 20,
+      fiatCurrency: 'USD',
+    })
+  : null;
   });
 }
 
@@ -603,17 +604,17 @@ if (isConnected && address) {
   </p>
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
     {/* Fund Button — only show when connected */}
-    {isConnected && sessionToken && (
+    {isConnected && fundingUrl && (
   <div
-    key={address}
+    key={address}  // Optional but good for re-mount
     style={{
-      background: "#ffffff",
-      color: "#000000",
+      background: "#ffd700",
+      color: "#000",
       padding: "16px 32px",
       borderRadius: "24px",
       fontWeight: "bold",
       fontSize: "22px",
-      boxShadow: "0 4px 20px rgba(255,255,255,0.4)",
+      boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
       transition: "transform 0.3s",
       border: "none",
       display: "inline-block",
@@ -622,10 +623,10 @@ if (isConnected && address) {
     onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
     onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
   >
-    <FundButton
-      sessionToken={sessionToken}
+    <FundButton 
+      fundingUrl={fundingUrl}
       text="Buy ETH/USDC with Card"
-      hideIcon={true}
+      hideIcon={true}  // Removes blue logo
     />
   </div>
 )}
