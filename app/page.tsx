@@ -940,7 +940,7 @@ export default function Home() {
   <li style={{ marginBottom: "20px" }}>
     <strong>1. Connect a wallet (30 seconds)</strong>
     <br />
-    Tap the gold “Connect Wallet” button (top right) → in the modal, choose <strong>“Sign in with Base”</strong> (recommended — easiest for beginners, no app needed) or “Use another wallet” (Coinbase, MetaMask, etc.).
+    Tap the gold “Connect Wallet” button (next to social icons top of screen) → choose <strong>“Sign in with Base”</strong> (recommended — easiest for beginners, no app needed) or “Use another wallet” (Coinbase, MetaMask, etc.).
     <br />
     <span style={{ color: "#ffd700", fontSize: "16px" }}>
       “Sign in with Base” creates your secure Smart Wallet instantly using email or passkey — no seed phrases, no hassle.
@@ -950,7 +950,7 @@ export default function Home() {
   <li style={{ marginBottom: "20px" }}>
     <strong>2. Add funds with card (instant)</strong>
     <br />
-    Scroll down and tap “Buy ETH/USDC with Card” → choose ETH or USDC → pay with card or Apple Pay → funds arrive immediately in your wallet.
+    Scroll down and tap “Buy ETH/USDC with debit/credit Card” → choose ETH or USDC → pay with card or Apple Pay → funds arrive immediately in your wallet.
     <br />
     <span style={{ color: "#ffd700", fontSize: "16px" }}>
       No redirects, no waiting — all in-app. Buy a little extra (~5%) if you plan to swap to $CARDS.
@@ -963,7 +963,7 @@ export default function Home() {
                   Tap “Trade $CARDS on Uniswap” → widget opens here → select ETH to $CARDS → swap.
                   <br />
                   <span style={{ color: "#ffd700", fontSize: "16px" }}>
-                    Note: Includes ~3.5% trade tax (funds our discounts)—expect to get slightly less $CARDS. Skip for ETH/USDC payments.
+                    Note: Includes ~3.5% trade tax (funds our tokens utilites, ecosystem, & discounts)—expect to get slightly less $CARDS. Skip for ETH/USDC payments.
                   </span>
                 </li>
 
