@@ -571,20 +571,6 @@ export default function Home() {
               </Wallet>
             </div>
           </header>
-
-          {/* Swap Section — Focused on In-App */}
-          <div style={{ textAlign: "center", margin: "40px 0" }}>
-            <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "16px" }}>
-              New to Base? Connect your wallet and buy ETH directly inside it with card.
-            </p>
-            <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-
-              <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-             <FundButton 
-                text="Buy ETH/USDC with Card"
-                // Optional: customize
-                // asset="ETH" or "USDC"
-              />
               {/* Swap Section — Focused on In-App */}
 <div style={{ textAlign: "center", margin: "40px 0" }}>
   <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "16px" }}>
