@@ -578,25 +578,26 @@ export default function Home() {
     Already connected? Add funds or swap to $CARDS for 10% off + free shipping.
   </p>
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-    {/* Fund Button — only useful after connect */}
-    <FundButton 
+    {/* Styled wrapper around FundButton */}
+    <div
       style={{
-    background: "#ffd700",
-    color: "#000",
-    padding: "16px 32px",
-    borderRadius: "24px",
-    fontWeight: "bold",
-    fontSize: "22px",
-    boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-    transition: "transform 0.3s",
-    border: "none",
-    display: "inline-block",
-    cursor: "pointer",
-  }}
-  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
->
-  <FundButton text="Buy ETH/USDC with Card" />
+        background: "#ffd700",
+        color: "#000",
+        padding: "16px 32px",
+        borderRadius: "24px",
+        fontWeight: "bold",
+        fontSize: "22px",
+        boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+        transition: "transform 0.3s",
+        border: "none",
+        display: "inline-block",
+        cursor: "pointer",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+    >
+      <FundButton text="Buy ETH/USDC with Card" />
+    </div>
 
     {/* Swap Button */}
     <button
@@ -618,9 +619,9 @@ export default function Home() {
     >
       Trade $CARDS on Uniswap
     </button>
-      </div>
+  </div>
 
-    {/* How to Buy Guide */}
+  {/* How to Buy Guide */}
   <button
     onClick={() => setShowHowToBuy(true)}
     style={{
