@@ -44,18 +44,16 @@ export default function Home() {
   const { disconnect } = useDisconnect();
   const [sessionToken, setSessionToken] = useState<string | null>(null);
 
-// This builds the URL ONLY with sessionToken (secure mode)
-const fundingUrl = isConnected && address && sessionToken
+  const fundingUrl = isConnected && address && sessionToken
   ? getOnrampBuyUrl({
       projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
-      sessionToken: sessionToken,  // Required now
-      presetFiatAmount: 5,        // Small amount for testing
+      sessionToken,
+      presetFiatAmount: 5,
       fiatCurrency: 'USD',
-      assets: ['ETH', 'USDC'],    // Optional: pre-select assets
+      assets: ['ETH', 'USDC'],
     })
   : null;
 
-// Fetch sessionToken every time wallet connects
 useEffect(() => {
   if (isConnected && address) {
     fetch('/api/onramp/session', {
@@ -63,16 +61,12 @@ useEffect(() => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ address }),
     })
-      .then(res => res.json())
-      .then(data => {
-        if (data.sessionToken) {
-          setSessionToken(data.sessionToken);
-          console.log('Session token received successfully');
-        } else {
-          console.error('Failed to get sessionToken:', data);
-        }
+      .then(r => r.json())
+      .then(d => {
+        if (d.sessionToken) setSessionToken(d.sessionToken);
+        else console.error('No token:', d);
       })
-      .catch(err => console.error('Token fetch error:', err));
+      .catch(console.error);
   } else {
     setSessionToken(null);
   }
