@@ -465,15 +465,15 @@ export default function Home() {
                       <<div className="flex items-center gap-3">
         {/* Only render Identity/Avatar/Name when fully connected and address exists */}
         {status === 'connected' && address ? (
-          <Identity address={address} hasCopyAddressOnClick>
-            <Avatar className="h-9 w-9 ring-2 ring-black" />
-            <Name />
-          </Identity>
-        ) : (
-          <span className="font-bold drop-shadow-md">
-            {isLoading ? 'Connecting...' : 'Connect Wallet'}
-          </span>
-        )}
+  <>
+    <Identity address={address}>
+      <Avatar className="h-9 w-9 ring-2 ring-black" />
+    </Identity>
+    <Name />
+  </>
+) : (
+  <span>{isLoading ? 'Connecting...' : 'Connect Wallet'}</span>
+)}
       </div>
     </button>
                   )}
