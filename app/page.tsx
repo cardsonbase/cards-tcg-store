@@ -25,6 +25,7 @@ import { useCart } from "@/lib/cart";
 import dynamic from "next/dynamic";
 import { useAccount, useDisconnect } from 'wagmi';  // Add useDisconnect
 import { FundButton, getOnrampBuyUrl } from '@coinbase/onchainkit/fund';
+import { base } from 'wagmi/chains';
 
 export default function Home() {
   const [price, setPrice] = useState(0.00005);
