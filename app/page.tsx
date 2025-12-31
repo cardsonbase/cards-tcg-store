@@ -581,27 +581,27 @@ export default function Home() {
     {/* Fund Button — only show when connected */}
     {isConnected && (
       <div
-        style={{
-          background: "#ffd700",
-          color: "#000",
-          padding: "16px 32px",
-          borderRadius: "24px",
-          fontWeight: "bold",
-          fontSize: "22px",
-          boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-          transition: "transform 0.3s",
-          border: "none",
-          display: "inline-block",
-          cursor: "pointer",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-      >
-        <FundButton 
-          text="Buy ETH/USDC with Card"
-          hideIcon={true}
-        />
-      </div>
+  style={{
+    background: "#ffffff",
+    color: "#000",
+    padding: "16px 32px",
+    borderRadius: "24px",
+    fontWeight: "bold",
+    fontSize: "22px",
+    boxShadow: "0 4px 20px rgba(255,255,255,0.3)",
+    transition: "transform 0.3s",
+    border: "none",
+    display: "inline-block",
+    cursor: "pointer",
+  }}
+  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+>
+  <FundButton 
+    text="Buy ETH/USDC with Card"
+    hideIcon={true}
+  />
+</div>
     )}
 
     {/* Swap Button — only show when connected */}
