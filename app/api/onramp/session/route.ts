@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
 const API_KEY_NAME = process.env.CDP_SECRET_API_KEY_NAME;
-const PRIVATE_KEY = process.env.CDP_SECRET_API_KEY;  // Multiline PEM – no .replace() needed
+const PRIVATE_KEY = process.env.CDP_SECRET_API_KEY_PRIVATE_KEY;  // Multiline PEM – no .replace() needed
 
 export async function POST(request: Request) {
   try {
