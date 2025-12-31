@@ -571,17 +571,19 @@ export default function Home() {
               </Wallet>
             </div>
           </header>
-              {/* Swap Section — Focused on In-App */}
+
+          {/* Swap Section — Focused on In-App */}
 <div style={{ textAlign: "center", margin: "40px 0" }}>
   <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "16px" }}>
-    New to Base? Connect your wallet and buy ETH directly inside it with card.
+    Already connected? Add funds or swap to $CARDS for 10% off + free shipping.
   </p>
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+    {/* Fund Button — only useful after connect */}
     <FundButton 
-      text="Buy ETH/USDC with Card"
+      text="Add Funds with Card"
     />
 
-    {/* Swap Widget Button */}
+    {/* Swap Button */}
     <button
       onClick={() => setShowSwapModal(true)}
       style={{
@@ -603,7 +605,7 @@ export default function Home() {
     </button>
   </div>
 
-  {/* How to Buy Button */}
+  {/* How to Buy Guide */}
   <button
     onClick={() => setShowHowToBuy(true)}
     style={{
@@ -617,7 +619,7 @@ export default function Home() {
       cursor: "pointer",
     }}
   >
-    How to Buy Guide
+    New to crypto? Full beginner guide →
   </button>
 </div>
 
