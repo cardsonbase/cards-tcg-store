@@ -51,7 +51,6 @@ export default function Home() {
       fiatCurrency: 'USD',
     })
   : null;
-  });
 }
 
   useEffect(() => {
