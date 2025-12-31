@@ -581,15 +581,15 @@ export default function Home() {
     {/* Fund Button — only show when connected */}
     {isConnected && address && (
   <div
-    key={address}  // forces re-mount after connect
+    key={address}
     style={{
-      background: "#ffd700",
-      color: "#000",
+      background: "#ffffff",
+      color: "#000000",
       padding: "16px 32px",
       borderRadius: "24px",
       fontWeight: "bold",
       fontSize: "22px",
-      boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+      boxShadow: "0 4px 20px rgba(255,255,255,0.4)",
       transition: "transform 0.3s",
       border: "none",
       display: "inline-block",
@@ -600,6 +600,7 @@ export default function Home() {
   >
     <FundButton 
       text="Buy ETH/USDC with Card"
+      hideIcon={true}
     />
   </div>
 )}
