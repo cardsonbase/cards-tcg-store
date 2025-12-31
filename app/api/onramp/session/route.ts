@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Coinbase failed', details: data }, { status: 500 });
     }
 
-    return NextResponse.json({ sessionToken: data.sessionToken });
+    return NextResponse.json({ sessionToken: data.token });
   } catch (err: any) {
     console.error('Error:', err);
     return NextResponse.json({ error: 'Server error', msg: err.message }, { status: 500 });
