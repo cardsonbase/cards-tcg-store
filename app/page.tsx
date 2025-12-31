@@ -996,7 +996,7 @@ export default function Home() {
                   Email <a href="mailto:cardscollectibles@cardsonbase.com" style={{ color: "#ffd700", textDecoration: "underline" }}>cardscollectibles@cardsonbase.com</a>
                 </p>
                 <p style={{ marginTop: "12px", fontSize: "13px", color: "#666" }}>
-                  Thousands shipped—you're good.
+                   "With proven expertise in TCG sales and thousands in product value shipped, we're committed to your satisfaction." Learn more about us at cardsonbase.com/about
                 </p>
               </div>
 
