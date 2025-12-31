@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
 const API_KEY_NAME = process.env.CDP_SECRET_API_KEY_NAME!;
-const PRIVATE_KEY = process.env.CDP_SECRET_API_KEY_PRIVATE_KEY!.replace(/\\n/g, '\n'); // Fix line breaks if needed
+const PRIVATE_KEY = process.env.CDP_SECRET_API_KEY!.replace(/\\n/g, '\n'); // Fix line breaks if needed
 
 export async function POST(request: Request) {
   try {
