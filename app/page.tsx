@@ -429,17 +429,17 @@ export default function Home() {
 
               <Wallet>
                 <ConnectWallet
-                  render={({ onClick, status, isLoading }) => (
-                    <button
-                      onClick={() => {
-                        if (status === 'disconnected') {
-                          onClick(); // Opens the connection modal
-                        } else {
-                          setIsDropdownOpen((prev) => !prev); // Toggle dropdown when connected
-                        }
-                      }}
-                      disabled={isLoading}
-                      style={{
+  render={({ onClick, status, isLoading }) => (
+    <button
+      onClick={() => {
+        if (status === 'disconnected') {
+          onClick();
+        } else {
+          setIsDropdownOpen((prev) => !prev);
+        }
+      }}
+      disabled={isLoading}
+      style={{
                         position: 'relative',
                         overflow: 'hidden',
                         background: 'linear-gradient(to right, #ffd700, #ffed4e)',
@@ -469,7 +469,9 @@ export default function Home() {
             <Name />
           </Identity>
         )}
+        {/* Show text when disconnected or during loading */}
         {status === 'disconnected' && 'Connect Wallet'}
+        {isLoading && 'Connecting...'}
       </div>
     </button>
                   )}
