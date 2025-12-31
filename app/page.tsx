@@ -579,7 +579,6 @@ export default function Home() {
   </p>
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
     {/* Styled wrapper around FundButton */}
-    // Then in the JSX:
 <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
   {isConnected && (
     <div
