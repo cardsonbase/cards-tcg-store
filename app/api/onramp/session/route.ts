@@ -1,11 +1,11 @@
-// /api/onramp/session/route.ts (or .js)
+// /api/onramp/session/route.ts
 
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
 const API_KEY_NAME = process.env.CDP_SECRET_API_KEY_NAME?.trim();
-const PRIVATE_KEY_ESCAPED = process.env.CDP_SECRET_API_KEY_PRIVATE_KEY?.trim();
-const PRIVATE_KEY = PRIVATE_KEY_ESCAPED?.replace(/\\n/g, '\n').trim();
+// Ed25519 private key is a single base64 string — no escaping or newlines needed
+const PRIVATE_KEY = process.env.CDP_SECRET_API_KEY_PRIVATE_KEY?.trim();
 
 export async function POST(request: Request) {
   try {
@@ -22,16 +22,17 @@ export async function POST(request: Request) {
     const payload = {
       iss: API_KEY_NAME,
       nbf: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + 60,  // 60s is fine
+      exp: Math.floor(Date.now() / 1000) + 60,
       aud: 'https://api.developer.coinbase.com/onramp/v1/token',
     };
 
+    // Critical changes for Ed25519
     const token = jwt.sign(payload, PRIVATE_KEY, {
-      algorithm: 'ES256',
+      algorithm: 'EdDSA',                 // ← Ed25519 uses EdDSA
       header: { kid: API_KEY_NAME },
     });
 
-    console.log('Generated JWT (first 50 chars):', token.slice(0, 50) + '...'); // For debug
+    console.log('Generated JWT (first 50 chars):', token.slice(0, 50) + '...');
 
     const res = await fetch('https://api.developer.coinbase.com/onramp/v1/token', {
       method: 'POST',
@@ -41,17 +42,20 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         addresses: [{ address, blockchains: ['base'] }],
-        assets: ['ETH', 'USDC'],  // These are fine for Base
+        assets: ['ETH', 'USDC'],
       }),
     });
 
     const data = await res.json();
 
     console.log('Coinbase response status:', res.status);
-    console.log('Coinbase response body:', data);  // Critical for debugging!
+    console.log('Coinbase response body:', data);
 
     if (!res.ok) {
-      return NextResponse.json({ error: 'Coinbase token failed', details: data, status: res.status }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Coinbase token failed', details: data, status: res.status },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ sessionToken: data.sessionToken });
