@@ -24,7 +24,7 @@ import { ref, onValue } from "firebase/database";
 import { useCart } from "@/lib/cart";
 import dynamic from "next/dynamic";
 import { useAccount, useDisconnect } from 'wagmi';  // Add useDisconnect
-import { FundButton } from '@coinbase/onchainkit/fund';
+import { FundButton, getOnrampBuyUrl } from '@coinbase/onchainkit/fund';
 
 export default function Home() {
   const [price, setPrice] = useState(0.00005);
@@ -41,6 +41,16 @@ export default function Home() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
+  let fundingUrl = null;
+if (isConnected && address) {
+  fundingUrl = getOnrampBuyUrl({
+    projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID,  // Your loaded ID
+    addresses: { [address]: ['base'] },
+    assets: ['ETH'],  // Or ['USDC']
+    presetFiatAmount: 20,  // Optional preset
+    fiatCurrency: 'USD',
+  });
+}
   
   useEffect(() => {
     const fetchPrice = async () => {
@@ -579,7 +589,7 @@ export default function Home() {
   </p>
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
     {/* Fund Button — only show when connected */}
-    {isConnected && address && (
+    {isConnected && fundingUrl && (
   <div
     key={address}
     style={{
