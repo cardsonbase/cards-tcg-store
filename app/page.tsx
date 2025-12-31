@@ -42,36 +42,41 @@ export default function Home() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
-  const [sessionToken, setSessionToken] = useState(null);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
 
-  // Guest checkout for pre-approval testing (no server call; limits apply)
-  const fundingUrl = isConnected && address
-    ? getOnrampBuyUrl({
-        projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
-        // sessionToken: sessionToken, // Uncomment after approval for secure mode
-        addresses: [{ address, blockchains: ['base'] }], // Guest mode
-        assets: ['ETH', 'USDC'],
-        presetFiatAmount: 5, // Start with $5 for tests
-        fiatCurrency: 'USD',
+// This builds the URL ONLY with sessionToken (secure mode)
+const fundingUrl = isConnected && address && sessionToken
+  ? getOnrampBuyUrl({
+      projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
+      sessionToken: sessionToken,  // Required now
+      presetFiatAmount: 5,        // Small amount for testing
+      fiatCurrency: 'USD',
+      assets: ['ETH', 'USDC'],    // Optional: pre-select assets
+    })
+  : null;
+
+// Fetch sessionToken every time wallet connects
+useEffect(() => {
+  if (isConnected && address) {
+    fetch('/api/onramp/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.sessionToken) {
+          setSessionToken(data.sessionToken);
+          console.log('Session token received successfully');
+        } else {
+          console.error('Failed to get sessionToken:', data);
+        }
       })
-    : null;
-
-  // Secure mode (uncomment after approval)
-  /*
-  useEffect(() => {
-    if (isConnected && address) {
-      fetch('/api/onramp/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address }),
-      })
-        .then(res => res.json())
-        .then(data => setSessionToken(data.sessionToken))
-        .catch(err => console.error("Token fetch error:", err));
-    }
-  }, [isConnected, address]);
-  */
-
+      .catch(err => console.error('Token fetch error:', err));
+  } else {
+    setSessionToken(null);
+  }
+}, [isConnected, address]);
   useEffect(() => {
     const fetchPrice = async () => {
       try {
