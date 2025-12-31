@@ -1,3 +1,5 @@
+// /api/onramp/session/route.ts (or .js)
+
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
@@ -8,26 +10,28 @@ const PRIVATE_KEY = PRIVATE_KEY_ESCAPED?.replace(/\\n/g, '\n').trim();
 export async function POST(request: Request) {
   try {
     if (!API_KEY_NAME || !PRIVATE_KEY) {
-      return NextResponse.json({ error: 'Config error' }, { status: 500 });
+      console.error('Missing API key name or private key');
+      return NextResponse.json({ error: 'Server config error' }, { status: 500 });
     }
 
     const { address } = await request.json();
-    if (!address) {
-      return NextResponse.json({ error: 'No address' }, { status: 400 });
+    if (!address || !address.startsWith('0x')) {
+      return NextResponse.json({ error: 'Invalid address' }, { status: 400 });
     }
 
-    // Fixed: Use 'aud' for Onramp token endpoint
     const payload = {
       iss: API_KEY_NAME,
       nbf: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + 60,
+      exp: Math.floor(Date.now() / 1000) + 60,  // 60s is fine
       aud: 'https://api.developer.coinbase.com/onramp/v1/token',
     };
 
     const token = jwt.sign(payload, PRIVATE_KEY, {
-      algorithm: 'ES256',  // Correct for your ECDSA key
+      algorithm: 'ES256',
       header: { kid: API_KEY_NAME },
     });
+
+    console.log('Generated JWT (first 50 chars):', token.slice(0, 50) + '...'); // For debug
 
     const res = await fetch('https://api.developer.coinbase.com/onramp/v1/token', {
       method: 'POST',
@@ -37,20 +41,22 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         addresses: [{ address, blockchains: ['base'] }],
-        assets: ['ETH', 'USDC'],
+        assets: ['ETH', 'USDC'],  // These are fine for Base
       }),
     });
 
     const data = await res.json();
 
+    console.log('Coinbase response status:', res.status);
+    console.log('Coinbase response body:', data);  // Critical for debugging!
+
     if (!res.ok) {
-      console.error('Coinbase error:', res.status, data);
-      return NextResponse.json({ error: 'Token failed', details: data }, { status: 500 });
+      return NextResponse.json({ error: 'Coinbase token failed', details: data, status: res.status }, { status: 500 });
     }
 
     return NextResponse.json({ sessionToken: data.sessionToken });
   } catch (error: any) {
-    console.error('Error:', error.message);
-    return NextResponse.json({ error: 'Failed', msg: error.message }, { status: 500 });
+    console.error('JWT signing or fetch error:', error);
+    return NextResponse.json({ error: 'Server error', msg: error.message }, { status: 500 });
   }
 }
