@@ -600,7 +600,6 @@ export default function Home() {
   >
     <FundButton 
       text="Buy ETH/USDC with Card"
-      hideIcon={true}
     />
   </div>
 )}
