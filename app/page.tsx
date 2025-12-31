@@ -39,7 +39,7 @@ export default function Home() {
   const [showHowToBuy, setShowHowToBuy] = useState(false);
   const { setFrameReady, isFrameReady } = useMiniKit();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   
   useEffect(() => {
