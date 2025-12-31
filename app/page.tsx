@@ -578,56 +578,62 @@ export default function Home() {
     Already connected? Add funds or swap to $CARDS for 10% off + free shipping.
   </p>
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-    {/* Styled wrapper around FundButton */}
-<div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-  {isConnected && (
-    <div
-      style={{
-        background: "#ffd700",
-        color: "#000",
-        padding: "16px 32px",
-        borderRadius: "24px",
-        fontWeight: "bold",
-        fontSize: "22px",
-        boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-        transition: "transform 0.3s",
-        border: "none",
-        display: "inline-block",
-        cursor: "pointer",
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-    >
-      <FundButton 
-        text="Buy ETH/USDC with Card"
-        hideIcon={true}
-      />
-    </div>
-  )}
+    {/* Fund Button — only show when connected */}
+    {isConnected && (
+      <div
+        style={{
+          background: "#ffd700",
+          color: "#000",
+          padding: "16px 32px",
+          borderRadius: "24px",
+          fontWeight: "bold",
+          fontSize: "22px",
+          boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+          transition: "transform 0.3s",
+          border: "none",
+          display: "inline-block",
+          cursor: "pointer",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+      >
+        <FundButton 
+          text="Buy ETH/USDC with Card"
+          hideIcon={true}
+        />
+      </div>
+    )}
 
-  {/* Swap button — also only show when connected */}
-  {isConnected && (
-    <button
-      onClick={() => setShowSwapModal(true)}
-      style={{
-        background: "#ffd700",
-        color: "#000",
-        padding: "16px 32px",
-        borderRadius: "24px",
-        fontWeight: "bold",
-        fontSize: "22px",
-        boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-        transition: "transform 0.3s",
-        border: "none",
-        cursor: "pointer",
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-    >
-      Trade $CARDS on Uniswap
-    </button>
+    {/* Swap Button — only show when connected */}
+    {isConnected && (
+      <button
+        onClick={() => setShowSwapModal(true)}
+        style={{
+          background: "#ffd700",
+          color: "#000",
+          padding: "16px 32px",
+          borderRadius: "24px",
+          fontWeight: "bold",
+          fontSize: "22px",
+          boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+          transition: "transform 0.3s",
+          border: "none",
+          cursor: "pointer",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+      >
+        Trade $CARDS on Uniswap
+      </button>
+    )}
+  </div>
+
+  {/* Message when not connected */}
+  {!isConnected && (
+    <p style={{ color: "#aaa", fontSize: "18px", marginTop: "20px" }}>
+      Connect your wallet above to add funds or swap →
+    </p>
   )}
-</div>
 
   {/* How to Buy Guide */}
   <button
