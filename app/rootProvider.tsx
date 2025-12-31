@@ -8,6 +8,7 @@ export function RootProvider({ children }: { children: ReactNode }) {
   return (
     <OnchainKitProvider
   apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+  projectId={process.env.NEXT_PUBLIC_CDP_PROJECT_ID}
   chain={base}
   config={{
     appearance: {
