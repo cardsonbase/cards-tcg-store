@@ -921,25 +921,25 @@ export default function Home() {
               </div>
 
               <ol style={{ fontSize: "19px", lineHeight: "1.8", paddingLeft: "24px" }}>
-                <li style={{ marginBottom: "20px" }}>
-                  <strong>1. Connect a wallet (30 seconds)</strong>
-                  <br />
-                  Tap “Connect Wallet” → choose Smart Wallet or another → it sets up instantly (no complex setup).
-                  <br />
-                  <span style={{ color: "#ffd700", fontSize: "16px" }}>
-                    What to do: If prompted, download the Coinbase Wallet app—it's free and secure.
-                  </span>
-                </li>
+  <li style={{ marginBottom: "20px" }}>
+    <strong>1. Connect a wallet (30 seconds)</strong>
+    <br />
+    Tap the gold “Connect Wallet” button (top right) → in the modal, choose <strong>“Sign in with Base”</strong> (recommended — easiest for beginners, no app needed) or “Use another wallet” (Coinbase, MetaMask, etc.).
+    <br />
+    <span style={{ color: "#ffd700", fontSize: "16px" }}>
+      “Sign in with Base” creates your secure Smart Wallet instantly using email or passkey — no seed phrases, no hassle.
+    </span>
+  </li>
 
-                <li style={{ marginBottom: "20px" }}>
-                  <strong>2. Buy ETH with card</strong>
-                  <br />
-                  In your wallet app, tap "Buy" → use card or Apple Pay → get Base ETH (arrives instantly, no holds).
-                  <br />
-                  <span style={{ color: "#ffd700", fontSize: "16px" }}>
-                    ETH is the 'gas' for Base—buy a bit more (~5%) if swapping to $CARDS to cover network fees.
-                  </span>
-                </li>
+  <li style={{ marginBottom: "20px" }}>
+    <strong>2. Add funds with card (instant)</strong>
+    <br />
+    Scroll down and tap “Buy ETH/USDC with Card” → choose ETH or USDC → pay with card or Apple Pay → funds arrive immediately in your wallet.
+    <br />
+    <span style={{ color: "#ffd700", fontSize: "16px" }}>
+      No redirects, no waiting — all in-app. Buy a little extra (~5%) if you plan to swap to $CARDS.
+    </span>
+  </li>
 
                 <li style={{ marginBottom: "20px" }}>
                   <strong>3. Swap to $CARDS (optional for discount)</strong>
