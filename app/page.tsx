@@ -462,16 +462,18 @@ export default function Home() {
                         e.currentTarget.style.transform = 'scale(1)';
                       }}
                     >
-                      <div className="flex items-center gap-3">
-        {status === 'connected' && address && (
+                      <<div className="flex items-center gap-3">
+        {/* Only render Identity/Avatar/Name when fully connected and address exists */}
+        {status === 'connected' && address ? (
           <Identity address={address} hasCopyAddressOnClick>
             <Avatar className="h-9 w-9 ring-2 ring-black" />
             <Name />
           </Identity>
+        ) : (
+          <span className="font-bold drop-shadow-md">
+            {isLoading ? 'Connecting...' : 'Connect Wallet'}
+          </span>
         )}
-        {/* Show text when disconnected or during loading */}
-        {status === 'disconnected' && 'Connect Wallet'}
-        {isLoading && 'Connecting...'}
       </div>
     </button>
                   )}
