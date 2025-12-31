@@ -41,6 +41,7 @@ export default function Home() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
+  const [sessionToken, setSessionToken] = useState(null);
   let fundingUrl = null;
 if (isConnected && address) {
   fundingUrl = getOnrampBuyUrl({
@@ -51,6 +52,19 @@ if (isConnected && address) {
     fiatCurrency: 'USD',
   });
 }
+
+  useEffect(() => {
+  if (isConnected && address) {
+    fetch('/api/onramp/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address, chainId: base.id }),
+    })
+    .then(res => res.json())
+    .then(data => setSessionToken(data.sessionToken))
+    .catch(err => console.error("Token fetch error:", err));
+  }
+}, [isConnected, address]);
   
   useEffect(() => {
     const fetchPrice = async () => {
@@ -589,7 +603,7 @@ if (isConnected && address) {
   </p>
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
     {/* Fund Button — only show when connected */}
-    {isConnected && fundingUrl && (
+    {isConnected && sessionToken && (
   <div
     key={address}
     style={{
@@ -608,7 +622,8 @@ if (isConnected && address) {
     onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
     onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
   >
-    <FundButton 
+    <FundButton
+      sessionToken={sessionToken}
       text="Buy ETH/USDC with Card"
       hideIcon={true}
     />
