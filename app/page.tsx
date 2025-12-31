@@ -463,7 +463,7 @@ export default function Home() {
                         e.currentTarget.style.transform = 'scale(1)';
                       }}
                     >
-                      <<div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3">
         {/* Only render Identity/Avatar/Name when fully connected and address exists */}
         {status === 'connected' && address ? (
   <>
