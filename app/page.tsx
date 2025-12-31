@@ -463,12 +463,15 @@ export default function Home() {
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9 ring-2 ring-black" />
-                        <span className="font-bold drop-shadow-md">
-                          {status === 'disconnected' ? 'Connect Wallet' : <Name />}
-                        </span>
-                      </div>
-                    </button>
+        {status === 'connected' && address && (
+          <Identity address={address} hasCopyAddressOnClick>
+            <Avatar className="h-9 w-9 ring-2 ring-black" />
+            <Name />
+          </Identity>
+        )}
+        {status === 'disconnected' && 'Connect Wallet'}
+      </div>
+    </button>
                   )}
                 />
 
