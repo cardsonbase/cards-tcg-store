@@ -11,9 +11,6 @@ import '@coinbase/onchainkit/styles.css';
 const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  console.log("CDP Project ID:", process.env.NEXT_PUBLIC_CDP_PROJECT_ID)
-  console.log("OnchainKit API Key:", process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY);
-  
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
