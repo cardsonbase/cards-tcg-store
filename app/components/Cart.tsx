@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount, useWriteContract, useSendTransaction } from "wagmi";
 import { parseUnits, parseEther } from "viem";
 import { db } from "@/lib/firebase";
 import { ref, runTransaction } from "firebase/database";
 import { useCart } from "@/lib/cart";
 
-const TOKEN_ADDRESS = "0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d" as const;
-const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as const; // USDC on Base (6 decimals)
-const RECEIVE_WALLET = "0x862fa56aA3477ED1f9AEe5D712B816027b263f2f" as const;
+const TOKEN_ADDRESS = "0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d";
+const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"; // USDC on Base
+const RECEIVE_WALLET = "0x862fa56aA3477ED1f9AEe5D712B816027b263f2f";
 const CARDS_DECIMALS = 9;
+const USDC_DECIMALS = 6;
+const ORIGIN_ZIP = "71111";
 
 export default function Cart({
   cardsPriceUsd,
@@ -23,7 +25,8 @@ export default function Cart({
 }) {
   const cart = useCart();
   const { address } = useAccount();
-  const { writeContract, isPending, isSuccess, data: txHash } = useWriteContract();
+  const { writeContract, isPending: contractPending, isSuccess: contractSuccess, data: txHash } = useWriteContract();
+  const { sendTransaction, isPending: sendPending } = useSendTransaction();
 
   const [showForm, setShowForm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -35,46 +38,72 @@ export default function Cart({
     state: "",
     zip: "",
   });
+  const [paymentMethod, setPaymentMethod] = useState<'$CARDS' | 'ETH' | 'USDC'>('$CARDS');
+  const [ethPrice, setEthPrice] = useState(0);
+  const [shipping, setShipping] = useState(0);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
-  const [paymentCurrency, setPaymentCurrency] = useState<"CARDS" | "ETH" | "USDC">("CARDS");
 
-  // New: Fetch live ETH price
-  const [ethPriceUsd, setEthPriceUsd] = useState(2950); // fallback ~ current market
+  const totalBaseUsd = cart.items.reduce((s, i) => s + i.usd * i.quantity, 0);
+  const totalItems = cart.items.reduce((s, i) => s + i.quantity, 0);
+  const totalWeightOz = cart.items.reduce((s, i) => s + i.weightOz * i.quantity, 0);
+  const isCards = paymentMethod === '$CARDS';
+  const discountedUsd = isCards ? totalBaseUsd * 0.9 : totalBaseUsd;
+  const totalUsd = discountedUsd + shipping;
+  const amount = isCards ? Math.ceil(totalUsd / cardsPriceUsd) : (paymentMethod === 'ETH' ? totalUsd / ethPrice : totalUsd);
+  const amountWei = isCards ? parseUnits(amount.toString(), CARDS_DECIMALS) : (paymentMethod === 'ETH' ? parseEther(amount.toFixed(18)) : parseUnits(amount.toString(), USDC_DECIMALS));
 
   useEffect(() => {
     const fetchEthPrice = async () => {
       try {
-        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd", {
-          cache: "no-cache",
-        });
+        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
         const data = await res.json();
-        if (data.ethereum?.usd) {
-          setEthPriceUsd(data.ethereum.usd);
-        }
+        setEthPrice(data.ethereum.usd);
       } catch (err) {
-        console.error("ETH price fetch failed:", err);
+        console.error("ETH price fetch failed", err);
+        setEthPrice(2000); // Fallback
       }
     };
-
     fetchEthPrice();
-    const interval = setInterval(fetchEthPrice, 30000); // refresh every 30s
-    return () => clearInterval(interval);
   }, []);
 
-  const totalBaseUsd = cart.items.reduce((s, i) => s + i.usd * i.quantity, 0);
-  const totalItems = cart.items.reduce((s, i) => s + i.quantity, 0);
-  const shipping = 0;
-  const totalUsd = totalBaseUsd + shipping;
+  const calculateZone = (destZip: string) => {
+    const firstDigit = destZip[0];
+    const zipFirstDigitToZoneFrom7 = {
+      '0': 5, // Northeast
+      '1': 5, // Mid-Atlantic
+      '2': 4, // Southeast
+      '3': 3, // South
+      '4': 4, // Midwest
+      '5': 5, // Central
+      '6': 4, // Southwest
+      '7': 1, // Local (AR, LA, OK, TX)
+      '8': 4, // West
+      '9': 6, // Pacific
+    };
+    return zipFirstDigitToZoneFrom7[firstDigit as keyof typeof zipFirstDigitToZoneFrom7] || 8; // Default high zone
+  };
 
-  // Amounts based on selected currency
-  const cardsAmount = Math.ceil(totalUsd / cardsPriceUsd);
-  const cardsAmountWei = parseUnits(cardsAmount.toString(), CARDS_DECIMALS);
+  const calculateShipping = (zone: number, weightOz: number) => {
+    const weightBracket = Math.min(Math.ceil(weightOz / 4) * 4, 16); // Bracket in 4oz increments, cap at 16oz
+    const rates = {
+      4: [7.20, 7.25, 7.35, 7.50, 7.80, 7.90, 8.10, 8.40, 8.40],
+      8: [7.50, 7.70, 7.85, 8.00, 8.35, 8.55, 8.80, 9.25, 9.25],
+      12: [8.55, 8.85, 9.05, 9.30, 9.75, 10.00, 10.45, 11.10, 11.10],
+      16: [9.10, 9.45, 9.75, 10.10, 10.65, 11.00, 11.55, 12.45, 12.45],
+    };
+    const bracketRates = rates[weightBracket as keyof typeof rates] || rates[16];
+    return bracketRates[zone - 1] || 12.45; // Default max
+  };
 
-  const ethAmount = (totalUsd / ethPriceUsd).toFixed(6); // 6 decimals for display
-  const ethAmountWei = parseEther(ethAmount);
-
-  const usdcAmount = totalUsd.toFixed(2); // USDC = $1
-  const usdcAmountWei = parseUnits(usdcAmount, 6);
+  useEffect(() => {
+    if (!isCards && form.zip.length === 5) {
+      const zone = calculateZone(form.zip);
+      const shipCost = calculateShipping(zone, totalWeightOz);
+      setShipping(shipCost);
+    } else {
+      setShipping(0);
+    }
+  }, [form.zip, paymentMethod, totalWeightOz, isCards]);
 
   const handleProceedToShipping = () => {
     for (const item of cart.items) {
@@ -88,30 +117,24 @@ export default function Cart({
   };
 
   const handlePay = () => {
-    if (paymentCurrency === "CARDS") {
+    if (paymentMethod === 'ETH') {
+      sendTransaction({
+        to: RECEIVE_WALLET as `0x${string}`,
+        value: amountWei,
+      });
+    } else {
+      const tokenAddr = paymentMethod === '$CARDS' ? TOKEN_ADDRESS : USDC_ADDRESS;
       writeContract({
-        address: TOKEN_ADDRESS,
+        address: tokenAddr as `0x${string}`,
         abi: [{ name: "transfer", type: "function", inputs: [{ type: "address" }, { type: "uint256" }], outputs: [], stateMutability: "nonpayable" }],
         functionName: "transfer",
-        args: [RECEIVE_WALLET, cardsAmountWei],
-      });
-    } else if (paymentCurrency === "ETH") {
-      writeContract({
-        address: RECEIVE_WALLET,
-        value: ethAmountWei,
-      });
-    } else if (paymentCurrency === "USDC") {
-      writeContract({
-        address: USDC_ADDRESS,
-        abi: [{ name: "transfer", type: "function", inputs: [{ type: "address" }, { type: "uint256" }], outputs: [], stateMutability: "nonpayable" }],
-        functionName: "transfer",
-        args: [RECEIVE_WALLET, usdcAmountWei],
+        args: [RECEIVE_WALLET, amountWei],
       });
     }
   };
 
   useEffect(() => {
-    if (isSuccess && txHash) {
+    if ((contractSuccess || sendPending === false && txHash) && txHash) { // Handle both
       cart.items.forEach((item) => {
         runTransaction(ref(db, `products/${item.id}`), (current) => {
           if (!current || current.stock < item.quantity) return current;
@@ -130,11 +153,11 @@ export default function Cart({
           state: form.state,
           zip: form.zip,
           items: cart.items,
-          paymentCurrency,
-          amount: paymentCurrency === "CARDS" ? cardsAmount : paymentCurrency === "ETH" ? ethAmount : usdcAmount,
+          amount,
           totalUsd,
           shipping,
           txHash,
+          paymentMethod,
         }),
       });
 
@@ -142,9 +165,9 @@ export default function Cart({
       setShowForm(false);
       setShowSuccess(true);
     }
-  }, [isSuccess, txHash]);
+  }, [contractSuccess, sendPending, txHash]);
 
-  // SUCCESS SCREEN (unchanged)
+  // SUCCESS SCREEN
   if (showSuccess) {
     return (
       <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }}>
@@ -175,7 +198,7 @@ export default function Cart({
     );
   }
 
-  // SHIPPING FORM — now with currency selector and live ETH price
+  // SHIPPING FORM — Now fully scrollable and fits on mobile
   if (showForm) {
     return (
       <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "20px" }}>
@@ -211,64 +234,10 @@ export default function Cart({
 
           <input placeholder="ZIP Code" value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })} style={inputStyle} />
 
-          {/* Payment Currency Selector */}
-          <div style={{ margin: "30px 0" }}>
-            <p style={{ color: "#ffd700", fontSize: "24px", fontWeight: "bold", textAlign: "center" }}>Choose Payment</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "16px" }}>
-              <button
-                onClick={() => setPaymentCurrency("CARDS")}
-                style={{
-                  padding: "16px",
-                  borderRadius: "16px",
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  background: paymentCurrency === "CARDS" ? "#ffd700" : "#222",
-                  color: paymentCurrency === "CARDS" ? "#000" : "#ffd700",
-                  border: "2px solid #ffd700",
-                }}
-              >
-                ✨ $CARDS → 10% OFF + Free Shipping<br />
-                ≈ {cardsAmount.toLocaleString()} $CARDS
-              </button>
-
-              <button
-                onClick={() => setPaymentCurrency("ETH")}
-                style={{
-                  padding: "16px",
-                  borderRadius: "16px",
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  background: paymentCurrency === "ETH" ? "#00ff9d" : "#222",
-                  color: paymentCurrency === "ETH" ? "#000" : "#fff",
-                  border: "2px solid #00ff9d",
-                }}
-              >
-                ETH → Full Price<br />
-                ≈ {ethAmount} ETH (live price)
-              </button>
-
-              <button
-                onClick={() => setPaymentCurrency("USDC")}
-                style={{
-                  padding: "16px",
-                  borderRadius: "16px",
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  background: paymentCurrency === "USDC" ? "#00ff9d" : "#222",
-                  color: paymentCurrency === "USDC" ? "#000" : "#fff",
-                  border: "2px solid #00ff9d",
-                }}
-              >
-                USDC → Full Price<br />
-                {usdcAmount} USDC
-              </button>
-            </div>
-          </div>
-
           <div style={{ background: "#000", padding: "20px", borderRadius: "16px", border: "2px solid #00ff9d", textAlign: "center", margin: "20px 0" }}>
-            <p style={{ color: "#00ff9d", fontSize: "20px", fontWeight: "bold" }}>Shipping: FREE</p>
+            <p style={{ color: "#00ff9d", fontSize: "20px", fontWeight: "bold" }}>Shipping: ${shipping.toFixed(2)}</p>
             <p style={{ color: "#00ff9d", fontSize: "28px", fontWeight: "bold", marginTop: "8px" }}>
-              Total: ${totalUsd.toFixed(2)}
+              Total: ${totalUsd.toFixed(2)} ≈ {amount.toLocaleString()} {paymentMethod}
             </p>
           </div>
 
@@ -286,29 +255,29 @@ export default function Cart({
 
           <button
             onClick={handlePay}
-            disabled={isPending || !isTermsAccepted || !address}
+            disabled={contractPending || sendPending || !isTermsAccepted || !address || !form.zip || form.zip.length !== 5}
             style={{
               width: "100%",
               padding: "20px",
               borderRadius: "24px",
               fontSize: "32px",
               fontWeight: "bold",
-              cursor: isTermsAccepted && !isPending && address ? "pointer" : "not-allowed",
-              background: isTermsAccepted && !isPending && address ? "linear-gradient(to right, #00ff9d, #00cc7a)" : "#444",
+              cursor: isTermsAccepted && address && form.zip.length === 5 ? "pointer" : "not-allowed",
+              background: isTermsAccepted && address && form.zip.length === 5 ? "linear-gradient(to right, #00ff9d, #00cc7a)" : "#444",
               color: "#000",
               border: "none",
-              marginTop: "auto",
+              marginTop: "auto", // Pushes button to bottom if space
               boxShadow: isTermsAccepted && address ? "0 10px 30px rgba(0,255,157,0.5)" : "none",
             }}
           >
-            {isPending ? "CONFIRMING..." : "CONFIRM & PAY"}
+            {(contractPending || sendPending) ? "CONFIRMING..." : "CONFIRM & PAY"}
           </button>
         </div>
       </div>
     );
   }
 
-  // MAIN CART VIEW (unchanged except minor styling)
+  // MAIN CART VIEW — Now properly scrollable
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" }} onClick={onClose}>
       <div
@@ -390,9 +359,54 @@ export default function Cart({
           <p style={{ color: "#aaa", fontSize: "22px", marginBottom: "10px" }}>
             Items Total: <span style={{ color: "#ffd700", fontWeight: "bold" }}>${totalBaseUsd.toFixed(2)}</span>
           </p>
-          <p style={{ color: "#00ff9d", fontSize: "28px", fontWeight: "bold", marginBottom: "20px" }}>Shipping: FREE</p>
-          <p style={{ color: "#ffd700", fontSize: "48px", fontWeight: "bold" }}>TOTAL: ${totalUsd.toFixed(2)}</p>
-          <p style={{ color: "#00ff9d", fontSize: "36px", fontWeight: "bold" }}>≈ {cardsAmount.toLocaleString()} $CARDS (best deal)</p>
+          <p style={{ color: "#00ff9d", fontSize: "28px", fontWeight: "bold", marginBottom: "20px" }}>Shipping: {isCards ? 'FREE' : 'Calculated at checkout'}</p>
+          <p style={{ color: "#ffd700", fontSize: "48px", fontWeight: "bold" }}>TOTAL: ${discountedUsd.toFixed(2)}</p>
+          <p style={{ color: "#00ff9d", fontSize: "36px", fontWeight: "bold" }}>≈ {amount.toLocaleString()} {paymentMethod}</p>
+        </div>
+
+        <div style={{ marginTop: "20px", textAlign: "center" }}>
+          <p style={{ color: "#aaa", fontSize: "18px", marginBottom: "10px" }}>Payment Method:</p>
+          <div style={{ display: "flex", justifyContent: "center", gap: "12px" }}>
+            <button
+              onClick={() => setPaymentMethod('$CARDS')}
+              style={{
+                padding: "12px 24px",
+                background: paymentMethod === '$CARDS' ? "#ffd700" : "#111",
+                color: paymentMethod === '$CARDS' ? "#000" : "#ffd700",
+                border: "1px solid #ffd700",
+                borderRadius: "12px",
+                fontWeight: "bold",
+              }}
+            >
+              $CARDS (10% off + free ship)
+            </button>
+            <button
+              onClick={() => setPaymentMethod('ETH')}
+              style={{
+                padding: "12px 24px",
+                background: paymentMethod === 'ETH' ? "#ffd700" : "#111",
+                color: paymentMethod === 'ETH' ? "#000" : "#ffd700",
+                border: "1px solid #ffd700",
+                borderRadius: "12px",
+                fontWeight: "bold",
+              }}
+            >
+              ETH
+            </button>
+            <button
+              onClick={() => setPaymentMethod('USDC')}
+              style={{
+                padding: "12px 24px",
+                background: paymentMethod === 'USDC' ? "#ffd700" : "#111",
+                color: paymentMethod === 'USDC' ? "#000" : "#ffd700",
+                border: "1px solid #ffd700",
+                borderRadius: "12px",
+                fontWeight: "bold",
+              }}
+            >
+              USDC
+            </button>
+          </div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "40px" }}>
