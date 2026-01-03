@@ -6,9 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 const client = createClient();
 
 const ALLOWED_ORIGINS = [
-  'https://cardsonbase.com',
   'https://cards-tcg-store.vercel.app',
-  // Add any Farcaster frame domains if needed, but these two cover your app
 ];
 
 export async function GET(request: NextRequest) {
