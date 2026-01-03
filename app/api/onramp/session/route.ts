@@ -7,7 +7,6 @@ const API_KEY_ID = process.env.CDP_API_KEY_ID?.trim();
 const API_KEY_SECRET = process.env.CDP_API_KEY_SECRET?.trim();
 
 const ALLOWED_ORIGINS = [
-  'https://cardsonbase.com', // Website
   'https://cards-tcg-store.vercel.app', // Vercel deployment
 ];
 
