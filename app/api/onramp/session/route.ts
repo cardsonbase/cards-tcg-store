@@ -97,12 +97,13 @@ export async function OPTIONS(request: NextRequest) {
     return new NextResponse(null, {
       status: 204,
       headers: {
-        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0],  // My domain only
         'Access-Control-Allow-Methods': 'POST',
         'Access-Control-Allow-Headers': 'Content-Type',
       },
     });
   }
 
-  return new NextResponse(null, { status: 403 });
+  // Bad origin — no ACAO header at all
+  return new NextResponse('CORS origin not allowed', { status: 403 });
 }
