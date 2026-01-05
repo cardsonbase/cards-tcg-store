@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
     const res = NextResponse.json({ message: "Missing token" }, { status: 401 });
-    if (origin) res.headers.set('Access-Control-Allow-Origin', origin);
+    if (origin) response.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGINS[0]);
     return res;
   }
 
