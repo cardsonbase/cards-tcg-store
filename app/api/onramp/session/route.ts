@@ -6,30 +6,33 @@ import { ethers } from 'ethers'; // npm install ethers
 
 const API_KEY_ID = process.env.CDP_API_KEY_ID?.trim();
 const API_KEY_SECRET = process.env.CDP_API_KEY_SECRET?.trim();
-const ALLOWED_ORIGIN = 'https://cards-tcg-store.vercel.app'; // exact production domain
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Validate CDP keys
+    // 1. Server config check
     if (!API_KEY_ID || !API_KEY_SECRET) {
-      return NextResponse.json({ error: 'Server config error' }, { status: 500 });
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
-    // 2. Get and validate client-provided address (from connected wallet)
+    // 2. Parse body
     const body = await request.json();
-    const address = body.address?.trim();
+    const clientAddress = body.address?.trim();
+    if (!clientAddress) {
+      return NextResponse.json({ error: 'Missing wallet address' }, { status: 400 });
+    }
 
-    if (!address || !ethers.isAddress(address)) { // Proper checksum validation
+    // 3. Proper Ethereum address validation (checksummed)
+    if (!ethers.isAddress(clientAddress)) {
       return NextResponse.json({ error: 'Invalid wallet address' }, { status: 400 });
     }
 
-    // 3. Get true client IP (required by Coinbase for fraud detection)
-    const clientIp = request.ip;
+    // 4. Get true client IP (Next.js on Vercel provides real IP)
+    const clientIp = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
     if (!clientIp) {
-      return NextResponse.json({ error: 'Unable to determine IP' }, { status: 400 });
+      return NextResponse.json({ error: 'Unable to determine client IP' }, { status: 400 });
     }
 
-    // 4. Generate JWT and request session token from Coinbase
+    // 5. Generate JWT for Coinbase
     const jwtToken = await generateJwt({
       apiKeyId: API_KEY_ID,
       apiKeySecret: API_KEY_SECRET,
@@ -38,48 +41,31 @@ export async function POST(request: NextRequest) {
       requestPath: '/onramp/v1/token',
     });
 
-    const coinbaseRes = await fetch('https://api.developer.coinbase.com/onramp/v1/token', {
+    // 6. Call Coinbase for session token
+    const coinbaseResponse = await fetch('https://api.developer.coinbase.com/onramp/v1/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwtToken}`,
       },
       body: JSON.stringify({
-        addresses: [{ address, blockchains: ['base'] }],
+        addresses: [{ address: clientAddress, blockchains: ['base'] }],
         assets: ['ETH', 'USDC'],
-        clientIp, // Critical for compliance
+        clientIp, // Critical for fraud detection
       }),
     });
 
-    const data = await coinbaseRes.json();
+    const data = await coinbaseResponse.json();
 
-    if (!coinbaseRes.ok) {
-      console.error('Coinbase error:', data);
-      return NextResponse.json({ error: 'Failed to generate token' }, { status: 500 });
+    if (!coinbaseResponse.ok) {
+      console.error('Coinbase error:', coinbaseResponse.status, data);
+      return NextResponse.json({ error: 'Failed to generate session token' }, { status: 500 });
     }
 
-    // 5. Return session token with restricted CORS
-    return NextResponse.json({ sessionToken: data.token }, {
-      headers: {
-        'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-    });
+    // 7. Return only the fresh session token
+    return NextResponse.json({ sessionToken: data.token });
   } catch (err: any) {
-    console.error('Onramp error:', err);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    console.error('Onramp session error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
-
-// Handle preflight (required for restricted origin)
-export async function OPTIONS(request: NextRequest) {
-  return new NextResponse(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
-      'Access-Control-Allow-Methods': 'POST',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
 }
