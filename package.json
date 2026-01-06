@@ -27,6 +27,7 @@
     "viem": "^2.41.2",
     "wagmi": "^2.19.5",
     "jsonwebtoken": "^9.0.2",
+    "siwe": "^2.1.4",
     "@noble/ed25519": "^2.1.0",
     "@coinbase/cdp-sdk": "^1.0.0",
     "zustand": "^5.0.9"
