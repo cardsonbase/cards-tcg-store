@@ -1,4 +1,4 @@
-// proxy.ts — Strict CORS for CDP compliance
+// proxy.ts — Strict CORS for maximum CDP compliance
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
@@ -11,7 +11,7 @@ export function proxy(request: NextRequest) {
   const origin = request.headers.get('origin');
   const isAllowed = origin !== null && ALLOWED_ORIGINS.includes(origin);
 
-  // Handle preflight (OPTIONS)
+  // Handle preflight OPTIONS
   if (request.method === 'OPTIONS') {
     if (isAllowed) {
       const response = new NextResponse(null, { status: 204 });
@@ -23,18 +23,18 @@ export function proxy(request: NextRequest) {
       return response;
     }
 
-    // Reject unknown origins — no CORS headers
+    // Bad origin → explicit reject, no CORS headers
     return new NextResponse('CORS origin not allowed', { status: 403 });
   }
 
-  // For actual requests
+  // For real requests (POST, GET, etc.)
   const response = NextResponse.next();
 
   if (isAllowed) {
     response.headers.set('Access-Control-Allow-Origin', origin!);
     response.headers.set('Access-Control-Allow-Credentials', 'true');
   }
-  // No ACAO for bad origins → browser blocks
+  // No ACAO header for bad origins → browser blocks automatically
 
   return response;
 }
