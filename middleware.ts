@@ -1,41 +1,46 @@
-// middleware.ts
+// middleware.ts (slightly stricter version)
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const ALLOWED_ORIGINS = ['https://cards-tcg-store.vercel.app']; // Add more if needed, e.g. localhost for dev
+const ALLOWED_ORIGINS = [
+  'https://cards-tcg-store.vercel.app',
+  'http://localhost:3000', // remove in prod if not needed
+];
 
 export function middleware(request: NextRequest) {
   const origin = request.headers.get('origin');
 
+  const isAllowed = origin && ALLOWED_ORIGINS.includes(origin);
+
+  // Handle preflight
+  if (request.method === 'OPTIONS') {
+    if (isAllowed) {
+      const response = new NextResponse(null, { status: 204 });
+      response.headers.set('Access-Control-Allow-Origin', origin!);
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      response.headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+      response.headers.set('Access-Control-Max-Age', '86400');
+      response.headers.set('Access-Control-Allow-Credentials', 'true');
+      return response;
+    }
+
+    // Reject unknown origins explicitly
+    return new NextResponse('CORS origin not allowed', { status: 403 });
+  }
+
+  // For non-OPTIONS requests
   const response = NextResponse.next();
 
-  if (origin && ALLOWED_ORIGINS.includes(origin)) {
-    response.headers.set('Access-Control-Allow-Origin', origin); // Reflect exact origin
-  } else {
-    // Optionally block unknown origins
-    // response.headers.set('Access-Control-Allow-Origin', 'null');
+  if (isAllowed) {
+    response.headers.set('Access-Control-Allow-Origin', origin!);
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
   }
-
-  response.headers.set('Access-Control-Allow-Credentials', 'true');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  response.headers.set(
-    'Access-Control-Allow-Headers',
-    'Authorization, Content-Type'
-  );
-  // Cache preflight for 24 hours
-  response.headers.set('Access-Control-Max-Age', '86400');
-
-  // Handle preflight early
-  if (request.method === 'OPTIONS') {
-    return new NextResponse(null, {
-      status: 204,
-      headers: response.headers,
-    });
-  }
+  // If not allowed, we send no ACAO header → browser blocks
 
   return response;
 }
 
 export const config = {
-  matcher: '/api/:path*', // Apply only to your API routes
+  matcher: '/api/:path*',
 };
