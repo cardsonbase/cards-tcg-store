@@ -3,12 +3,32 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { generateJwt } from '@coinbase/cdp-sdk/auth';
 import { createClient } from '@farcaster/quick-auth';
-import { ethers } from 'ethers'; // Add this dependency: npm install ethers
+import { ethers } from 'ethers';
 
 const API_KEY_ID = process.env.CDP_API_KEY_ID?.trim();
 const API_KEY_SECRET = process.env.CDP_API_KEY_SECRET?.trim();
 
 const client = createClient();
+
+// Only allow your production domain — NO localhost, NO wildcards
+const ALLOWED_ORIGIN = 'https://cards-tcg-store.vercel.app';
+
+// Helper to add secure CORS headers to all responses
+function addCorsHeaders(response: NextResponse, request: NextRequest) {
+  const origin = request.headers.get('origin');
+
+  // Only allow exact match to your production domain
+  if (origin === ALLOWED_ORIGIN) {
+    response.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+  }
+
+  // Always set these for allowed methods/headers
+  response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+
+  return response;
+}
 
 // Verify Farcaster JWT and return userFid (FID as string)
 async function verifyAuth(authHeader: string | null): Promise<string | null> {
@@ -45,24 +65,38 @@ function isValidEthereumAddress(address: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  let response = new NextResponse();
+
   try {
     // 1. Authentication — require valid Farcaster login
     const authorization = request.headers.get('Authorization');
     const userFid = await verifyAuth(authorization);
 
     if (!userFid) {
-      return NextResponse.json({ error: 'Unauthorized: Invalid or missing token' }, { status: 401 });
+      response = NextResponse.json(
+        { error: 'Unauthorized: Invalid or missing token' },
+        { status: 401 }
+      );
+      return addCorsHeaders(response, request);
     }
 
     // 2. Validate CDP API keys
     if (!API_KEY_ID || !API_KEY_SECRET) {
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+      response = NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+      return addCorsHeaders(response, request);
     }
 
-    // 3. Get true client IP (required by Coinbase)
+    // 3. Get true client IP (required by Coinbase) — works reliably on Vercel production
     const clientIp = request.ip;
     if (!clientIp) {
-      return NextResponse.json({ error: 'Unable to determine client IP' }, { status: 400 });
+      response = NextResponse.json(
+        { error: 'Unable to determine client IP' },
+        { status: 400 }
+      );
+      return addCorsHeaders(response, request);
     }
 
     // 4. Determine wallet address securely
@@ -78,12 +112,20 @@ export async function POST(request: NextRequest) {
       try {
         body = await request.json();
       } catch {
-        return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+        response = NextResponse.json(
+          { error: 'Invalid JSON body' },
+          { status: 400 }
+        );
+        return addCorsHeaders(response, request);
       }
 
       const clientAddress = body.address?.trim();
       if (!clientAddress || !isValidEthereumAddress(clientAddress)) {
-        return NextResponse.json({ error: 'Invalid or missing wallet address' }, { status: 400 });
+        response = NextResponse.json(
+          { error: 'Invalid or missing wallet address' },
+          { status: 400 }
+        );
+        return addCorsHeaders(response, request);
       }
 
       address = clientAddress;
@@ -117,25 +159,38 @@ export async function POST(request: NextRequest) {
     console.log('Coinbase Onramp Token Response:', coinbaseResponse.status, data);
 
     if (!coinbaseResponse.ok) {
-      return NextResponse.json(
+      response = NextResponse.json(
         { error: 'Failed to generate session token', details: data },
         { status: 500 }
       );
+      return addCorsHeaders(response, request);
     }
 
     // 7. Success — return only the session token
-    return NextResponse.json({ sessionToken: data.token });
+    response = NextResponse.json({ sessionToken: data.token });
+    return addCorsHeaders(response, request);
   } catch (err: any) {
     console.error('Onramp session error:', err);
-    return NextResponse.json(
+    response = NextResponse.json(
       { error: 'Internal server error', message: err.message },
       { status: 500 }
     );
+    return addCorsHeaders(response, request);
   }
 }
 
-// Optional: Handle preflight CORS (Next.js middleware usually handles this)
-// But safe to leave empty if you're using middleware.ts for CORS
-export const OPTIONS = async () => {
-  return new NextResponse(null, { status: 204 });
-};
+// Handle preflight OPTIONS request with strict CORS
+export async function OPTIONS(request: NextRequest) {
+  const response = new NextResponse(null, { status: 204 });
+
+  const origin = request.headers.get('origin');
+  if (origin === ALLOWED_ORIGIN) {
+    response.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+  }
+
+  response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+
+  return response;
+}
