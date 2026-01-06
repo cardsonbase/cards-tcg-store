@@ -23,8 +23,8 @@ import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import { ref, onValue } from "firebase/database";
 import { useCart } from "@/lib/cart";
 import dynamic from "next/dynamic";
-import { useAccount, useDisconnect } from 'wagmi';  // Add useDisconnect
-import { FundButton, getOnrampBuyUrl } from '@coinbase/onchainkit/fund';
+import { useAccount, useDisconnect } from 'wagmi';
+import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund';
 import { base } from 'wagmi/chains';
 
 export default function Home() {
@@ -42,35 +42,7 @@ export default function Home() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
-  const [sessionToken, setSessionToken] = useState<string | null>(null);
 
-  const fundingUrl = isConnected && address && sessionToken
-  ? getOnrampBuyUrl({
-      projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
-      sessionToken,
-      presetFiatAmount: 5,
-      fiatCurrency: 'USD',
-      assets: ['ETH', 'USDC'],
-    })
-  : null;
-
-useEffect(() => {
-  if (isConnected && address) {
-    fetch('/api/onramp/session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address }),
-    })
-      .then(r => r.json())
-      .then(d => {
-        if (d.sessionToken) setSessionToken(d.sessionToken);
-        else console.error('No token:', d);
-      })
-      .catch(console.error);
-  } else {
-    setSessionToken(null);
-  }
-}, [isConnected, address]);
   useEffect(() => {
     const fetchPrice = async () => {
       try {
@@ -614,32 +586,62 @@ render={({ onClick, status, isLoading }) => (
   </p>
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
     {/* Fund Button — only show when connected */}
-    {isConnected && fundingUrl && (
-  <div
-    key={address}  // Optional but good for re-mount
-    style={{
-      background: "#ffd700",
-      color: "#000",
-      padding: "16px 32px",
-      borderRadius: "24px",
-      fontWeight: "bold",
-      fontSize: "22px",
-      boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-      transition: "transform 0.3s",
-      border: "none",
-      display: "inline-block",
-      cursor: "pointer",
-    }}
-    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-  >
-    <FundButton 
-      fundingUrl={fundingUrl}
-      text="Buy ETH/USDC with Card"
-      hideIcon={true}  // Removes blue logo
-    />
-  </div>
-)}
+    {isConnected && address && (
+      <button
+        onClick={async () => {
+          try {
+            const res = await fetch('/api/onramp/session', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ address }),
+            });
+
+            if (!res.ok) {
+              alert('Failed to load payment. Please try again.');
+              console.error('Session fetch failed:', await res.text());
+              return;
+            }
+
+            const { sessionToken } = await res.json();
+
+            if (!sessionToken) {
+              alert('No session token received. Please try again.');
+              return;
+            }
+
+            const url = getOnrampBuyUrl({
+              projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
+              sessionToken,
+              presetFiatAmount: 5,
+              fiatCurrency: 'USD',
+              assets: ['ETH', 'USDC'],
+            });
+
+            window.open(url, '_blank', 'noopener,noreferrer');
+          } catch (err) {
+            console.error('Onramp error:', err);
+            alert('Something went wrong. Please try again.');
+          }
+        }}
+        style={{
+          background: "#ffd700",
+          color: "#000",
+          padding: "16px 32px",
+          borderRadius: "24px",
+          fontWeight: "bold",
+          fontSize: "22px",
+          boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+          transition: "transform 0.3s",
+          border: "none",
+          display: "inline-block",
+          cursor: "pointer",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+      >
+        Buy ETH/USDC with Card
+      </button>
+    )}
 
     {/* Swap Button — only show when connected */}
     {isConnected && (
