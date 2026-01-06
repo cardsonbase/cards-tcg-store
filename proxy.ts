@@ -1,14 +1,13 @@
-// middleware.ts — Strict CORS (recommended for CDP)
+// proxy.ts — Strict CORS for CDP compliance
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const ALLOWED_ORIGINS = [
   'https://cards-tcg-store.vercel.app',
-  'http://localhost:3000', // optional for dev
 ];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const origin = request.headers.get('origin');
   const isAllowed = origin !== null && ALLOWED_ORIGINS.includes(origin);
 
@@ -24,18 +23,18 @@ export function middleware(request: NextRequest) {
       return response;
     }
 
-    // Explicitly reject unknown origins — no CORS headers sent
+    // Reject unknown origins — no CORS headers
     return new NextResponse('CORS origin not allowed', { status: 403 });
   }
 
-  // For actual requests (GET, POST, etc.)
+  // For actual requests
   const response = NextResponse.next();
 
   if (isAllowed) {
     response.headers.set('Access-Control-Allow-Origin', origin!);
     response.headers.set('Access-Control-Allow-Credentials', 'true');
   }
-  // If not allowed → no ACAO header → browser blocks the response
+  // No ACAO for bad origins → browser blocks
 
   return response;
 }
