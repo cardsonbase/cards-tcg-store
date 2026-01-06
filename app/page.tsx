@@ -586,62 +586,72 @@ render={({ onClick, status, isLoading }) => (
   </p>
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
     {/* Fund Button — only show when connected */}
-    {isConnected && address && (
-      <button
-        onClick={async () => {
-          try {
-            const res = await fetch('/api/onramp/session', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ address }),
-            });
+{isConnected && address && (
+  <button
+    onClick={async () => {
+      try {
+        const res = await fetch('/api/onramp/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address }),
+        });
 
-            if (!res.ok) {
-              alert('Failed to load payment. Please try again.');
-              console.error('Session fetch failed:', await res.text());
-              return;
-            }
+        if (!res.ok) {
+          alert('Failed to load payment. Please try again.');
+          return;
+        }
 
-            const { sessionToken } = await res.json();
+        const { sessionToken } = await res.json();
 
-            if (!sessionToken) {
-              alert('No session token received. Please try again.');
-              return;
-            }
+        if (!sessionToken) {
+          alert('No session token received. Please try again.');
+          return;
+        }
 
-            const url = getOnrampBuyUrl({
-              projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
-              sessionToken,
-              presetFiatAmount: 5,
-              fiatCurrency: 'USD',
-              assets: ['ETH', 'USDC'],
-            });
+        // Build the URL
+        const fundingUrl = getOnrampBuyUrl({
+          projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
+          sessionToken,
+          presetFiatAmount: 5,
+          fiatCurrency: 'USD',
+          assets: ['ETH', 'USDC'],
+        });
 
-            window.open(url, '_blank', 'noopener,noreferrer');
-          } catch (err) {
-            console.error('Onramp error:', err);
-            alert('Something went wrong. Please try again.');
-          }
-        }}
-        style={{
-          background: "#ffd700",
-          color: "#000",
-          padding: "16px 32px",
-          borderRadius: "24px",
-          fontWeight: "bold",
-          fontSize: "22px",
-          boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-          transition: "transform 0.3s",
-          border: "none",
-          display: "inline-block",
-          cursor: "pointer",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-      >
-        Buy ETH/USDC with Card
-      </button>
-    )}
+        // Now pass it to FundButton's internal handler for popup modal
+        // This simulates what FundButton does under the hood
+        const width = 480;
+        const height = 720;
+        const left = window.screen.width / 2 - width / 2;
+        const top = window.screen.height / 2 - height / 2;
+        window.open(
+          fundingUrl,
+          'coinbase-onramp',
+          `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+        );
+      } catch (err) {
+        console.error('Onramp error:', err);
+        alert('Something went wrong. Please try again.');
+      }
+    }}
+    style={{
+      background: "#ffd700",
+      color: "#000",
+      padding: "16px 32px",
+      borderRadius: "24px",
+      fontWeight: "bold",
+      fontSize: "22px",
+      boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+      transition: "transform 0.3s",
+      border: "none",
+      display: "inline-block",
+      cursor: "pointer",
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+  >
+    Buy ETH/USDC with Card
+  </button>
+)}
 
     {/* Swap Button — only show when connected */}
     {isConnected && (
