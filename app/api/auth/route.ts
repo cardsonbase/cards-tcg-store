@@ -5,9 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const client = createClient();
 
-const ALLOWED_ORIGINS = [
-  'https://cards-tcg-store.vercel.app',
-];
+const ALLOWED_ORIGINS = ['https://cards-tcg-store.vercel.app'];
 
 export async function GET(request: NextRequest) {
   const origin = request.headers.get('origin');
@@ -21,7 +19,7 @@ export async function GET(request: NextRequest) {
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
     const res = NextResponse.json({ message: "Missing token" }, { status: 401 });
-    if (origin) response.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGINS[0]);
+    if (origin) res.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGINS[0]);
     return res;
   }
 
@@ -34,13 +32,10 @@ export async function GET(request: NextRequest) {
     const userFid = payload.sub;
 
     const res = NextResponse.json({ userFid });
-    if (origin) {
-      res.headers.set('Access-Control-Allow-Origin', origin);
-      res.headers.set('Access-Control-Allow-Methods', 'GET');
-      res.headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
-    }
+    res.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGINS[0]);
+    res.headers.set('Access-Control-Allow-Methods', 'GET');
+    res.headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
     return res;
-
   } catch (e) {
     let message = "Internal server error";
     let status = 500;
@@ -53,12 +48,12 @@ export async function GET(request: NextRequest) {
     }
 
     const res = NextResponse.json({ message }, { status });
-    if (origin) res.headers.set('Access-Control-Allow-Origin', origin);
+    if (origin) res.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGINS[0]);
     return res;
   }
 }
 
-// Handle preflight
+// Preflight handler
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin');
 
@@ -66,19 +61,17 @@ export async function OPTIONS(request: NextRequest) {
     return new NextResponse(null, {
       status: 204,
       headers: {
-        'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0],  // Your domain only
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0],
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Authorization, Content-Type',
       },
     });
   }
 
-  // Bad origin — no ACAO header at all
   return new NextResponse('CORS origin not allowed', { status: 403 });
 }
 
 function getUrlHost(request: NextRequest) {
-  // ... (keep your existing function unchanged)
   const origin = request.headers.get("origin");
   if (origin) {
     try {
