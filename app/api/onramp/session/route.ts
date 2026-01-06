@@ -2,136 +2,65 @@
 
 import { NextResponse, NextRequest } from 'next/server';
 import { generateJwt } from '@coinbase/cdp-sdk/auth';
-import { createClient } from '@farcaster/quick-auth';
 import { ethers } from 'ethers';
+import { SiweMessage } from 'siwe'; // npm install siwe
 
 const API_KEY_ID = process.env.CDP_API_KEY_ID?.trim();
 const API_KEY_SECRET = process.env.CDP_API_KEY_SECRET?.trim();
 
-const client = createClient();
-
-// Only allow your production domain — NO localhost, NO wildcards
 const ALLOWED_ORIGIN = 'https://cards-tcg-store.vercel.app';
 
-// Helper to add secure CORS headers to all responses
+// Strict CORS helper
 function addCorsHeaders(response: NextResponse, request: NextRequest) {
   const origin = request.headers.get('origin');
-
-  // Only allow exact match to your production domain
   if (origin === ALLOWED_ORIGIN) {
     response.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
     response.headers.set('Access-Control-Allow-Credentials', 'true');
   }
-
-  // Always set these for allowed methods/headers
   response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
-
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
   return response;
 }
 
-// Verify Farcaster JWT and return userFid (FID as string)
-async function verifyAuth(authHeader: string | null): Promise<string | null> {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-
-  try {
-    const token = authHeader.split(' ')[1];
-    const payload = await client.verifyJwt({ token });
-    return payload.sub; // This is the user's FID (string)
-  } catch (e) {
-    return null;
-  }
-}
-
-// Optional: Future DB lookup — replace with real implementation when ready
-async function getStoredAddressForFid(userFid: string): Promise<string | null> {
-  // Example (Prisma):
-  // const user = await prisma.user.findUnique({ where: { fid: Number(userFid) } });
-  // return user?.address ?? null;
-
-  // For now: no stored address
-  return null;
-}
-
-// Validate Ethereum address (checksummed EIP-55 format)
 function isValidEthereumAddress(address: string): boolean {
-  try {
-    return ethers.isAddress(address); // Handles checksum validation safely
-  } catch {
-    return false;
-  }
+  return ethers.isAddress(address);
 }
 
 export async function POST(request: NextRequest) {
   let response = new NextResponse();
 
   try {
-    // 1. Authentication — require valid Farcaster login
-    const authorization = request.headers.get('Authorization');
-    const userFid = await verifyAuth(authorization);
+    const body = await request.json();
+    const { message, signature, address } = body;
 
-    if (!userFid) {
-      response = NextResponse.json(
-        { error: 'Unauthorized: Invalid or missing token' },
-        { status: 401 }
-      );
+    // Basic validation
+    if (!message || !signature || !address || !isValidEthereumAddress(address)) {
+      response = NextResponse.json({ error: 'Invalid request: missing or invalid fields' }, { status: 400 });
       return addCorsHeaders(response, request);
     }
 
-    // 2. Validate CDP API keys
+    // Verify SIWE signature
+    const siwe = new SiweMessage(message);
+    const { success, data } = await siwe.verify({ signature, domain: 'cards-tcg-store.vercel.app', nonce: message.nonce });
+
+    if (!success || data.address.toLowerCase() !== address.toLowerCase()) {
+      response = NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      return addCorsHeaders(response, request);
+    }
+
+    // Optional: Additional checks (recommended)
+    // if (new Date(data.expirationTime) < new Date()) { ... expired ... }
+
+    // CDP keys
     if (!API_KEY_ID || !API_KEY_SECRET) {
-      response = NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
-      );
+      response = NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
       return addCorsHeaders(response, request);
     }
 
-    // 3. Get true client IP (required by Coinbase) — works reliably on Vercel production
-    const clientIp = request.ip;
-    if (!clientIp) {
-      response = NextResponse.json(
-        { error: 'Unable to determine client IP' },
-        { status: 400 }
-      );
-      return addCorsHeaders(response, request);
-    }
+    // Client IP
+    const clientIp = request.ip || '127.0.0.1';
 
-    // 4. Determine wallet address securely
-    let address: string;
-
-    // Preferred: Use stored address from DB (most secure)
-    const storedAddress = await getStoredAddressForFid(userFid);
-    if (storedAddress && isValidEthereumAddress(storedAddress)) {
-      address = storedAddress;
-    } else {
-      // Fallback: Accept client-provided address (safe because endpoint is authenticated)
-      let body;
-      try {
-        body = await request.json();
-      } catch {
-        response = NextResponse.json(
-          { error: 'Invalid JSON body' },
-          { status: 400 }
-        );
-        return addCorsHeaders(response, request);
-      }
-
-      const clientAddress = body.address?.trim();
-      if (!clientAddress || !isValidEthereumAddress(clientAddress)) {
-        response = NextResponse.json(
-          { error: 'Invalid or missing wallet address' },
-          { status: 400 }
-        );
-        return addCorsHeaders(response, request);
-      }
-
-      address = clientAddress;
-    }
-
-    // 5. Generate JWT for Coinbase API
+    // Generate session token for the authenticated address
     const jwtToken = await generateJwt({
       apiKeyId: API_KEY_ID,
       apiKeySecret: API_KEY_SECRET,
@@ -140,7 +69,6 @@ export async function POST(request: NextRequest) {
       requestPath: '/onramp/v1/token',
     });
 
-    // 6. Request session token from Coinbase
     const coinbaseResponse = await fetch('https://api.developer.coinbase.com/onramp/v1/token', {
       method: 'POST',
       headers: {
@@ -150,47 +78,28 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         addresses: [{ address, blockchains: ['base'] }],
         assets: ['ETH', 'USDC'],
-        clientIp, // Required for fraud detection
+        clientIp,
       }),
     });
 
     const data = await coinbaseResponse.json();
 
-    console.log('Coinbase Onramp Token Response:', coinbaseResponse.status, data);
-
     if (!coinbaseResponse.ok) {
-      response = NextResponse.json(
-        { error: 'Failed to generate session token', details: data },
-        { status: 500 }
-      );
+      console.error('Coinbase error:', data);
+      response = NextResponse.json({ error: 'Failed to get session token' }, { status: 500 });
       return addCorsHeaders(response, request);
     }
 
-    // 7. Success — return only the session token
     response = NextResponse.json({ sessionToken: data.token });
     return addCorsHeaders(response, request);
   } catch (err: any) {
     console.error('Onramp session error:', err);
-    response = NextResponse.json(
-      { error: 'Internal server error', message: err.message },
-      { status: 500 }
-    );
+    response = NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     return addCorsHeaders(response, request);
   }
 }
 
-// Handle preflight OPTIONS request with strict CORS
 export async function OPTIONS(request: NextRequest) {
   const response = new NextResponse(null, { status: 204 });
-
-  const origin = request.headers.get('origin');
-  if (origin === ALLOWED_ORIGIN) {
-    response.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
-    response.headers.set('Access-Control-Allow-Credentials', 'true');
-  }
-
-  response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
-
-  return response;
+  return addCorsHeaders(response, request);
 }
