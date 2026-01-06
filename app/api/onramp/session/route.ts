@@ -6,35 +6,28 @@ import { generateJwt } from '@coinbase/cdp-sdk/auth';
 const API_KEY_ID = process.env.CDP_API_KEY_ID?.trim();
 const API_KEY_SECRET = process.env.CDP_API_KEY_SECRET?.trim();
 
-const ALLOWED_ORIGINS = [
-  'https://cards-tcg-store.vercel.app', // Vercel deployment
-];
+const ALLOWED_ORIGINS = ['https://cards-tcg-store.vercel.app'];
 
 export async function POST(request: NextRequest) {
-  // === CORS Preflight Handling ===
   const origin = request.headers.get('origin');
 
-  if (origin && ALLOWED_ORIGINS.includes(origin)) {
-    // CORS headers on all responses below
-  } else {
-    // Reject requests from unknown origins
+  // Reject unknown origins early
+  if (origin && !ALLOWED_ORIGINS.includes(origin)) {
     return new NextResponse('CORS origin not allowed', { status: 403 });
   }
 
   try {
     if (!API_KEY_ID || !API_KEY_SECRET) {
-      return NextResponse.json(
-        { error: 'Missing API key config' },
-        { status: 500, headers: { 'Access-Control-Allow-Origin': origin || '' } }
-      );
+      const res = NextResponse.json({ error: 'Missing API key config' }, { status: 500 });
+      if (origin) res.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGINS[0]);
+      return res;
     }
 
     const { address } = await request.json();
     if (!address || !address.startsWith('0x')) {
-      return NextResponse.json(
-        { error: 'Invalid address' },
-        { status: 400, headers: { 'Access-Control-Allow-Origin': origin || '' } }
-      );
+      const res = NextResponse.json({ error: 'Invalid address' }, { status: 400 });
+      if (origin) res.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGINS[0]);
+      return res;
     }
 
     const jwtToken = await generateJwt({
@@ -62,34 +55,27 @@ export async function POST(request: NextRequest) {
     console.log('Coinbase status:', res.status, 'Response:', data);
 
     if (!res.ok) {
-      return NextResponse.json(
-        { error: 'Coinbase failed', details: data },
-        { status: 500, headers: { 'Access-Control-Allow-Origin': origin || '' } }
-      );
+      const errorRes = NextResponse.json({ error: 'Coinbase failed', details: data }, { status: 500 });
+      if (origin) errorRes.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGINS[0]);
+      return errorRes;
     }
 
-    // Success — return session token
+    // Success
     const response = NextResponse.json({ sessionToken: data.token });
-
-    // Set CORS headers
-    response.headers.set('Access-Control-Allow-Origin', origin || '');
+    response.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGINS[0]);
     response.headers.set('Access-Control-Allow-Methods', 'POST');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
 
     return response;
-
   } catch (err: any) {
     console.error('Error:', err);
-    const response = NextResponse.json(
-      { error: 'Server error', msg: err.message },
-      { status: 500 }
-    );
-    response.headers.set('Access-Control-Allow-Origin', origin || '');
-    return response;
+    const errorRes = NextResponse.json({ error: 'Server error', msg: err.message }, { status: 500 });
+    if (origin) errorRes.headers.set('Access-Control-Allow-Origin', ALLOWED_ORIGINS[0]);
+    return errorRes;
   }
 }
 
-// Handle preflight OPTIONS request
+// Preflight handler
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin');
 
@@ -97,13 +83,13 @@ export async function OPTIONS(request: NextRequest) {
     return new NextResponse(null, {
       status: 204,
       headers: {
-        'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0],  // My domain only
+        'Access-Control-Allow-Origin': ALLOWED_ORIGINS[0],
         'Access-Control-Allow-Methods': 'POST',
         'Access-Control-Allow-Headers': 'Content-Type',
       },
     });
   }
 
-  // Bad origin — no ACAO header at all
+  // Bad origin — no ACAO header
   return new NextResponse('CORS origin not allowed', { status: 403 });
 }
