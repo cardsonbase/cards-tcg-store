@@ -617,13 +617,17 @@ render={({ onClick, status, isLoading }) => (
           return;
         }
 
-        const url = getOnrampBuyUrl({
-          projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
-          sessionToken,
-          presetFiatAmount: 5,
-          fiatCurrency: 'USD',
-          assets: ['ETH', 'USDC'],
-        });
+        // Inside the onClick, after getting sessionToken...
+const url = getOnrampBuyUrl({
+  projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
+  sessionToken,
+  presetFiatAmount: 5,
+  fiatCurrency: 'USD',
+  assets: ['ETH', 'USDC'],
+});
+
+// Open in NEW TAB instead of popup — avoids all Smart Wallet popup conflicts
+window.open(url, '_blank', 'noopener,noreferrer');
 
         // Critical fix: Delay popup to avoid Smart Wallet closing it
         setTimeout(() => {
