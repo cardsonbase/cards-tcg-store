@@ -15,15 +15,22 @@ function isValidSignature(
 ): boolean {
   try {
     // ERC-6492 detection: signature ends with this magic bytes (hex)
-    const ERC6492_SUFFIX = '6492649264926492649264926492649264926492649264926492';
+    function isValidSignature(
+  address: string,
+  message: string,
+  signature: string
+): boolean {
+  try {
+    const ERC6492_SUFFIX = '6492649264926492649264926492649264926492649264926492'; // 32 bytes = 64 hex chars
+
     if (signature.toLowerCase().endsWith(ERC6492_SUFFIX.toLowerCase())) {
-      // Extract the actual signature (last 130 characters = 65 bytes hex)
-      const actualSigHex = '0x' + signature.slice(-130);
+      // Extract the last 130 hex chars (65 bytes = 130 hex + '0x') before the suffix
+      const actualSigHex = '0x' + signature.slice(-130 - 64, -64); // Skip the 64-char suffix
       const recovered = ethers.verifyMessage(message, actualSigHex);
       return recovered.toLowerCase() === address.toLowerCase();
     }
 
-    // Standard personal_sign (MetaMask, etc.)
+    // Standard signature
     const recovered = ethers.verifyMessage(message, signature);
     return recovered.toLowerCase() === address.toLowerCase();
   } catch (error) {
