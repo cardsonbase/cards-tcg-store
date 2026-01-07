@@ -636,7 +636,7 @@ render={({ onClick, status, isLoading }) => (
             'coinbase-onramp',
             `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
           );
-        }, 400); // 400ms delay — tested sweet spot
+        }, 800); // 800ms delay — tested sweet spot
 
       } catch (err: any) {
         console.error('Onramp error:', err);
