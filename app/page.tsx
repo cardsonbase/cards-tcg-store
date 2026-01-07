@@ -617,17 +617,13 @@ render={({ onClick, status, isLoading }) => (
           return;
         }
 
-        // Inside the onClick, after getting sessionToken...
-const url = getOnrampBuyUrl({
-  projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
-  sessionToken,
-  presetFiatAmount: 5,
-  fiatCurrency: 'USD',
-  assets: ['ETH', 'USDC'],
-});
-
-// Open in NEW TAB instead of popup — avoids all Smart Wallet popup conflicts
-window.open(url, '_blank', 'noopener,noreferrer');
+        const url = getOnrampBuyUrl({
+          projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
+          sessionToken,
+          presetFiatAmount: 5,
+          fiatCurrency: 'USD',
+          assets: ['ETH', 'USDC'],
+        });
 
         // Critical fix: Delay popup to avoid Smart Wallet closing it
         setTimeout(() => {
@@ -640,7 +636,7 @@ window.open(url, '_blank', 'noopener,noreferrer');
             'coinbase-onramp',
             `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
           );
-        }, 800); // 800ms delay — tested sweet spot
+        }, 400); // 400ms delay — tested sweet spot
 
       } catch (err: any) {
         console.error('Onramp error:', err);
