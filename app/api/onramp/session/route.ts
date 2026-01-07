@@ -7,25 +7,27 @@ import { ethers } from 'ethers';
 const API_KEY_ID = process.env.CDP_API_KEY_ID?.trim();
 const API_KEY_SECRET = process.env.CDP_API_KEY_SECRET?.trim();
 
-// Helper to support Coinbase Smart Wallet (passkey-based) signatures
-async function isValidSmartWalletSignature(
+// Handles both standard EOA signatures and Coinbase Smart Wallet ERC-6492 wrapped signatures
+function isValidSignature(
   address: string,
   message: string,
   signature: string
-): Promise<boolean> {
+): boolean {
   try {
-    // ERC-6492 magic suffix for undeployed smart wallets (Coinbase Smart Wallet uses this)
-    const ERC6492_MAGIC = '6492649264926492649264926492649264926492649264926492';
-    if (signature.endsWith(ERC6492_MAGIC)) {
-      // Extract the actual EOA-style signature (last 130 chars = 65 bytes hex)
-      const actualSig = '0x' + signature.slice(-130);
-      return ethers.verifyMessage(message, actualSig).toLowerCase() === address.toLowerCase();
+    // ERC-6492 detection: signature ends with this magic bytes (hex)
+    const ERC6492_SUFFIX = '6492649264926492649264926492649264926492649264926492';
+    if (signature.toLowerCase().endsWith(ERC6492_SUFFIX.toLowerCase())) {
+      // Extract the actual signature (last 130 characters = 65 bytes hex)
+      const actualSigHex = '0x' + signature.slice(-130);
+      const recovered = ethers.verifyMessage(message, actualSigHex);
+      return recovered.toLowerCase() === address.toLowerCase();
     }
 
     // Standard personal_sign (MetaMask, etc.)
-    return ethers.verifyMessage(message, signature).toLowerCase() === address.toLowerCase();
+    const recovered = ethers.verifyMessage(message, signature);
+    return recovered.toLowerCase() === address.toLowerCase();
   } catch (error) {
-    console.error('Signature validation error:', error);
+    console.error('Signature verification failed:', error);
     return false;
   }
 }
@@ -47,7 +49,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid wallet address' }, { status: 400 });
     }
 
-    // Timestamp replay protection
+    // Replay protection via timestamp in message
     const timestampMatch = message.match(/Timestamp: (\d+)/);
     if (!timestampMatch) {
       return NextResponse.json({ error: 'Invalid message format' }, { status: 400 });
@@ -58,8 +60,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Signature expired' }, { status: 401 });
     }
 
-    // Verify signature (supports both EOA and Smart Wallet)
-    if (!(await isValidSmartWalletSignature(address, message, signature))) {
+    // Verify signature — now supports Coinbase Smart Wallet
+    if (!isValidSignature(address, message, signature)) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unable to determine client IP' }, { status: 400 });
     }
 
-    // Generate JWT for Coinbase
+    // Generate JWT for Coinbase API
     const jwtToken = await generateJwt({
       apiKeyId: API_KEY_ID,
       apiKeySecret: API_KEY_SECRET,
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
       requestPath: '/onramp/v1/token',
     });
 
-    // Request session token from Coinbase
+    // Request session token
     const coinbaseResponse = await fetch('https://api.developer.coinbase.com/onramp/v1/token', {
       method: 'POST',
       headers: {
@@ -95,7 +97,7 @@ export async function POST(request: NextRequest) {
     const data = await coinbaseResponse.json();
 
     if (!coinbaseResponse.ok) {
-      console.error('Coinbase error:', coinbaseResponse.status, data);
+      console.error('Coinbase API error:', coinbaseResponse.status, data);
       return NextResponse.json({ error: 'Failed to generate session token' }, { status: 500 });
     }
 
