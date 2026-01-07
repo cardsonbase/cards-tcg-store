@@ -633,7 +633,8 @@ render={({ onClick, status, isLoading }) => (
     }}
     // ... same styles
   >
-    Buy ETH/USDC with Card via Coinbase Onramp
+    Buy ETH/USDC with
+    Coinbase Onramp
   </button>
 )}
 
