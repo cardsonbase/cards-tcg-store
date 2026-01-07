@@ -1,30 +1,12 @@
+// /app/api/onramp/session/route.ts
+
 import { NextResponse, NextRequest } from 'next/server';
 import { generateJwt } from '@coinbase/cdp-sdk/auth';
 import { ethers } from 'ethers';
+import { verifyMessage } from '@ambire/signature-validator'; // <--- New import
 
 const API_KEY_ID = process.env.CDP_API_KEY_ID?.trim();
 const API_KEY_SECRET = process.env.CDP_API_KEY_SECRET?.trim();
-
-// Handles both standard EOA and Coinbase Smart Wallet (ERC-6492) signatures
-function isValidSignature(address: string, message: string, signature: string): boolean {
-  try {
-    const ERC6492_SUFFIX = '6492649264926492649264926492649264926492649264926492';
-
-    if (signature.toLowerCase().endsWith(ERC6492_SUFFIX.toLowerCase())) {
-      // Extract the actual signature: last 130 hex chars before the 64-char suffix
-      const actualSigHex = '0x' + signature.slice(-130 - 64, -64);
-      const recovered = ethers.verifyMessage(message, actualSigHex);
-      return recovered.toLowerCase() === address.toLowerCase();
-    }
-
-    // Standard signature (MetaMask, etc.)
-    const recovered = ethers.verifyMessage(message, signature);
-    return recovered.toLowerCase() === address.toLowerCase();
-  } catch (error) {
-    console.error('Signature verification failed:', error);
-    return false;
-  }
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,20 +32,29 @@ export async function POST(request: NextRequest) {
     }
     const ts = parseInt(timestampMatch[1]);
     const age = Date.now() - ts;
-    if (age > 300000 || age < 0) {
+    if (age > 300000 || age < 0) { // 5 minutes
       return NextResponse.json({ error: 'Signature expired' }, { status: 401 });
     }
 
-    // Verify signature (now works with Base Smart Wallet PIN)
-    if (!isValidSignature(address, message, signature)) {
+    // Verify with Ambire library — handles EOA, ERC-1271, and ERC-6492 (Smart Wallet) automatically
+    const isValid = await verifyMessage({
+      signer: address,
+      message: message,
+      signature: signature,
+      provider: ethers.getDefaultProvider('base'), // or any Base RPC — needed for deployed contract checks
+    });
+
+    if (!isValid) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
+    // Get client IP
     const clientIp = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
     if (!clientIp) {
       return NextResponse.json({ error: 'Unable to determine client IP' }, { status: 400 });
     }
 
+    // Generate JWT and call Coinbase
     const jwtToken = await generateJwt({
       apiKeyId: API_KEY_ID,
       apiKeySecret: API_KEY_SECRET,
