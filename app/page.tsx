@@ -589,83 +589,83 @@ render={({ onClick, status, isLoading }) => (
   <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
         {/* Fund Button — only show when connected */}
     {isConnected && address && (
-      <button
-        onClick={async () => {
-          try {
-            // 1. Create message with timestamp
-            const timestamp = Date.now();
-            const message = `Authenticate to fund wallet on CARDS Collectibles\nTimestamp: ${timestamp}`;
+  <button
+    onClick={async () => {
+      try {
+        const timestamp = Date.now();
+        const message = `Authenticate to fund wallet on CARDS Collectibles\nTimestamp: ${timestamp}`;
 
-            // 2. Use the hook (already defined at top level)
-            const signature = await signMessageAsync({ message });
+        const signature = await signMessageAsync({ message });
 
-            // 3. Send to backend
-            const res = await fetch('/api/onramp/session', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ address, message, signature }),
-            });
+        const res = await fetch('/api/onramp/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address, message, signature }),
+        });
 
-            if (!res.ok) {
-              const error = await res.text();
-              alert('Authentication failed. Please try again.');
-              console.error('Auth failed:', error);
-              return;
-            }
+        if (!res.ok) {
+          const error = await res.text();
+          alert('Authentication failed. Please try again.');
+          console.error('Auth failed:', error);
+          return;
+        }
 
-            const { sessionToken } = await res.json();
+        const { sessionToken } = await res.json();
 
-            if (!sessionToken) {
-              alert('No session token received.');
-              return;
-            }
+        if (!sessionToken) {
+          alert('No session token received.');
+          return;
+        }
 
-            // 4. Build and open Onramp in centered popup
-            const url = getOnrampBuyUrl({
-              projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
-              sessionToken,
-              presetFiatAmount: 5,
-              fiatCurrency: 'USD',
-              assets: ['ETH', 'USDC'],
-            });
+        const url = getOnrampBuyUrl({
+          projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID!,
+          sessionToken,
+          presetFiatAmount: 5,
+          fiatCurrency: 'USD',
+          assets: ['ETH', 'USDC'],
+        });
 
-            const width = 480;
-            const height = 720;
-            const left = window.screen.width / 2 - width / 2;
-            const top = window.screen.height / 2 - height / 2;
-            window.open(
-              url,
-              'coinbase-onramp',
-              `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
-            );
-          } catch (err: any) {
-            console.error('Onramp sign error:', err);
-            if (err?.cause?.code === 4001) {
-              alert('You rejected the signature request.');
-            } else {
-              alert('Signing failed. Please try again.');
-            }
-          }
-        }}
-        style={{
-          background: "#ffd700",
-          color: "#000",
-          padding: "16px 32px",
-          borderRadius: "24px",
-          fontWeight: "bold",
-          fontSize: "22px",
-          boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-          transition: "transform 0.3s",
-          border: "none",
-          display: "inline-block",
-          cursor: "pointer",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-      >
-        Buy ETH/USDC with Card
-      </button>
-    )}
+        // Critical fix: Delay popup to avoid Smart Wallet closing it
+        setTimeout(() => {
+          const width = 480;
+          const height = 720;
+          const left = window.screen.width / 2 - width / 2;
+          const top = window.screen.height / 2 - height / 2;
+          window.open(
+            url,
+            'coinbase-onramp',
+            `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+          );
+        }, 400); // 400ms delay — tested sweet spot
+
+      } catch (err: any) {
+        console.error('Onramp error:', err);
+        if (err?.cause?.code === 4001) {
+          alert('You rejected the signature request.');
+        } else {
+          alert('Signing failed. Please try again.');
+        }
+      }
+    }}
+    style={{
+      background: "#ffd700",
+      color: "#000",
+      padding: "16px 32px",
+      borderRadius: "24px",
+      fontWeight: "bold",
+      fontSize: "22px",
+      boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+      transition: "transform 0.3s",
+      border: "none",
+      display: "inline-block",
+      cursor: "pointer",
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+  >
+    Buy ETH/USDC with Card
+  </button>
+)}
 
     {/* Swap Button — only show when connected */}
     {isConnected && (
