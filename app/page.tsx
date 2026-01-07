@@ -26,6 +26,7 @@ import dynamic from "next/dynamic";
 import { useAccount, useDisconnect } from 'wagmi';
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund';
 import { base } from 'wagmi/chains';
+import { useSignMessage } from 'wagmi';
 
 export default function Home() {
   const [price, setPrice] = useState(0.00005);
