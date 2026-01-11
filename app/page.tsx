@@ -23,31 +23,13 @@ import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import { ref, onValue } from "firebase/database";
 import { useCart } from "@/lib/cart";
 import dynamic from "next/dynamic";
-import { useAccount, useDisconnect } from 'wagmi';
+import { useAccount, useDisconnect, usePublicClient } from 'wagmi';
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund';
 import { base } from 'wagmi/chains';
 import { useSignMessage } from 'wagmi';
-import { usePublicClient } from 'wagmi';
 
-export default function Home() {
-  const [price, setPrice] = useState(0.00005);
-  const [products, setProducts] = useState<any[]>([]);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"all" | "slabs" | "boosters">("all");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const cart = useCart();
-  const [showCart, setShowCart] = useState(false);
-  const [showSwapModal, setShowSwapModal] = useState(false);
-  const [treasuryEth, setTreasuryEth] = useState(0);
-  const [showHowToBuy, setShowHowToBuy] = useState(false);
-  const { setFrameReady, isFrameReady } = useMiniKit();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { address, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
-  const { signMessageAsync } = useSignMessage();
-  const publicClient = usePublicClient(); // Defaults to your wagmi config chain (Base)
-
-  const PAIR_ABI = [
+// ── ABIs ────────────────────────────────────────────────────────────────────────
+const PAIR_ABI = [
   {
     constant: true,
     inputs: [],
@@ -103,24 +85,40 @@ const CHAINLINK_ETH_USD_ABI = [
   },
 ] as const;
 
+// ── Constants ───────────────────────────────────────────────────────────────────
 const WETH_ADDRESS = '0x4200000000000000000000000000000000000006' as const;
 const CARDS_ADDRESS = '0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d' as const;
-const PAIR_ADDRESS = '0xd739228018b3d0b3222d34ce869e55891471549c' as const; // Current Uniswap V2 pair
-const ETH_USD_ORACLE = '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70' as const; // Chainlink ETH/USD on Base
+const PAIR_ADDRESS = '0xd739228018b3d0b3222d34ce869e55891471549c' as const;
+const ETH_USD_ORACLE = '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70' as const;
 
-  export default function Home() {
+// ── Main Component ──────────────────────────────────────────────────────────────
+export default function Home() {
   const [price, setPrice] = useState(0.000012); // initial fallback value
-
+  const [products, setProducts] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "slabs" | "boosters">("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const cart = useCart();
+  const [showCart, setShowCart] = useState(false);
+  const [showSwapModal, setShowSwapModal] = useState(false);
+  const [treasuryEth, setTreasuryEth] = useState(0);
+  const [showHowToBuy, setShowHowToBuy] = useState(false);
+  const { setFrameReady, isFrameReady } = useMiniKit();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { signMessageAsync } = useSignMessage();
   const publicClient = usePublicClient();
 
+  // ── On-chain price fetching ─────────────────────────────────────────────────
   useEffect(() => {
-    let lastGoodPrice = 0.000012; // sensible starting point
+    let lastGoodPrice = 0.000012; // fallback / starting point
 
     const fetchPrice = async () => {
       try {
         if (!publicClient) throw new Error("Public client not available");
 
-        // 1. Get token0 and token1 from the pair
+        // 1. Get pair tokens
         const [token0, token1] = await Promise.all([
           publicClient.readContract({
             address: PAIR_ADDRESS,
@@ -144,7 +142,7 @@ const ETH_USD_ORACLE = '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70' as const; //
         const reserve0 = BigInt(reserves[0]);
         const reserve1 = BigInt(reserves[1]);
 
-        // 3. Determine which is WETH and which is CARDS
+        // 3. Assign reserves correctly
         const isWethToken0 = token0.toLowerCase() === WETH_ADDRESS.toLowerCase();
         const reserveWeth = isWethToken0 ? reserve0 : reserve1;
         const reserveCards = isWethToken0 ? reserve1 : reserve0;
@@ -153,59 +151,53 @@ const ETH_USD_ORACLE = '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70' as const; //
           throw new Error("Zero reserves in pool");
         }
 
-        // 4. Get CARDS decimals (should be 9)
+        // 4. Get token decimals
         const cardsDecimals = await publicClient.readContract({
           address: CARDS_ADDRESS,
           abi: ERC20_ABI,
           functionName: 'decimals',
         });
-
         const CARDS_DECIMALS = BigInt(cardsDecimals);
 
-        // 5. Normalize reserves to 18 decimals (standard for precision)
-        const reserveWethNormalized = reserveWeth; // already 18 decimals
+        // 5. Normalize to 18 decimals
+        const reserveWethNormalized = reserveWeth;
         const reserveCardsNormalized = reserveCards * (10n ** (18n - CARDS_DECIMALS));
 
-        // 6. Price: how many ETH for 1 CARDS (18-decimal precision)
+        // 6. Price of 1 CARDS in ETH
         const priceCardsInEthBig = (reserveWethNormalized * (10n ** 18n)) / reserveCardsNormalized;
         const priceCardsInEth = Number(priceCardsInEthBig) / 1e18;
 
-        // 7. Get ETH/USD from Chainlink
+        // 7. ETH/USD from Chainlink
         const oracleData = await publicClient.readContract({
           address: ETH_USD_ORACLE,
           abi: CHAINLINK_ETH_USD_ABI,
           functionName: 'latestRoundData',
         });
 
-        const ethUsdRaw = oracleData[1]; // int256
+        const ethUsdRaw = oracleData[1];
         if (ethUsdRaw <= 0n) throw new Error("Invalid Chainlink price");
-        const ethUsd = Number(ethUsdRaw) / 1e8; // Chainlink uses 8 decimals
+        const ethUsd = Number(ethUsdRaw) / 1e8;
 
-        // 8. Final price: 1 CARDS in USD
+        // 8. Final USD price
         const newPrice = priceCardsInEth * ethUsd;
 
         if (isNaN(newPrice) || newPrice <= 0) {
-          throw new Error("Calculated price invalid");
+          throw new Error("Invalid calculated price");
         }
 
         setPrice(newPrice);
         lastGoodPrice = newPrice;
 
-        // Optional: log for debugging
         console.log(`CARDS Price: $${newPrice.toFixed(9)} | ETH/USD: $${ethUsd.toFixed(2)}`);
 
       } catch (err) {
         console.error("On-chain price fetch failed:", err);
-        setPrice(lastGoodPrice); // fallback to last known good price
+        setPrice(lastGoodPrice);
       }
     };
 
-    // Initial fetch
     fetchPrice();
-
-    // Poll every 12 seconds (Base block time ~2s, but kinder to RPC)
     const interval = setInterval(fetchPrice, 12000);
-
     return () => clearInterval(interval);
   }, [publicClient]);
 
