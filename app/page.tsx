@@ -27,6 +27,7 @@ import { useAccount, useDisconnect } from 'wagmi';
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund';
 import { base } from 'wagmi/chains';
 import { useSignMessage } from 'wagmi';
+import { usePublicClient } from 'wagmi';
 
 export default function Home() {
   const [price, setPrice] = useState(0.00005);
@@ -44,6 +45,57 @@ export default function Home() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
+
+  const PAIR_ABI = [
+  {
+    constant: true,
+    inputs: [],
+    name: 'getReserves',
+    outputs: [
+      { name: '_reserve0', type: 'uint112' },
+      { name: '_reserve1', type: 'uint112' },
+      { name: '_blockTimestampLast', type: 'uint32' },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'token0',
+    outputs: [{ name: '', type: 'address' }],
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'token1',
+    outputs: [{ name: '', type: 'address' }],
+    type: 'function',
+  },
+] as const;
+
+const ORACLE_ABI = [
+  {
+    inputs: [],
+    name: 'latestRoundData',
+    outputs: [
+      { internalType: 'uint80', name: 'roundId', type: 'uint80' },
+      { internalType: 'int256', name: 'answer', type: 'int256' },
+      { internalType: 'uint256', name: 'startedAt', type: 'uint256' },
+      { internalType: 'uint256', name: 'updatedAt', type: 'uint256' },
+      { internalType: 'uint80', name: 'answeredInRound', type: 'uint80' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const;
+
+const WETH_ADDRESS = '0x4200000000000000000000000000000000000006' as const;
+const CARDS_ADDRESS = '0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d' as const;
+const PAIR_ADDRESS = '0xd739228018b3d0b3222d34ce869e55891471549c' as const; // Your current Uniswap V2 pair
+const ETH_USD_ORACLE = '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70' as const; // Chainlink ETH/USD on Base
 
   useEffect(() => {
   let lastGoodPrice = 0.000012;   // ← sensible initial value or load from localStorage
