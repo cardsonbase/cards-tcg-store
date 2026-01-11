@@ -45,6 +45,7 @@ export default function Home() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
+  const publicClient = usePublicClient(); // Defaults to your wagmi config chain (Base)
 
   const PAIR_ABI = [
   {
@@ -98,55 +99,74 @@ const PAIR_ADDRESS = '0xd739228018b3d0b3222d34ce869e55891471549c' as const; // Y
 const ETH_USD_ORACLE = '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70' as const; // Chainlink ETH/USD on Base
 
   useEffect(() => {
-  let lastGoodPrice = 0.000012;   // ← sensible initial value or load from localStorage
+  let lastGoodPrice = 0.000012; // Initial fallback or from localStorage
   let lastGoodLiquidity = 0;
 
   const fetchPrice = async () => {
     try {
-      const res = await fetch(
-        "https://api.dexscreener.com/latest/dex/tokens/0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d",
-        { cache: "no-cache", headers: { "Cache-Control": "no-cache" } }
-      );
+      // 1. Get tokens from pair (future-proof if pair tokens swap)
+      const token0 = await publicClient.readContract({
+        address: PAIR_ADDRESS,
+        abi: PAIR_ABI,
+        functionName: 'token0',
+      });
+      const token1 = await publicClient.readContract({
+        address: PAIR_ADDRESS,
+        abi: PAIR_ABI,
+        functionName: 'token1',
+      });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // 2. Get reserves
+      const reserves = await publicClient.readContract({
+        address: PAIR_ADDRESS,
+        abi: PAIR_ABI,
+        functionName: 'getReserves',
+      });
+      const reserve0 = BigInt(reserves[0]);
+      const reserve1 = BigInt(reserves[1]);
 
-      const data = await res.json();
+      // Determine which reserve is WETH/CARDS
+      const isWethToken0 = token0.toLowerCase() === WETH_ADDRESS.toLowerCase();
+      const reserveWeth = isWethToken0 ? reserve0 : reserve1;
+      const reserveCards = isWethToken0 ? reserve1 : reserve0;
 
-      if (!data?.pairs?.length) {
-        console.warn("No pairs → using last known good price");
-        setPrice(lastGoodPrice);
-        return;
+      if (reserveWeth === 0n || reserveCards === 0n) {
+        throw new Error('Zero reserves');
       }
 
-      // Filter Base + sort by liquidity (handles future multi-pair scenarios)
-      const basePairs = data.pairs
-        .filter(p => p.chainId === "base")
-        .filter(p => (p.liquidity?.usd || 0) > 100); // ignore dust pools
+      // 3. Get ETH/USD from Chainlink
+      const oracleData = await publicClient.readContract({
+        address: ETH_USD_ORACLE,
+        abi: ORACLE_ABI,
+        functionName: 'latestRoundData',
+      });
+      const ethUsd = Number(oracleData[1]) / 1e8; // Chainlink scale: 8 decimals
 
-      if (basePairs.length === 0) {
-        setPrice(lastGoodPrice);
-        return;
-      }
+      // 4. Calculate CARDS USD: (reserveWeth / reserveCards) * ethUsd
+      // Use BigInt for precision, then convert to float
+      const cardsEthBig = (reserveWeth * 10n**18n) / reserveCards; // 18 decimals for ETH
+      const cardsEth = Number(cardsEthBig) / 1e18;
+      const newPrice = cardsEth * ethUsd;
 
-      basePairs.sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0));
-
-      const primaryPair = basePairs[0];
-      const newPrice = parseFloat(primaryPair.priceUsd);
+      // Optional: Calc liquidity USD (for display or logging)
+      const liquidityUsd = (Number(reserveWeth) / 1e18) * ethUsd * 2; // Total value locked
 
       if (!isNaN(newPrice) && newPrice > 0) {
         setPrice(newPrice);
         lastGoodPrice = newPrice;
-        lastGoodLiquidity = primaryPair.liquidity?.usd || 0;
-        // Optional: save to localStorage for page refresh persistence
+        lastGoodLiquidity = liquidityUsd;
+        // Optional: localStorage.setItem('lastCardsPrice', newPrice.toString());
+      } else {
+        throw new Error('Invalid price calc');
       }
     } catch (err) {
-      console.error("Price fetch failed:", err);
+      console.error('On-chain price fetch failed:', err);
       setPrice(lastGoodPrice);
     }
   };
 
   fetchPrice();
-  const interval = setInterval(fetchPrice, 12000); // 12s → kinder to API
+  const interval = setInterval(fetchPrice, 12000); // 12s poll (Base block ~2s, but conservative)
   return () => clearInterval(interval);
 }, []);
 
