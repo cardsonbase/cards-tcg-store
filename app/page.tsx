@@ -46,27 +46,57 @@ export default function Home() {
   const { signMessageAsync } = useSignMessage();
 
   useEffect(() => {
-    const fetchPrice = async () => {
-      try {
-        const res = await fetch("https://api.dexscreener.com/latest/dex/pairs/base/0xd739228018b3d0b3222d34ce869e55891471549c", {
-          cache: "no-cache",
-          headers: { "Cache-Control": "no-cache" }
-        });
-        const data = await res.json();
-        if (data.pairs && data.pairs.length > 0) {
-          const newPrice = parseFloat(data.pairs[0].priceUsd);
-          setPrice(newPrice);
-        }
-      } catch (err) {
-        console.error("Price fetch failed:", err);
-        setPrice(0.00000066593);
-      }
-    };
+  let lastGoodPrice = 0.000012;   // ← sensible initial value or load from localStorage
+  let lastGoodLiquidity = 0;
 
-    fetchPrice();
-    const id = setInterval(fetchPrice, 10000);
-    return () => clearInterval(id);
-  }, []);
+  const fetchPrice = async () => {
+    try {
+      const res = await fetch(
+        "https://api.dexscreener.com/latest/dex/tokens/0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d",
+        { cache: "no-cache", headers: { "Cache-Control": "no-cache" } }
+      );
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+
+      if (!data?.pairs?.length) {
+        console.warn("No pairs → using last known good price");
+        setPrice(lastGoodPrice);
+        return;
+      }
+
+      // Filter Base + sort by liquidity (handles future multi-pair scenarios)
+      const basePairs = data.pairs
+        .filter(p => p.chainId === "base")
+        .filter(p => (p.liquidity?.usd || 0) > 100); // ignore dust pools
+
+      if (basePairs.length === 0) {
+        setPrice(lastGoodPrice);
+        return;
+      }
+
+      basePairs.sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0));
+
+      const primaryPair = basePairs[0];
+      const newPrice = parseFloat(primaryPair.priceUsd);
+
+      if (!isNaN(newPrice) && newPrice > 0) {
+        setPrice(newPrice);
+        lastGoodPrice = newPrice;
+        lastGoodLiquidity = primaryPair.liquidity?.usd || 0;
+        // Optional: save to localStorage for page refresh persistence
+      }
+    } catch (err) {
+      console.error("Price fetch failed:", err);
+      setPrice(lastGoodPrice);
+    }
+  };
+
+  fetchPrice();
+  const interval = setInterval(fetchPrice, 12000); // 12s → kinder to API
+  return () => clearInterval(interval);
+}, []);
 
   useEffect(() => {
     const fetchTreasury = async () => {
