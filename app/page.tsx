@@ -112,94 +112,87 @@ export default function Home() {
 
   // ── On-chain price fetching ─────────────────────────────────────────────────
   useEffect(() => {
-    let lastGoodPrice = 0.000012; // fallback / starting point
+  let lastGoodPrice = 0.00000855; // update to recent known good value
 
-    const fetchPrice = async () => {
-      try {
-        if (!publicClient) throw new Error("Public client not available");
+  const fetchPrice = async () => {
+    try {
+      if (!publicClient) throw new Error("No public client");
 
-        // 1. Get pair tokens
-        const [token0, token1] = await Promise.all([
-          publicClient.readContract({
-            address: PAIR_ADDRESS,
-            abi: PAIR_ABI,
-            functionName: 'token0',
-          }),
-          publicClient.readContract({
-            address: PAIR_ADDRESS,
-            abi: PAIR_ABI,
-            functionName: 'token1',
-          }),
-        ]);
+      // Get pair tokens
+      const [token0, token1] = await Promise.all([
+        publicClient.readContract({ address: PAIR_ADDRESS, abi: PAIR_ABI, functionName: 'token0' }),
+        publicClient.readContract({ address: PAIR_ADDRESS, abi: PAIR_ABI, functionName: 'token1' }),
+      ]);
 
-        // 2. Get reserves
-        const reserves = await publicClient.readContract({
-          address: PAIR_ADDRESS,
-          abi: PAIR_ABI,
-          functionName: 'getReserves',
-        });
+      // Reserves
+      const reserves = await publicClient.readContract({
+        address: PAIR_ADDRESS,
+        abi: PAIR_ABI,
+        functionName: 'getReserves',
+      });
+      const reserve0 = BigInt(reserves[0]);
+      const reserve1 = BigInt(reserves[1]);
 
-        const reserve0 = BigInt(reserves[0]);
-        const reserve1 = BigInt(reserves[1]);
+      console.log("Raw reserves:", { reserve0: reserve0.toString(), reserve1: reserve1.toString() });
 
-        // 3. Assign reserves correctly
-        const isWethToken0 = token0.toLowerCase() === WETH_ADDRESS.toLowerCase();
-        const reserveWeth = isWethToken0 ? reserve0 : reserve1;
-        const reserveCards = isWethToken0 ? reserve1 : reserve0;
+      // Assign
+      const isWeth0 = token0.toLowerCase() === WETH_ADDRESS.toLowerCase();
+      let reserveWeth = isWeth0 ? reserve0 : reserve1;
+      let reserveCards = isWeth0 ? reserve1 : reserve0;
 
-        if (reserveWeth === 0n || reserveCards === 0n) {
-          throw new Error("Zero reserves in pool");
-        }
+      console.log("Assigned:", { reserveWeth: reserveWeth.toString(), reserveCards: reserveCards.toString(), isWeth0 });
 
-        // 4. Get token decimals
-        const cardsDecimals = await publicClient.readContract({
-          address: CARDS_ADDRESS,
-          abi: ERC20_ABI,
-          functionName: 'decimals',
-        });
-        const CARDS_DECIMALS = BigInt(cardsDecimals);
+      if (reserveWeth === 0n || reserveCards === 0n) throw new Error("Zero reserves");
 
-        // 5. Normalize to 18 decimals
-        const reserveWethNormalized = reserveWeth;
-        const reserveCardsNormalized = reserveCards * (10n ** (18n - CARDS_DECIMALS));
+      // Decimals
+      const cardsDecimalsNum = await publicClient.readContract({
+        address: CARDS_ADDRESS,
+        abi: ERC20_ABI,
+        functionName: 'decimals',
+      });
+      const CARDS_DECIMALS = BigInt(cardsDecimalsNum);
+      console.log("CARDS decimals:", Number(CARDS_DECIMALS)); // should log 9
 
-        // 6. Price of 1 CARDS in ETH
-        const priceCardsInEthBig = (reserveWethNormalized * (10n ** 18n)) / reserveCardsNormalized;
-        const priceCardsInEth = Number(priceCardsInEthBig) / 1e18;
+      // Normalize (WETH 18 dec, CARDS 9 dec → scale CARDS up)
+      const reserveCardsNorm = reserveCards * (10n ** (18n - CARDS_DECIMALS));
 
-        // 7. ETH/USD from Chainlink
-        const oracleData = await publicClient.readContract({
-          address: ETH_USD_ORACLE,
-          abi: CHAINLINK_ETH_USD_ABI,
-          functionName: 'latestRoundData',
-        });
+      // Price: ETH per 1 CARDS (small number)
+      const ethPerCardsScaled = (reserveWeth * (10n ** 18n)) / reserveCardsNorm;
+      const ethPerCards = Number(ethPerCardsScaled) / 1e18;
 
-        const ethUsdRaw = oracleData[1];
-        if (ethUsdRaw <= 0n) throw new Error("Invalid Chainlink price");
-        const ethUsd = Number(ethUsdRaw) / 1e8;
+      console.log("ETH per CARDS:", ethPerCards);
 
-        // 8. Final USD price
-        const newPrice = priceCardsInEth * ethUsd;
+      // Chainlink ETH/USD
+      const oracle = await publicClient.readContract({
+        address: ETH_USD_ORACLE,
+        abi: CHAINLINK_ETH_USD_ABI,
+        functionName: 'latestRoundData',
+      });
+      const ethUsd = Number(oracle[1]) / 1e8;
+      console.log("ETH/USD:", ethUsd);
 
-        if (isNaN(newPrice) || newPrice <= 0) {
-          throw new Error("Invalid calculated price");
-        }
+      // Final: USD per CARDS
+      let newPrice = ethPerCards * ethUsd;
 
-        setPrice(newPrice);
-        lastGoodPrice = newPrice;
-
-        console.log(`CARDS Price: $${newPrice.toFixed(9)} | ETH/USD: $${ethUsd.toFixed(2)}`);
-
-      } catch (err) {
-        console.error("On-chain price fetch failed:", err);
-        setPrice(lastGoodPrice);
+      // Sanity: if price looks impossible (e.g. >$0.001 or <$1e-7), fallback
+      if (newPrice > 0.001 || newPrice < 1e-7 || isNaN(newPrice)) {
+        throw new Error("Sanity check failed - price out of range");
       }
-    };
 
-    fetchPrice();
-    const interval = setInterval(fetchPrice, 12000);
-    return () => clearInterval(interval);
-  }, [publicClient]);
+      setPrice(newPrice);
+      lastGoodPrice = newPrice;
+
+      console.log(`Final CARDS USD price: $${newPrice.toFixed(10)}`);
+    } catch (err) {
+      console.error("Price fetch error:", err);
+      setPrice(lastGoodPrice);
+    }
+  };
+
+  fetchPrice();
+  const id = setInterval(fetchPrice, 15000); // slightly longer interval
+  return () => clearInterval(id);
+}, [publicClient]);
 
   useEffect(() => {
     const fetchTreasury = async () => {
