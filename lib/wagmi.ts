@@ -2,7 +2,7 @@ import { http, createConfig } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { coinbaseWallet } from 'wagmi/connectors';
 import { farcasterMiniApp } from '@farcaster/miniapp-wagmi-connector';
-import { Attribution } from 'ox/erc8021';  
+import { Attribution } from 'ox/ercs/erc8021';  
 
 const DATA_SUFFIX = Attribution.toDataSuffix({
   codes: [bc_xssv1xje],
