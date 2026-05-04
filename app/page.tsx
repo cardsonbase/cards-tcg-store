@@ -794,28 +794,30 @@ render={({ onClick, status, isLoading }) => (
 )}
 
     {/* Swap Button — only show when connected */}
-    {isConnected && (
-      <button
-        onClick={() => setShowSwapModal(true)}
-        style={{
-          background: "#ffd700",
-          color: "#000",
-          padding: "16px 32px",
-          borderRadius: "24px",
-          fontWeight: "bold",
-          fontSize: "22px",
-          boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-          transition: "transform 0.3s",
-          border: "none",
-          cursor: "pointer",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-      >
-        Trade $CARDS on Uniswap
-      </button>
-    )}
-  </div>
+{isConnected && (
+  <button
+    onClick={() => {
+      const uniswapUrl = `https://app.uniswap.org/#/swap?chain=base&inputCurrency=0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d&outputCurrency=ETH`;
+      window.open(uniswapUrl, '_blank', 'noopener,noreferrer');
+    }}
+    style={{
+      background: "#ffd700",
+      color: "#000",
+      padding: "16px 32px",
+      borderRadius: "24px",
+      fontWeight: "bold",
+      fontSize: "22px",
+      boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+      transition: "transform 0.3s",
+      border: "none",
+      cursor: "pointer",
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+  >
+    Trade $CARDS on Uniswap ↗
+  </button>
+)}
 
   {/* Message when not connected */}
   {!isConnected && (
