@@ -100,7 +100,6 @@ export default function Home() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const cart = useCart();
   const [showCart, setShowCart] = useState(false);
-  const [showSwapModal, setShowSwapModal] = useState(false);
   const [treasuryEth, setTreasuryEth] = useState(0);
   const [showHowToBuy, setShowHowToBuy] = useState(false);
   const { setFrameReady, isFrameReady } = useMiniKit();
@@ -1045,47 +1044,6 @@ render={({ onClick, status, isLoading }) => (
         </div>
       )}
 
-      {/* SWAP MODAL — Uniswap Widget */}
-      {showSwapModal && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          background: "rgba(0,0,0,0.9)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 1000,
-        }} onClick={() => setShowSwapModal(false)}>
-          <div
-            style={{
-              background: "#111",
-              border: "3px solid #ffd700",
-              borderRadius: "24px",
-              padding: "40px",
-              maxWidth: "600px",
-              width: "90%",
-              maxHeight: "90vh",
-              overflowY: "auto",
-              position: "relative",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <iframe
-              src="https://app.uniswap.org/swap?chain=base&inputCurrency=0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d&outputCurrency=ETH&use=v2"
-              height="660"
-              width="100%"
-              style={{
-                border: "0",
-                borderRadius: "16px",
-              }}
-            />
-          </div>
-        </div>
-      )}
-
       {/* HOW TO BUY GUIDE – ZERO-KNOWLEDGE ONBOARDING */}
       {showHowToBuy && (
         <div
@@ -1162,13 +1120,13 @@ render={({ onClick, status, isLoading }) => (
   </span>
 </li>
 
-              <li style={{ marginBottom: "20px" }}>
-                <strong>3. Swap to $CARDS (optional for discount)</strong>
+               <li style={{ marginBottom: "20px" }}>
+                <strong>3. Swap to $CARDS (optional for 10% off + free shipping)</strong>
                 <br />
-                Tap “Trade $CARDS on Uniswap” → widget opens here → select ETH to $CARDS → swap.
+                Tap “Trade $CARDS on Uniswap” → it will open Uniswap in a new tab (already pre-filled with ETH → $CARDS on Base).
                 <br />
                 <span style={{ color: "#ffd700", fontSize: "16px" }}>
-                  Note: Includes ~3.5% trade tax (funds our tokens utilites, ecosystem, & discounts)—expect to get slightly less $CARDS. Skip for ETH/USDC payments.
+                  Note: Includes ~3.5% trade tax (funds our token utilities, ecosystem, & discounts)—expect to get slightly less $CARDS. Skip if you just want to pay with ETH/USDC.
                 </span>
               </li>
 
