@@ -1072,7 +1072,7 @@ render={({ onClick, status, isLoading }) => (
             onClick={(e) => e.stopPropagation()}
           >
             <iframe
-              src="https://app.uniswap.org/swap?inputCurrency=ETH&outputCurrency=0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d&chain=base"
+              src="https://app.uniswap.org/swap?chain=base&inputCurrency=0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d&outputCurrency=ETH&use=v2"
               height="660"
               width="100%"
               style={{
