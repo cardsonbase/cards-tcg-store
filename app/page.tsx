@@ -22,10 +22,8 @@ import { db } from "@/lib/firebase";
 import { useMiniKit } from "@coinbase/onchainkit/minikit";
 import { ref, onValue } from "firebase/database";
 import { useCart } from "@/lib/cart";
-import dynamic from "next/dynamic";
 import { useAccount, useDisconnect, usePublicClient } from 'wagmi';
 import { getOnrampBuyUrl } from '@coinbase/onchainkit/fund';
-import { base } from 'wagmi/chains';
 import { useSignMessage } from 'wagmi';
 
 // ── ABIs ────────────────────────────────────────────────────────────────────────
@@ -93,7 +91,7 @@ const ETH_USD_ORACLE = '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70' as const;
 
 // ── Main Component ──────────────────────────────────────────────────────────────
 export default function Home() {
-  const [price, setPrice] = useState(0.000012); // initial fallback value
+  const [price, setPrice] = useState(0.000012);
   const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "slabs" | "boosters">("all");
@@ -111,88 +109,70 @@ export default function Home() {
 
   // ── On-chain price fetching ─────────────────────────────────────────────────
   useEffect(() => {
-  let lastGoodPrice = 0.00000855; // update to recent known good value
+    let lastGoodPrice = 0.00000855;
 
-  const fetchPrice = async () => {
-    try {
-      if (!publicClient) throw new Error("No public client");
+    const fetchPrice = async () => {
+      try {
+        if (!publicClient) throw new Error("No public client");
 
-      // Get pair tokens
-      const [token0, token1] = await Promise.all([
-        publicClient.readContract({ address: PAIR_ADDRESS, abi: PAIR_ABI, functionName: 'token0' }),
-        publicClient.readContract({ address: PAIR_ADDRESS, abi: PAIR_ABI, functionName: 'token1' }),
-      ]);
+        const [token0, token1] = await Promise.all([
+          publicClient.readContract({ address: PAIR_ADDRESS, abi: PAIR_ABI, functionName: 'token0' }),
+          publicClient.readContract({ address: PAIR_ADDRESS, abi: PAIR_ABI, functionName: 'token1' }),
+        ]);
 
-      // Reserves
-      const reserves = await publicClient.readContract({
-        address: PAIR_ADDRESS,
-        abi: PAIR_ABI,
-        functionName: 'getReserves',
-      });
-      const reserve0 = BigInt(reserves[0]);
-      const reserve1 = BigInt(reserves[1]);
+        const reserves = await publicClient.readContract({
+          address: PAIR_ADDRESS,
+          abi: PAIR_ABI,
+          functionName: 'getReserves',
+        });
+        const reserve0 = BigInt(reserves[0]);
+        const reserve1 = BigInt(reserves[1]);
 
-      console.log("Raw reserves:", { reserve0: reserve0.toString(), reserve1: reserve1.toString() });
+        const isWeth0 = token0.toLowerCase() === WETH_ADDRESS.toLowerCase();
+        let reserveWeth = isWeth0 ? reserve0 : reserve1;
+        let reserveCards = isWeth0 ? reserve1 : reserve0;
 
-      // Assign
-      const isWeth0 = token0.toLowerCase() === WETH_ADDRESS.toLowerCase();
-      let reserveWeth = isWeth0 ? reserve0 : reserve1;
-      let reserveCards = isWeth0 ? reserve1 : reserve0;
+        if (reserveWeth === 0n || reserveCards === 0n) throw new Error("Zero reserves");
 
-      console.log("Assigned:", { reserveWeth: reserveWeth.toString(), reserveCards: reserveCards.toString(), isWeth0 });
+        const cardsDecimalsNum = await publicClient.readContract({
+          address: CARDS_ADDRESS,
+          abi: ERC20_ABI,
+          functionName: 'decimals',
+        });
+        const CARDS_DECIMALS = BigInt(cardsDecimalsNum);
 
-      if (reserveWeth === 0n || reserveCards === 0n) throw new Error("Zero reserves");
+        const reserveCardsNorm = reserveCards * (10n ** (18n - CARDS_DECIMALS));
 
-      // Decimals
-      const cardsDecimalsNum = await publicClient.readContract({
-        address: CARDS_ADDRESS,
-        abi: ERC20_ABI,
-        functionName: 'decimals',
-      });
-      const CARDS_DECIMALS = BigInt(cardsDecimalsNum);
-      console.log("CARDS decimals:", Number(CARDS_DECIMALS)); // should log 9
+        const ethPerCardsScaled = (reserveWeth * (10n ** 18n)) / reserveCardsNorm;
+        const ethPerCards = Number(ethPerCardsScaled) / 1e18;
 
-      // Normalize (WETH 18 dec, CARDS 9 dec → scale CARDS up)
-      const reserveCardsNorm = reserveCards * (10n ** (18n - CARDS_DECIMALS));
+        const oracle = await publicClient.readContract({
+          address: ETH_USD_ORACLE,
+          abi: CHAINLINK_ETH_USD_ABI,
+          functionName: 'latestRoundData',
+        });
+        const ethUsd = Number(oracle[1]) / 1e8;
 
-      // Price: ETH per 1 CARDS (small number)
-      const ethPerCardsScaled = (reserveWeth * (10n ** 18n)) / reserveCardsNorm;
-      const ethPerCards = Number(ethPerCardsScaled) / 1e18;
+        let newPrice = ethPerCards * ethUsd;
 
-      console.log("ETH per CARDS:", ethPerCards);
+        if (newPrice > 0.001 || newPrice < 1e-7 || isNaN(newPrice)) {
+          throw new Error("Sanity check failed");
+        }
 
-      // Chainlink ETH/USD
-      const oracle = await publicClient.readContract({
-        address: ETH_USD_ORACLE,
-        abi: CHAINLINK_ETH_USD_ABI,
-        functionName: 'latestRoundData',
-      });
-      const ethUsd = Number(oracle[1]) / 1e8;
-      console.log("ETH/USD:", ethUsd);
-
-      // Final: USD per CARDS
-      let newPrice = ethPerCards * ethUsd;
-
-      // Sanity: if price looks impossible (e.g. >$0.001 or <$1e-7), fallback
-      if (newPrice > 0.001 || newPrice < 1e-7 || isNaN(newPrice)) {
-        throw new Error("Sanity check failed - price out of range");
+        setPrice(newPrice);
+        lastGoodPrice = newPrice;
+      } catch (err) {
+        console.error("Price fetch error:", err);
+        setPrice(lastGoodPrice);
       }
+    };
 
-      setPrice(newPrice);
-      lastGoodPrice = newPrice;
+    fetchPrice();
+    const id = setInterval(fetchPrice, 15000);
+    return () => clearInterval(id);
+  }, [publicClient]);
 
-      console.log(`Final CARDS USD price: $${newPrice.toFixed(10)}`);
-    } catch (err) {
-      console.error("Price fetch error:", err);
-      setPrice(lastGoodPrice);
-    }
-  };
-
-  fetchPrice();
-  const id = setInterval(fetchPrice, 15000); // slightly longer interval
-  return () => clearInterval(id);
-}, [publicClient]);
-
+  // Treasury balance
   useEffect(() => {
     const fetchTreasury = async () => {
       try {
@@ -200,7 +180,6 @@ export default function Home() {
           `https://api.basescan.org/api?module=account&action=balance&address=0x4380603428C0c102B5110B4ED068ca9084835d24&tag=latest&apikey=`
         );
         const data = await res.json();
-
         if (data.status === "1") {
           setTreasuryEth(parseFloat(data.result) / 1e18);
           return;
@@ -222,7 +201,7 @@ export default function Home() {
         const balance = parseInt(data.result, 16);
         setTreasuryEth(balance / 1e18);
       } catch (err) {
-        console.error("Both treasury fetches failed", err);
+        console.error("Treasury fetch failed", err);
         setTreasuryEth(0);
       }
     };
@@ -232,20 +211,15 @@ export default function Home() {
     return () => clearInterval(id);
   }, []);
 
-  // 1. Call setFrameReady IMMEDIATELY when the page loads (hides splash fastest)
+  // MiniKit frame ready
   useEffect(() => {
-    if (!isFrameReady) {
-      setFrameReady();
-    }
+    if (!isFrameReady) setFrameReady();
   }, [isFrameReady, setFrameReady]);
 
-  // 2. Your existing Firebase products listener (updated with extra safety call)
+  // Firebase products
   useEffect(() => {
-    // Skip on server-side rendering
     if (typeof window === "undefined") return;
-
     const prodRef = ref(db, "products");
-
     const unsubscribe = onValue(prodRef, (snap) => {
       const data = snap.val() || {};
       const list = Object.entries(data).map(([id, p]: any) => ({
@@ -257,15 +231,9 @@ export default function Home() {
         weightOz: Number(p.weightOz) || 8,
         category: p.category || "uncategorized",
       }));
-
       setProducts(list);
-
-      // Extra safety: call again after products load
-      if (!isFrameReady) {
-        setFrameReady();
-      }
+      if (!isFrameReady) setFrameReady();
     });
-
     return () => unsubscribe();
   }, [isFrameReady, setFrameReady]);
 
@@ -275,7 +243,7 @@ export default function Home() {
     .filter((p) => filter === "all" || (filter === "slabs" && p.weightOz <= 5) || (filter === "boosters" && p.weightOz > 5));
 
   const cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
-  
+
   return (
     <>
       {/* Floating Gold Cart Button */}
@@ -305,55 +273,53 @@ export default function Home() {
 
       {/* Main Page */}
       <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #000 0%, #111 100%)", color: "#fff", fontFamily: "Inter, sans-serif" }}>
+        {/* HEADER + WALLET (unchanged) */}
         <header className="header" style={{ padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #333" }}>
-          {/* LOGO — PERFECT, NO STRETCH, CRISP */}
+          {/* ... your full header code stays exactly the same ... */}
+          {/* (I kept your entire header exactly as you had it) */}
+          {/* LOGO */}
           <div className="flex items-center h-20">
-            <img
-              src="/logo.png"
-              alt="$CARDS"
-              className="h-full w-auto max-w-none"
-              style={{ objectFit: "contain" }}
-            />
+            <img src="/logo.png" alt="$CARDS" className="h-full w-auto max-w-none" style={{ objectFit: "contain" }} />
           </div>
 
-          {/* CENTER: TITLE + PRICE + TREASURY — NOW PERFECTLY ALIGNED WITH THE REST OF THE SITE */}
-         <div className="header-center" style={{ textAlign: "center", flex: 1, paddingRight: "50px" }}>
-         <h1 style={{ 
-         fontSize: "48px", 
-         fontWeight: "bold", 
-         background: "linear-gradient(90deg, #ffd700, #ffed4e)", 
-         WebkitBackgroundClip: "text", 
-         WebkitTextFillColor: "transparent",
-         margin: "0 0 24px 0",
-         fontFamily: "'Cinzel', serif"
-         }}>
-         CARDS COLLECTIBLES
-        </h1>
-  <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live $CARDS Price</p>
-  <p style={{ 
-    fontSize: "32px", 
-    fontWeight: "bold", 
-    background: "linear-gradient(90deg, #ffd700, #00ff9d)", 
-    WebkitBackgroundClip: "text", 
-    WebkitTextFillColor: "transparent",
-    animation: "glow 2s ease-in-out infinite alternate",
-    textShadow: "0 0 15px rgba(255,215,0,0.4)"
-  }}>
-    ${price.toFixed(7)}
-  </p>
-  <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live Treasury Balance</p>
-  <p style={{ 
-    fontSize: "28px", 
-    fontWeight: "bold", 
-    background: "linear-gradient(90deg, #ffd700, #00ff9d)", 
-    WebkitBackgroundClip: "text", 
-    WebkitTextFillColor: "transparent",
-    animation: "glow 2s ease-in-out infinite alternate",
-    textShadow: "0 0 15px rgba(255,215,0,0.4)"
-  }}>
-    {treasuryEth.toFixed(4)} ETH
-  </p>
-</div>
+          {/* CENTER TITLE + PRICE + TREASURY */}
+          <div className="header-center" style={{ textAlign: "center", flex: 1, paddingRight: "50px" }}>
+            <h1 style={{ 
+              fontSize: "48px", 
+              fontWeight: "bold", 
+              background: "linear-gradient(90deg, #ffd700, #ffed4e)", 
+              WebkitBackgroundClip: "text", 
+              WebkitTextFillColor: "transparent",
+              margin: "0 0 24px 0",
+              fontFamily: "'Cinzel', serif"
+            }}>
+              CARDS COLLECTIBLES
+            </h1>
+            <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live $CARDS Price</p>
+            <p style={{ 
+              fontSize: "32px", 
+              fontWeight: "bold", 
+              background: "linear-gradient(90deg, #ffd700, #00ff9d)", 
+              WebkitBackgroundClip: "text", 
+              WebkitTextFillColor: "transparent",
+              animation: "glow 2s ease-in-out infinite alternate",
+              textShadow: "0 0 15px rgba(255,215,0,0.4)"
+            }}>
+              ${price.toFixed(7)}
+            </p>
+            <p style={{ color: "#aaa", fontSize: "16px", margin: "4px 0" }}>Live Treasury Balance</p>
+            <p style={{ 
+              fontSize: "28px", 
+              fontWeight: "bold", 
+              background: "linear-gradient(90deg, #ffd700, #00ff9d)", 
+              WebkitBackgroundClip: "text", 
+              WebkitTextFillColor: "transparent",
+              animation: "glow 2s ease-in-out infinite alternate",
+              textShadow: "0 0 15px rgba(255,215,0,0.4)"
+            }}>
+              {treasuryEth.toFixed(4)} ETH
+            </p>
+          </div>
 
           {/* X LINK + DEXTOOLS + FARCASTER + BASESCAN + WALLET */}
           <div className="header-right" style={{ display: "flex", alignItems: "center", gap: "20px" }}>
@@ -531,19 +497,19 @@ export default function Home() {
               />
             </a>
 
-            <Wallet>
+  <Wallet>
               <ConnectWallet
-render={({ onClick, status, isLoading }) => (
-  <button
-    onClick={() => {
-      if (status === 'disconnected') {
-        onClick();
-      } else {
-        setIsDropdownOpen((prev) => !prev);
-      }
-    }}
-    disabled={isLoading}
-    style={{
+                render={({ onClick, status, isLoading }) => (
+                  <button
+                    onClick={() => {
+                      if (status === 'disconnected') {
+                        onClick();
+                      } else {
+                        setIsDropdownOpen((prev) => !prev);
+                      }
+                    }}
+                    disabled={isLoading}
+                    style={{
                       position: 'relative',
                       overflow: 'hidden',
                       background: 'linear-gradient(to right, #ffd700, #ffed4e)',
@@ -567,26 +533,23 @@ render={({ onClick, status, isLoading }) => (
                     }}
                   >
                     <div className="flex items-center gap-3">
-      {/* Only render Identity/Avatar/Name when fully connected and address exists */}
-      {status === 'connected' && address ? (
-<>
-  <Identity address={address}>
-    <Avatar className="h-9 w-9 ring-2 ring-black" />
-  </Identity>
-  <Name />
-</>
-) : (
-  <span>{isLoading ? 'Connecting...' : 'Connect Wallet'}</span>
-)}
-    </div>
-  </button>
+                      {status === 'connected' && address ? (
+                        <>
+                          <Identity address={address}>
+                            <Avatar className="h-9 w-9 ring-2 ring-black" />
+                          </Identity>
+                          <Name />
+                        </>
+                      ) : (
+                        <span>{isLoading ? 'Connecting...' : 'Connect Wallet'}</span>
+                      )}
+                    </div>
+                  </button>
                 )}
               />
 
-              {/* Custom Dropdown – properly conditional */}
               {isConnected && isDropdownOpen && (
                 <>
-                  {/* Invisible overlay – only when dropdown is open */}
                   <div
                     style={{
                       position: "fixed",
@@ -596,8 +559,6 @@ render={({ onClick, status, isLoading }) => (
                     }}
                     onClick={() => setIsDropdownOpen(false)}
                   />
-
-                  {/* Dropdown panel */}
                   <div
                     style={{
                       position: "absolute",
@@ -794,54 +755,53 @@ render={({ onClick, status, isLoading }) => (
 
     {/* Swap Button — only show when connected */}
 {isConnected && (
-  <button
-    onClick={() => {
-      const uniswapUrl = `https://app.uniswap.org/#/swap?chain=base&inputCurrency=0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d&outputCurrency=ETH`;
-      window.open(uniswapUrl, '_blank', 'noopener,noreferrer');
-    }}
-    style={{
-      background: "#ffd700",
-      color: "#000",
-      padding: "16px 32px",
-      borderRadius: "24px",
-      fontWeight: "bold",
-      fontSize: "22px",
-      boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
-      transition: "transform 0.3s",
-      border: "none",
-      cursor: "pointer",
-    }}
-    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-  >
-    Trade $CARDS on Uniswap ↗
-  </button>
-)}
+              <button
+                onClick={() => {
+                  const uniswapUrl = `https://app.uniswap.org/#/swap?chain=base&inputCurrency=0x65f3d0b7a1071d4f9aad85957d8986f5cff9ab3d&outputCurrency=ETH`;
+                  window.open(uniswapUrl, '_blank', 'noopener,noreferrer');
+                }}
+                style={{
+                  background: "#ffd700",
+                  color: "#000",
+                  padding: "16px 32px",
+                  borderRadius: "24px",
+                  fontWeight: "bold",
+                  fontSize: "22px",
+                  boxShadow: "0 4px 20px rgba(255,215,0,0.3)",
+                  transition: "transform 0.3s",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              >
+                Trade $CARDS on Uniswap ↗
+              </button>
+            )}
+          </div>
 
-  {/* Message when not connected */}
-  {!isConnected && (
-    <p style={{ color: "#aaa", fontSize: "18px", marginTop: "20px" }}>
-      Connect your wallet above to add funds or swap →
-    </p>
-  )}
+          {!isConnected && (
+            <p style={{ color: "#aaa", fontSize: "18px", marginTop: "20px" }}>
+              Connect your wallet above to add funds or swap →
+            </p>
+          )}
 
-  {/* How to Buy Guide */}
-  <button
-    onClick={() => setShowHowToBuy(true)}
-    style={{
-      marginTop: "20px",
-      background: "transparent",
-      color: "#ffd700",
-      padding: "8px 16px",
-      border: "1px solid #ffd700",
-      borderRadius: "12px",
-      fontSize: "16px",
-      cursor: "pointer",
-    }}
-  >
-    New to crypto? Full beginner guide →
-  </button>
-</div>
+          <button
+            onClick={() => setShowHowToBuy(true)}
+            style={{
+              marginTop: "20px",
+              background: "transparent",
+              color: "#ffd700",
+              padding: "8px 16px",
+              border: "1px solid #ffd700",
+              borderRadius: "12px",
+              fontSize: "16px",
+              cursor: "pointer",
+            }}
+          >
+            New to crypto? Full beginner guide →
+          </button>
+        </div>
 
         {/* Category Dropdown — Centered for Better Flow */}
         <div style={{ textAlign: "center", marginBottom: "20px" }}>
